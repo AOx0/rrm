@@ -11,7 +11,7 @@ async fn main() {
     println!("{:?}", statics::RW_DEFAULT_PATH);
 
     let p: &Path = Path::new("./path/to/123/456");
-    eprintln!("{}", expand!(p).display());
+    eprintln!("{}", p.absolutize().unwrap().display());
 
     if let args::Commands::Install { r#mod } = args.command {
         println!("Su nombre es {}", r#mod);
