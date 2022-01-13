@@ -1,9 +1,8 @@
 use std::path::{Path, PathBuf};
 pub use path_absolutize::Absolutize;
-use crate::expand;
 
 fn list_p(path: &Path) -> Vec<PathBuf> {
-    let contents = expand!(path).read_dir().unwrap();
+    let contents = path.absolutize().unwrap().read_dir().unwrap();
     let mut result = vec![];
     for e  in contents {
         result.push(e.unwrap().path());
