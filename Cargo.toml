@@ -1,0 +1,17 @@
+[package]
+name = "rwm"
+version = "0.1.0"
+edition = "2021"
+authors = ["AOx0"]
+description = "RimWorld command-line interface mod manager"
+
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+execute = "0.2.9"
+clap = { version= "3.0.7", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
+tokio =  { version= "1.15.0", features=["full"] }
+
+rwm_list = {path="rwm_list"}
