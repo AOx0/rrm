@@ -1,26 +1,9 @@
-use std::path::PathBuf;
-
-#[derive(Debug)]
-struct Mod {
-    pub path: PathBuf,
-    pub name: String,
-    pub identifier: String,
-    pub version: String
-}
-
-
-use std::fs::File;
-use std::io::{BufReader, Read};
-
 extern crate xml;
 
 use xml::reader::{EventReader, XmlEvent};
+use std::io::{BufReader, Read};
+use std::fs::File;
 
-fn indent(size: usize) -> String {
-    const INDENT: &'static str = "    ";
-    (0..size).map(|_| INDENT)
-        .fold(String::with_capacity(size*INDENT.len()), |r, s| r + s)
-}
 
 #[derive(Debug)]
 pub struct Element {
@@ -29,7 +12,7 @@ pub struct Element {
 }
 
 pub trait XMLFile {
-    fn values_of(&self, keys: Vec<&str>) -> Vec<Element>;
+    fn values_of(&self, keys: &[&str]) -> Vec<Element>;
 }
 
 impl Clone for Element {
@@ -42,7 +25,7 @@ impl Clone for Element {
 }
 
 impl XMLFile for File {
-    fn values_of(&self, keys: Vec<&str>) -> Vec<Element> {
+    fn values_of(&self, keys: &[&str]) -> Vec<Element> {
         let mut r = vec![];
         let mut record = Element {
             value: "".to_string(),
@@ -59,16 +42,21 @@ impl XMLFile for File {
 
 
         let parser= EventReader::from_str(&contents);
+        let mut depth = 0;
         for e in parser {
             match e {
                 Ok(XmlEvent::StartElement { name, .. }) => {
+                    depth += 1;
                     record.name = name.to_string();
                 }
                 Ok(XmlEvent::Characters(value)) => {
-                    if keys.contains(&&*record.name) {
+                    if keys.contains(&&*record.name) && ([0, 1, 2].contains(&depth)) {
                         record.value  = value;
                         r.push(record.clone());
                     }
+                }
+                Ok(XmlEvent::EndElement { .. }) => {
+                    depth -= 1;
                 }
                 Err(e) => {
                     println!("Error: {}", e);
@@ -86,11 +74,11 @@ fn test() {
     use crate::*;
 
     let file = File::open("/Applications/RimWorld.app/Mods/Achtung/About/Manifest.xml").unwrap();
-    let r = file.values_of(vec!["version", "identifier"]);
+    let r = file.values_of(&["version", "identifier"]);
     println!("{:?}", r);
 
     let file = File::open("/Applications/RimWorld.app/Mods/Area_unlocker/About/Manifest.xml").unwrap();
-    let r = file.values_of(vec!["version", "identifier"]);
+    let r = file.values_of(&["version", "identifier"]);
 
     println!("{:?}", r);
 }
