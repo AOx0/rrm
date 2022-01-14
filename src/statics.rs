@@ -1,3 +1,5 @@
+use std::path::Path;
+
 #[cfg(target_os = "macos")]
 pub const RW_DEFAULT_PATH: [&'static str; 2] = [
     r"/Applications/RimWorld.app/",
@@ -14,3 +16,8 @@ pub const RW_DEFAULT_PATH: [&'static str; 1] = [
     r"C:\Program Files (x86)\Steam\steamapps\common",
     "~/Library/Application Support/Steam/steamapps/common/RimWorld"
 ];
+
+pub fn dir_exists(path: &str) -> bool {
+    let dir = Path::new(path);
+    dir.exists() && dir.is_dir()
+} 
