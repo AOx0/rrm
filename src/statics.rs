@@ -13,11 +13,10 @@ pub const RW_DEFAULT_PATH: [&'static str; 3] = [
 ];
 #[cfg(target_os = "windows")]
 pub const RW_DEFAULT_PATH: [&'static str; 1] = [
-    r"C:\Program Files (x86)\Steam\steamapps\common",
-    "~/Library/Application Support/Steam/steamapps/common/RimWorld"
+    r"C:\Program Files (x86)\Steam\steamapps\common"
 ];
 
 pub fn dir_exists(path: &str) -> bool {
     let dir = Path::new(path);
     dir.exists() && dir.is_dir()
-} 
+}
