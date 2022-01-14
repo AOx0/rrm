@@ -1,6 +1,6 @@
 # rwm
 
-Inspired by Spoons [rmm][1]. This is a cross-platform Mod Manager for RimWorld.
+Inspired by Spoons [rmm][1]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
 
 Up to now, you must have `steamcmd` installed and available within your `PATH`.
 
@@ -54,3 +54,7 @@ You can install it via:
 [4]:	https://developer.valvesoftware.com/wiki/SteamCMD "SteamCMD website"
 [5]:	https://brew.sh "Homebrew"
 [6]:	https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip
+
+
+# To do
+Available [here](https://github.com/AOx0/rwm/projects/1)
