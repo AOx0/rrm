@@ -37,8 +37,8 @@ pub enum Commands {
     ]
     List {
         /// The path where Mods are installed
-        #[clap(required = false, default_value = "None", env="MODS_PATH")]
-        mods_path: String,
+        #[clap(required = false, default_value = "None", env="GAME_PATH")]
+        game_path: String,
     },
 }
 
