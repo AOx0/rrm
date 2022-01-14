@@ -39,6 +39,10 @@ pub enum Commands {
         /// The path where Mods are installed
         #[clap(required = false, default_value = "None", env="GAME_PATH")]
         game_path: String,
+
+        /// The path where Mods are installed
+        #[clap(short, long)]
+        large: bool,
     },
 }
 
