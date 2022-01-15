@@ -17,31 +17,15 @@ pub fn list_mods_at(path: &str, large: bool) {
     let mods = mods_at(path);
     mods.iter().for_each(|m| {
         if large{
-            println!("Path : {}", m[0].path.to_str().unwrap().to_string().replace("About", ""));
+            println!("Path : {}", m[0].path.parent().unwrap().display())
         }
 
-        let mut values = vec![];
-
-        m.iter().for_each(|m| {
-
-            if let Some(about) = &m.about {
-                let file = File::open(about.to_str().unwrap()).unwrap();
-                let value = file.values_of(&fields);
-                value.into_iter().for_each(|value| values.push(value));
-            }
-
-            if let Some(manifest) = &m.manifest {
-                let file = File::open(manifest.to_str().unwrap()).unwrap();
-                let value = file.values_of(&fields);
-                value.into_iter().for_each(|value| values.push(value));
-            }
-        });
-
+        let values = EVector::build_from(m, &fields);
         if large { print_large(values) } else { print_short(values) }
     })
 }
 
-fn print_large(values: Vec<Element>) {
+fn print_large(values: EVector) {
     let info = values.to_hash();
     let mut result = String::from("");
 
@@ -54,7 +38,7 @@ fn print_large(values: Vec<Element>) {
     println!("{result}");
 }
 
-fn print_short(values: Vec<Element>) {
+fn print_short(values: EVector) {
     let info = values.to_hash();
     let mut result = String::from("");
 
@@ -65,11 +49,14 @@ fn print_short(values: Vec<Element>) {
     println!("{result}");
 }
 
+type EVector =  Vec<Element>;
+
 trait ElementVector {
     fn to_hash(self) -> HashMap<String, String>;
+    fn build_from(m: &Vec<ModPaths>, with_fields: &[&str]) -> EVector;
 }
 
-impl ElementVector for Vec<Element> {
+impl ElementVector for EVector {
     fn to_hash(self) -> HashMap<String, String> {
         let mut basic_info = HashMap::new();
         self.into_iter().for_each(|m| {
@@ -77,6 +64,25 @@ impl ElementVector for Vec<Element> {
         });
 
         basic_info
+    }
+
+    fn build_from(m: &Vec<ModPaths>, with_fields: &[&str]) -> EVector {
+        let mut values = vec![];
+        m.iter().for_each(|m| {
+
+            if let Some(about) = &m.about {
+                let file = File::open(about.to_str().unwrap()).unwrap();
+                let value = file.values_of(&with_fields);
+                value.into_iter().for_each(|value| values.push(value));
+            }
+
+            if let Some(manifest) = &m.manifest {
+                let file = File::open(manifest.to_str().unwrap()).unwrap();
+                let value = file.values_of(&with_fields);
+                value.into_iter().for_each(|value| values.push(value));
+            }
+        });
+        values
     }
 }
 
