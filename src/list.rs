@@ -60,8 +60,8 @@ fn print_basic_info(values: Vec<Element>) {
     let mut result = String::from("");
 
     result.push_str(&basic_info.format_field("name", r"VAL"));
-    result.push_str(&basic_info.format_field("author", "by VAL"));
-    result.push_str(&basic_info.format_field("version", "[vVAL]"));
+    result.push_str(&basic_info.format_field("version", " [vVAL]"));
+    result.push_str(&basic_info.format_field("author", "\nby VAL\n"));
 
     println!("{result}");
 }
@@ -73,7 +73,7 @@ trait VersionInfo {
 impl VersionInfo for HashMap<String, String> {
     fn format_field(&self, key: &str, msg: &str) -> String {
         if self.contains_key(key) {
-            format!("{:<50}", msg.replace("VAL",  &self[key]))
+            format!("{}", msg.replace("VAL",  &self[key]))
         } else {
             "".to_string()
         }
