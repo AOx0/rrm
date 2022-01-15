@@ -16,3 +16,4 @@ tokio =  { version= "1.15.0", features=["full"] }
 
 rwm_list = {path="rwm_list"}
 rwm_xml = {path="rwm_xml"}
+rwm_scrap = {path="rwm_scrap"}
