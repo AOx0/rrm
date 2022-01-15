@@ -43,26 +43,28 @@ pub async fn look_for_mod(mod_name: &str) {
 
         //Get rid of unused characters in description.
         let m: String = m
-            .replace("\\t", "")
-            .replace("\\n", "")
-            .replace("\\r", "")
             .replace("\\/", "/")
             .replace(r"<br />", " ")
-            .replace("     ", " ")
-            .replace("    ", " ")
-            .replace("   ", " ")
-            .replace("  ", " ")
             .replace("SharedFileBindMouseHover( ", "");
 
+        //Get rid of \\n \\t \\r, etc.
+        let s: std::borrow::Cow<'_, str> = regex_replace_all!(r#"(\\.)"#, &m, |_, _| {
+            "".to_string()
+        });
+
+        //Get rid of multiple contiguous spaces
+        let s: std::borrow::Cow<'_, str> = regex_replace_all!(r#"( +)"#, &s, |_, _| {
+            " ".to_string()
+        });
+
         //Replace \uXXXX to its actual character
-        let s: std::borrow::Cow<'_, str> = regex_replace_all!(r#"\\u(.{4})"#, &m, |_, num: &str| {
+        let mut m = regex_replace_all!(r#"\\u(.{4})"#, &s, |_, num: &str| {
             let num: u32 = u32::from_str_radix(num, 16).unwrap();
             let c: char = std::char::from_u32(num).unwrap();
             c.to_string()
-        });
+        }).to_string();
 
-        let mut m = s.to_string();
-
+        //Remove ); from the end
         m.remove(m.len()-1);
         m.remove(m.len()-1);
 
