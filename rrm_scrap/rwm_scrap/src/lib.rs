@@ -47,21 +47,21 @@ pub async fn look_for_mod(mod_name: &str) {
             .replace(r"<br />", " ")
             .replace("SharedFileBindMouseHover( ", "");
 
+        //Replace \uXXXX to its actual character
+        let s = regex_replace_all!(r#"\\u(.{4})"#, &m, |_, num: &str| {
+            let num: u32 = u32::from_str_radix(num, 16).unwrap();
+            let c: char = std::char::from_u32(num).unwrap();
+            c.to_string()
+        }).to_string();
+
         //Get rid of \\n \\t \\r, etc.
-        let s: std::borrow::Cow<'_, str> = regex_replace_all!(r#"(\\.)"#, &m, |_, _| {
+        let s = regex_replace_all!(r#"(\\.)"#, &s, |_, _| {
             "".to_string()
         });
 
         //Get rid of multiple contiguous spaces
-        let s: std::borrow::Cow<'_, str> = regex_replace_all!(r#"( +)"#, &s, |_, _| {
+        let mut m = regex_replace_all!(r#"( +)"#, &s, |_, _| {
             " ".to_string()
-        });
-
-        //Replace \uXXXX to its actual character
-        let mut m = regex_replace_all!(r#"\\u(.{4})"#, &s, |_, num: &str| {
-            let num: u32 = u32::from_str_radix(num, 16).unwrap();
-            let c: char = std::char::from_u32(num).unwrap();
-            c.to_string()
         }).to_string();
 
         //Remove ); from the end
