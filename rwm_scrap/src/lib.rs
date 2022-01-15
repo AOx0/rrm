@@ -26,6 +26,8 @@ async fn get_contents(url: &str) -> String {
     resp
 }
 
+pub type ModsSteamInfo = Vec<ModSteamInfo>;
+
 pub async fn look_for_mod(mod_name: &str) {
     use scraper::{Html, Selector};
 
@@ -34,10 +36,12 @@ pub async fn look_for_mod(mod_name: &str) {
             .replace("URL", mod_name)
     ).await;
 
-    let contents: Html = Html::parse_document(&contents);
-    let selector: Selector = Selector::parse("#profileBlock > div > div.workshopBrowseItems > script").unwrap();
+    let mut mods_steam_info: ModsSteamInfo = vec![];
 
-    for element in contents.select(&selector) {
+    let contents: Html = Html::parse_document(&contents);
+    let script: Selector = Selector::parse("#profileBlock > div > div.workshopBrowseItems > script").unwrap();
+
+    for element in contents.select(&script) {
 
         let m  = html_escape::decode_html_entities(element.inner_html().as_str()).to_string();
 
@@ -80,30 +84,43 @@ pub async fn look_for_mod(mod_name: &str) {
             }
         });
 
-        let mod_info = ModSteamInfo {
+         mods_steam_info.push( ModSteamInfo {
             id: msf[0].replace("{id:", ""),
             title: msf[1].replace("title:", ""),
-            description: msf[2].replace("description:", "")
-        };
-
-        println!("{mod_info}")
-
+            description: msf[2].replace("description:", ""),
+            author: "".to_string()
+        });
     }
+
+    let author: Selector = Selector::parse("#profileBlock > div > div.workshopBrowseItems > div > div.workshopItemAuthorName.ellipsis > a").unwrap();
+
+    let mut i = 0;
+    for element in contents.select(&author) {
+
+        mods_steam_info[i].author = element.inner_html().to_string();
+
+        println!("{}", mods_steam_info[i]);
+
+        i+=1;
+    }
+
 }
 
 #[derive(Default)]
 struct ModSteamInfo {
     pub id: String,
     pub title: String,
-    pub description: String
+    pub description: String,
+    pub author: String
 }
 
 impl std::fmt::Display for ModSteamInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "\
                 Title: {} [ID: {}]\n\
+                Author: {}\n\
                 Description: {}\n\
-        ", self.title, self.id, self.description
+        ", self.title, self.id, self.author, self.description
         )
     }
 }
