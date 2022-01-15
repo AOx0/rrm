@@ -17,7 +17,7 @@ pub fn list_mods_at(path: &str, large: bool) {
     let mods = mods_at(path);
     mods.iter().for_each(|m| {
         if large{
-            println!("path : {}", m[0].path.to_str().unwrap().to_string().replace("About", ""));
+            println!("Path : {}", m[0].path.to_str().unwrap().to_string().replace("About", ""));
         }
 
         let mut values = vec![];
@@ -37,33 +37,47 @@ pub fn list_mods_at(path: &str, large: bool) {
             }
         });
 
-        if large {
-            values.iter().for_each(|m| {
-                println!("{} : {}", m.name, m.value);
-            });
-        } else {
-            print_basic_info(values);
-        }
-
-        if large {
-            println!("---\n");
-        }
+        if large { print_large(values) } else { print_short(values) }
     })
 }
 
-fn print_basic_info(values: Vec<Element>) {
-    let mut basic_info = HashMap::new();
-    values.into_iter().for_each(|m| {
-        basic_info.insert( m.name, m.value);
-    });
-
+fn print_large(values: Vec<Element>) {
+    let info = values.to_hash();
     let mut result = String::from("");
 
-    result.push_str(&basic_info.format_field("name", r"VAL"));
-    result.push_str(&basic_info.format_field("version", " [vVAL]"));
-    result.push_str(&basic_info.format_field("author", "\nby VAL\n"));
+    result.push_str(&info.format_field("name", "Name : VAL"));
+    result.push_str(&info.format_field("version", " [vVAL]"));
+    result.push_str(&info.format_field("packageId",  "\npackageId  : VAL\n"));
+    result.push_str(&info.format_field("identifier", "identifier : VAL\n"));
+    result.push_str(&info.format_field("author", "by VAL\n"));
 
     println!("{result}");
+}
+
+fn print_short(values: Vec<Element>) {
+    let info = values.to_hash();
+    let mut result = String::from("");
+
+    result.push_str(&info.format_field("name", r"VAL"));
+    result.push_str(&info.format_field("version", " [vVAL]"));
+    result.push_str(&info.format_field("author", "\nby VAL\n"));
+
+    println!("{result}");
+}
+
+trait ElementVector {
+    fn to_hash(self) -> HashMap<String, String>;
+}
+
+impl ElementVector for Vec<Element> {
+    fn to_hash(self) -> HashMap<String, String> {
+        let mut basic_info = HashMap::new();
+        self.into_iter().for_each(|m| {
+            basic_info.insert( m.name, m.value);
+        });
+
+        basic_info
+    }
 }
 
 trait VersionInfo {
