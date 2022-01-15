@@ -8,18 +8,11 @@ const S_FIELDS: [&str; 3] = ["version", "name", "author"];
 
 
 pub fn list_mods_at(path: &str, large: bool) {
-    let fields: &[&str] = if large {
-        &L_FIELDS
-    } else {
-        &S_FIELDS
-    };
+    let fields: &[&str] = if large { &L_FIELDS } else { &S_FIELDS };
 
     let mods = mods_at(path);
     mods.iter().for_each(|m| {
-        if large{
-            println!("Path : {}", m[0].path.parent().unwrap().display())
-        }
-
+        if large{ println!("Path : {}", m[0].path.parent().unwrap().display()) }
         let values = EVector::build_from(m, &fields);
         if large { print_large(values) } else { print_short(values) }
     })
