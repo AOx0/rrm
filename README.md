@@ -48,13 +48,13 @@ You can install it via:
 	sudo apt update
 	sudo apt install lib32gcc1 steamcmd 
 
+# To do
+Available [here][7]
+
 [1]:	https://github.com/Spoons/rmm "rmm"
 [2]:	https://github.com/AOx0/rwm#install--steamcmd
 [3]:	https://www.rust-lang.org/tools/install
 [4]:	https://developer.valvesoftware.com/wiki/SteamCMD "SteamCMD website"
 [5]:	https://brew.sh "Homebrew"
 [6]:	https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip
-
-
-# To do
-Available [here](https://github.com/AOx0/rwm/projects/1)
+[7]:	https://github.com/AOx0/rwm/projects/1

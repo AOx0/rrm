@@ -3,7 +3,7 @@ use std::path::Path;
 #[cfg(target_os = "macos")]
 pub const RW_DEFAULT_PATH: [&str; 2] = [
     r"/Applications/RimWorld.app/",
-    r"~/Library/Application Support/Steam/steamapps/common/RimWorld"
+    r"~/Library/Application Support/Steam/steamapps/common/RimWorld/RimWorldMac.app/"
 ];
 #[cfg(target_os = "linux")]
 pub const RW_DEFAULT_PATH: [&str; 3] = [
