@@ -14,11 +14,11 @@ pub fn list_mods_at(path: &str, large: bool) {
     mods.iter().for_each(|m| {
         if large{ println!("Path : {}", m[0].path.parent().unwrap().display()) }
         let values = EVector::build_from(m, &fields);
-        if large { print_large(values) } else { print_short(values) }
+        if large { print_large(values, m) } else { print_short(values, m) }
     })
 }
 
-fn print_large(values: EVector) {
+fn print_large(values: EVector, m: &Vec<ModPaths>) {
     let info = values.to_hash();
     let mut result = String::from("");
 
@@ -26,18 +26,21 @@ fn print_large(values: EVector) {
     result.push_str(&info.format_field("version", " [vVAL]"));
     result.push_str(&info.format_field("packageId",  "\npackageId  : VAL\n"));
     result.push_str(&info.format_field("identifier", "identifier : VAL\n"));
-    result.push_str(&info.format_field("author", "by VAL\n"));
+    result.push_str(&info.format_field("author", "by VAL"));
+    result.push_str(&format!(" [steamID: {}]\n", m[0].steam_id));
 
     println!("{result}");
 }
 
-fn print_short(values: EVector) {
+fn print_short(values: EVector, m: &Vec<ModPaths>) {
     let info = values.to_hash();
     let mut result = String::from("");
 
     result.push_str(&info.format_field("name", r"VAL"));
     result.push_str(&info.format_field("version", " [vVAL]"));
-    result.push_str(&info.format_field("author", "\nby VAL\n"));
+    result.push_str(&info.format_field("author", "\nby VAL"));
+    result.push_str(&format!(" [steamID: {}]\n", m[0].steam_id));
+
 
     println!("{result}");
 }

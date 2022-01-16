@@ -1,3 +1,5 @@
+use std::fs::File;
+use std::io::Read;
 pub use path_absolutize::Absolutize;
 use std::path::{Path, PathBuf};
 
@@ -34,7 +36,8 @@ pub fn list_path_abouts(path: &str)  -> Vec<PathBuf> {
 pub struct ModPaths {
     pub about: Option<PathBuf>,
     pub manifest: Option<PathBuf>,
-    pub path: PathBuf
+    pub path: PathBuf,
+    pub steam_id: String
 }
 
 fn get_mods(about_dir: &PathBuf) -> Vec<ModPaths> {
@@ -42,10 +45,18 @@ fn get_mods(about_dir: &PathBuf) -> Vec<ModPaths> {
     list_b(about_dir)
         .iter()
         .for_each(|path| {
+            let parent = path.parent().unwrap();
+            let steam_id = parent.join("PublishedFileId.txt");
+
+            let mut file = File::open(steam_id.clone()).unwrap();
+            let mut steam_id: Vec<u8> = Vec::new();
+            file.read_to_end(&mut steam_id).unwrap();
+
             let m = ModPaths {
                 about: if path.file_name().unwrap() == "About.xml" { Some(PathBuf::from(path)) } else { None },
                 manifest: if path.file_name().unwrap() == "Manifest.xml" { Some(PathBuf::from(path)) } else { None },
-                path: PathBuf::from(path.parent().unwrap())
+                path: PathBuf::from(parent),
+                steam_id: String::from_utf8(steam_id).unwrap()
             };
 
             if m.about.is_some() || m.manifest.is_some() {
