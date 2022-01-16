@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::Read;
 pub use path_absolutize::Absolutize;
 use std::path::{Path, PathBuf};
+use std::process::exit;
 
 fn list_p(path: &Path) -> Vec<PathBuf> {
     let contents = path.absolutize().unwrap().read_dir().unwrap();
@@ -48,7 +49,10 @@ fn get_mods(about_dir: &PathBuf) -> Vec<ModPaths> {
             let parent = path.parent().unwrap();
             let steam_id = parent.join("PublishedFileId.txt");
 
-            let mut file = File::open(steam_id.clone()).unwrap();
+            let mut file = File::open(steam_id.clone()).unwrap_or_else(|_| {
+                eprintln!("Could not find PublishedFileId.txt in path {}", parent.display());
+                exit(1);
+            });
             let mut steam_id: Vec<u8> = Vec::new();
             file.read_to_end(&mut steam_id).unwrap();
 
