@@ -11,38 +11,56 @@ pub fn list_mods_at(path: &str, large: bool) {
     let fields: &[&str] = if large { &L_FIELDS } else { &S_FIELDS };
 
     let mods = mods_at(path);
+
+    if !large {
+        let headers = "".to_string()
+            .add_s(&format!("{:>15}", "Steam ID"))
+            .add_s(&format!("   {:<10}", "Version"))
+            .add_s(&format!("   {:<50}", "Name"))
+            .add_s(&format!("   {:<20}", "Author"))
+            .add_s(&format!("\n{:>15}", "--------"))
+            .add_s(&format!("   {:<10}", "--------"))
+            .add_s(&format!("   {:<50}", "--------"))
+            .add_s(&format!("   {:<20}", "--------"));
+
+        println!("{}", headers);
+    }
+
     mods.iter().for_each(|m| {
         if large{ println!("Path : {}", m[0].path.parent().unwrap().display()) }
         let values = EVector::build_from(m, &fields);
-        if large { print_large(values, m) } else { print_short(values, m) }
+
+        if large {
+            print_large(values, m)
+        } else {
+            print_short(values, m)
+        }
     })
 }
 
 fn print_large(values: EVector, m: &Vec<ModPaths>) {
     let info = values.to_hash();
-    let mut result = String::from("");
+    let result = "".to_string()
+        .add_f(&info,"name", "", |k| format!("Name : {:}", k) )
+        .add_f(&info, "version", "",|k| format!(" [v{:}]", k) )
+        .add_s(&format!(  "\nSteam ID   : {}", m[0].steam_id))
+        .add_f(&info, "packageId",  "",|k| format!("\npackageId  : {}\n", k) )
+        .add_f(&info, "identifier", "",|k| format!("identifier : {}\n", k) )
+        .add_f(&info, "author", "",|k| format!("by {}\n", k) );
 
-    result.push_str(&info.format_field("name", "Name : VAL"));
-    result.push_str(&info.format_field("version", " [vVAL]"));
-    result.push_str(&info.format_field("packageId",  "\npackageId  : VAL\n"));
-    result.push_str(&info.format_field("identifier", "identifier : VAL\n"));
-    result.push_str(&info.format_field("author", "by VAL"));
-    result.push_str(&format!(" [steamID: {}]\n", m[0].steam_id));
-
-    println!("{result}");
+    println!("{}", result);
 }
 
 fn print_short(values: EVector, m: &Vec<ModPaths>) {
     let info = values.to_hash();
-    let mut result = String::from("");
+    let result = "".to_string()
+        .add_s(&format!("{:>15}", m[0].steam_id))
+        .add_f(&info, "version", " ",|k| format!("   {:<10}", k))
+        .add_f(&info, "name", " ",|k| format!("   {:<50}", k))
+        .add_f(&info, "author", " ",|k| format!("   {:<20}", k));
 
-    result.push_str(&info.format_field("name", r"VAL"));
-    result.push_str(&info.format_field("version", " [vVAL]"));
-    result.push_str(&info.format_field("author", "\nby VAL"));
-    result.push_str(&format!(" [steamID: {}]\n", m[0].steam_id));
 
-
-    println!("{result}");
+    println!("{}", result);
 }
 
 type EVector =  Vec<Element>;
@@ -83,16 +101,37 @@ impl ElementVector for EVector {
 }
 
 trait VersionInfo {
-    fn format_field(&self, key: &str, msg: &str) -> String;
+    fn format_field(&self, key: &str, default: &str, msg: impl FnOnce(&str) -> String) -> String;
 }
 
 impl VersionInfo for HashMap<String, String> {
-    fn format_field(&self, key: &str, msg: &str) -> String {
+    fn format_field(&self, key: &str, default: &str, msg: impl FnOnce(&str) -> String) -> String {
         if self.contains_key(key) {
-            format!("{}", msg.replace("VAL",  &self[key]))
+            msg(&self[key])
         } else {
-            "".to_string()
+            if default != "" {
+                msg(default)
+            } else {
+                "".to_string()
+            }
+
         }
 
     }
+}
+
+trait InfoString {
+    fn add_f(&self, m: &HashMap<String, String>, key: &str, default: &str, msg: impl FnOnce(&str) -> String) -> String;
+    fn add_s(&self, msg: &str) -> String;
+}
+
+impl InfoString for String {
+    fn add_f(&self, m: &HashMap<String, String>,  key: &str, default: &str, msg: impl FnOnce(&str) -> String) -> String {
+        format!("{self}{}", &m.format_field(key, default, msg ))
+    }
+
+    fn add_s(&self, msg: &str) -> String {
+        format!("{self}{}", msg)
+    }
+
 }

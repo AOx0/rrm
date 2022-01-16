@@ -56,7 +56,7 @@ fn get_mods(about_dir: &PathBuf) -> Vec<ModPaths> {
                 about: if path.file_name().unwrap() == "About.xml" { Some(PathBuf::from(path)) } else { None },
                 manifest: if path.file_name().unwrap() == "Manifest.xml" { Some(PathBuf::from(path)) } else { None },
                 path: PathBuf::from(parent),
-                steam_id: String::from_utf8(steam_id).unwrap()
+                steam_id: String::from_utf8(steam_id).unwrap().replace("\n", "").replace(" ", "")
             };
 
             if m.about.is_some() || m.manifest.is_some() {
