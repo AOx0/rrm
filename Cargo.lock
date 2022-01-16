@@ -1064,17 +1064,17 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "execute",
- "rwm_list",
+ "rwm_locals",
  "rwm_scrap",
- "rwm_xml",
  "tokio",
 ]
 
 [[package]]
-name = "rwm_list"
+name = "rwm_locals"
 version = "0.1.0"
 dependencies = [
  "path-absolutize",
+ "rwm_xml",
 ]
 
 [[package]]

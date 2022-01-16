@@ -1,9 +1,7 @@
+use rwm_locals::{DisplayType, GameMods};
+
 mod statics;
 mod args;
-mod locals;
-mod utils;
-
-use utils::*;
 
 #[tokio::main]
 async fn main() {
@@ -12,7 +10,7 @@ async fn main() {
     if let args::Commands::List { game_path, large } = args.command {
         if game_path != "None" {
             if statics::dir_exists(&game_path) {
-                list_mods_at(&format!("{}/Mods", game_path), large);
+                list_mods_at(&game_path, DisplayType::from(large));
             } else {
                 eprintln!("Error: \"{}\" is not a valid RimWorld's installation game path.", game_path)
             }
@@ -20,7 +18,7 @@ async fn main() {
             let mut found = false;
             statics::RW_DEFAULT_PATH.into_iter().for_each(|path| {
                 if statics::dir_exists(path) {
-                    list_mods_at(&format!("{}/Mods", path), large);
+                    list_mods_at(path, DisplayType::from(large));
                     found = true;
                 }
             });
@@ -36,9 +34,9 @@ async fn main() {
     }
 }
 
-pub fn list_mods_at(path: &str, large: bool) {
-    let mods = rwm_list::mods_at(path).parse(large);
+pub fn list_mods_at(path: &str, display_type: DisplayType) {
+    let mods: GameMods = GameMods::from(path)
+        .with_display(display_type);
 
-    if !large { println!("{}", Mod::gen_headers()); }
-    mods.iter().for_each(|r#mod| println!("{}", r#mod));
+    mods.display();
 }

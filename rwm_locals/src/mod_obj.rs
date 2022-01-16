@@ -1,7 +1,18 @@
-use std::fmt::{Display, Formatter};
-use rwm_list::ModPaths;
-use crate::utils::*;
+use crate::mod_paths::ModPaths;
+use crate::*;
+use std::io::{Write, Stdout};
 
+pub enum DisplayType { Short, Long }
+
+impl From<bool> for DisplayType {
+    fn from(t: bool) -> Self {
+        if t {
+            DisplayType::Long
+        }  else {
+            DisplayType::Short
+        }
+    }
+}
 
 pub struct Mod {
     path: String,
@@ -11,11 +22,11 @@ pub struct Mod {
     version: Option<String>,
     package_id: Option<String>,
     identifier: Option<String>,
-    large: bool
 }
 
 impl Mod {
-    pub fn from_evec(e_vec: EVector, m: &ModPaths, large: bool) -> Self {
+
+    pub fn from_evec(e_vec: EVector, m: &ModPaths) -> Self {
         let mods = e_vec.to_hash();
 
         Mod {
@@ -25,8 +36,7 @@ impl Mod {
             steam_id: m.steam_id.clone(),
             version: mods.get("version").cloned(),
             package_id: mods.get("packageId").cloned(),
-            identifier: mods.get("identifier").cloned(),
-            large
+            identifier: mods.get("identifier").cloned()
         }
     }
 
@@ -43,22 +53,29 @@ impl Mod {
     }
 
     pub fn gen_large(&self) -> String {
-        let mut result = "".to_string()
+        let mut result = ""
+            .to_string()
             .add_s(format!("Path : {:}\n", self.path))
             .add_s(format!("Name : {:}", self.name));
 
         if self.version.is_some() {
-            result.push_str(&format!(" [v{:}]", self.version.clone().unwrap()) )
+            result.push_str(&format!(" [v{:}]", self.version.clone().unwrap()))
         }
 
-        result.push_str(&format!(    "\nSteam ID   : {}", self.steam_id));
+        result.push_str(&format!("\nSteam ID   : {}", self.steam_id));
 
         if self.package_id.is_some() {
-            result.push_str(&format!("\npackageId  : {}\n", self.package_id.clone().unwrap()))
+            result.push_str(&format!(
+                "\npackageId  : {}\n",
+                self.package_id.clone().unwrap()
+            ))
         }
 
         if self.identifier.is_some() {
-            result.push_str(&format!(  "identifier : {}\n", self.identifier.clone().unwrap()))
+            result.push_str(&format!(
+                "identifier : {}\n",
+                self.identifier.clone().unwrap()
+            ))
         }
 
         result.push_str(&format!("by {}\n", self.author));
@@ -69,19 +86,32 @@ impl Mod {
     pub fn gen_short(&self) -> String {
         "".to_string()
             .add_s(format!("{:>15}", self.steam_id))
-            .add_s(format!("   {:^10}", self.version.clone().unwrap_or(" ".to_string())))
+            .add_s(format!(
+                "   {:^10}",
+                self.version.clone().unwrap_or(" ".to_string())
+            ))
             .add_s(format!("   {:<50}", self.name))
             .add_s(format!("   {:<20}", self.author))
     }
-}
 
-impl Display for Mod {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if self.large {
-            write!(f, "{}", self.gen_large())
+    pub fn display(&self, form: &DisplayType) {
+        let mut f: Stdout = std::io::stdout();
+
+        if let DisplayType::Long = form {
+            write!(f, "{}\n", self.gen_large()).unwrap()
         } else {
-            write!(f, "{}", self.gen_short())
+            write!(f, "{}\n", self.gen_short()).unwrap()
         }
     }
 }
 
+
+trait InfoString {
+    fn add_s(&self, msg: String) -> String;
+}
+
+impl InfoString for String {
+    fn add_s(&self, msg: String) -> String {
+        format!("{self}{}", msg)
+    }
+}

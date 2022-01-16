@@ -1,5 +1,5 @@
 [package]
-name = "rwm_list"
+name = "rwm_locals"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 path-absolutize = "3.0.11"
+rwm_xml = {path = "../rwm_xml"}
