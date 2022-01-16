@@ -2,12 +2,12 @@ mod mod_obj;
 mod mod_paths;
 mod game_path;
 
+use std::ops::Deref;
 pub use mod_obj::*;
 pub use mod_paths::*;
 pub use game_path::*;
 
 use std::process::exit;
-use std::slice::Iter;
 
 pub type Mods = Vec<Mod>;
 
@@ -25,7 +25,7 @@ impl GameMods {
 
     pub fn display(&self) {
         let d_type = self.display_type.as_ref().unwrap_or_else(|| {
-            println!("Error, make sure to set display_type to a variant of DisplayType");
+            eprintln!("Error, make sure to set display_type to a variant of DisplayType");
             exit(1);
         });
 
@@ -35,9 +35,13 @@ impl GameMods {
             m.display(d_type)
         })
     }
+}
 
-    pub fn mods_iter(&mut self) -> Iter<Mod> {
-        self.mods.iter()
+impl Deref for GameMods {
+    type Target = Mods;
+
+    fn deref(&self) -> &Self::Target {
+        &self.mods
     }
 }
 
