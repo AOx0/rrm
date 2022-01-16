@@ -26,8 +26,6 @@ async fn get_contents(url: &str) -> String {
     resp
 }
 
-pub type ModsSteamInfo = Vec<ModSteamInfo>;
-
 pub async fn look_for_mod(mod_name: &str) {
     use scraper::{Html, Selector};
 
@@ -36,7 +34,7 @@ pub async fn look_for_mod(mod_name: &str) {
             .replace("URL", mod_name)
     ).await;
 
-    let mut mods_steam_info: ModsSteamInfo = vec![];
+    let mut mods_steam_info: Vec<ModSteamInfo> = vec![];
 
     let contents: Html = Html::parse_document(&contents);
     let script: Selector = Selector::parse("#profileBlock > div > div.workshopBrowseItems > script").unwrap();
