@@ -12,7 +12,7 @@ async fn main() {
             if statics::dir_exists(&game_path) {
                 list_mods_at(&game_path, DisplayType::from(large));
             } else {
-                eprintln!("Error: \"{}\" is not a valid RimWorld's installation game path.", game_path)
+                eprintln!("Error: \"{}\" is not a valid RimWorld installation path.", game_path)
             }
         } else {
             let mut found = false;
@@ -25,7 +25,7 @@ async fn main() {
 
             if !found {
                 eprintln!("\
-                    Error: Unable to find RimWorld's installation path.\n\
+                    Error: Unable to find RimWorld installation path.\n\
                     Try specifying the path:\n\
                     \trwm list <PATH>        <--- Like this\
                 ")

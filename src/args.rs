@@ -33,14 +33,14 @@ pub enum Commands {
 
     #[clap(
         visible_alias = "l",
-        about = "List installed Mods in ../Mods/")
+        about = crate::statics::LIST_DESCRIPTION)
     ]
     List {
-        /// The path where Mods are installed
+        /// The path where RimWorld is installed
         #[clap(required = false, default_value = "None", env="GAME_PATH")]
         game_path: String,
 
-        /// The path where Mods are installed
+        /// The path where RimWorld is installed
         #[clap(short, long)]
         large: bool,
     },

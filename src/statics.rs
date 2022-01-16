@@ -20,3 +20,8 @@ pub fn dir_exists(path: &str) -> bool {
     let dir = Path::new(path);
     dir.exists() && dir.is_dir()
 }
+
+#[cfg(any(target_os = "macos" , target_os = "linux"))]
+pub const LIST_DESCRIPTION: & str  = "List installed Mods in Path/To/RimWorld/Mods/";
+#[cfg(target_os = "windows")]
+pub const LIST_DESCRIPTION: & str  = r#"List installed Mods in C:\Path\To\RimWorld\Mods"#;
