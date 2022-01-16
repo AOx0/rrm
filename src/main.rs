@@ -1,6 +1,8 @@
 mod statics;
 mod args;
 mod list;
+mod locals;
+mod utils;
 
 #[tokio::main]
 async fn main() {
