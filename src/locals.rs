@@ -2,6 +2,7 @@ use std::fmt::{Display, Formatter};
 use rwm_list::ModPaths;
 use crate::utils::*;
 
+
 pub struct Mod {
     path: String,
     name: String,
@@ -42,10 +43,9 @@ impl Mod {
     }
 
     pub fn gen_large(&self) -> String {
-        let mut result = "".to_string();
-
-        result.push_str(&format!("Path : {:}\n", self.path));
-        result.push_str(&format!("Name : {:}", self.name));
+        let mut result = "".to_string()
+            .add_s(format!("Path : {:}\n", self.path))
+            .add_s(format!("Name : {:}", self.name));
 
         if self.version.is_some() {
             result.push_str(&format!(" [v{:}]", self.version.clone().unwrap()) )

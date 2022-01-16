@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use rwm_xml::{Element, XMLFile};
 use rwm_list::ModPaths;
+pub use crate::locals::Mod;
 
 pub trait InfoString {
     fn add_f(&self, m: &HashMap<String, String>, key: &str, default: &str, msg: impl FnOnce(&str) -> String) -> String;
@@ -78,5 +79,25 @@ impl VersionInfo for HashMap<String, String> {
 
         }
 
+    }
+}
+
+pub type Mods = Vec<Mod>;
+
+pub trait ModVec {
+    fn parse(self, large: bool) -> Mods;
+}
+
+impl ModVec for Vec<Vec<ModPaths>> {
+    fn parse(self, large: bool) -> Mods{
+        const L_FIELDS: [&str; 6] = ["version", "identifier", "name", "packageId", "author", "targetVersion"];
+
+        let mut mods = vec![];
+        self.iter().for_each(|m| {
+            let values = EVector::build_from(m, &L_FIELDS);
+            mods.push(values.to_mod(&m.get(0).unwrap(), large));
+        });
+
+        mods
     }
 }
