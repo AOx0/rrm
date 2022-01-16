@@ -2,6 +2,7 @@ use crate::mod_paths::ModPaths;
 use crate::*;
 use std::io::{Write, Stdout};
 
+#[derive(Clone, Copy)]
 pub enum DisplayType { Short, Long }
 
 impl From<bool> for DisplayType {
