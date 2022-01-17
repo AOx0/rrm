@@ -15,10 +15,14 @@ pub fn search_locally(
 
     let all_false = !(authors || version || steam_id || name || all);
 
+    let mut size: usize = 0;
+
     let matches: Vec<&Mod> = mods
         .iter()
         .filter(|m| {
-            (if name || all || all_false {
+
+
+            let result = (if name || all || all_false {
                 matcher.fuzzy_match(&m.name, word).is_some()
             } else {
                 false
@@ -36,14 +40,20 @@ pub fn search_locally(
                 matcher.fuzzy_match(&m.steam_id, word).is_some()
             } else {
                 false
-            })
+            });
+
+            if result && m.name.len() > size {
+                size = m.name.len();
+            };
+
+            result
         })
         .collect();
 
     if !matches.is_empty() {
-        println!("{}", Mod::gen_headers());
+        println!("{}", Mod::gen_headers(size));
 
-        matches.iter().for_each(|m| m.display(&DisplayType::Short))
+        matches.iter().for_each(|m| m.display(&DisplayType::Short, size))
     } else {
         println!("No results found")
     }

@@ -25,17 +25,17 @@ fn list_p(path: &Path) -> Vec<PathBuf> {
     result
 }
 
-fn list_b(buf: &PathBuf) -> Vec<PathBuf> {
-    list_p(buf.as_path())
+fn list_b(buf: &Path) -> Vec<PathBuf> {
+    list_p(buf)
 }
 
-fn get_mods(about_dir: &PathBuf) -> Vec<ModPaths> {
+fn get_mods(about_dir: &Path) -> Vec<ModPaths> {
     let mut mod_files = vec![];
     list_b(about_dir).iter().for_each(|path| {
         let parent = path.parent().unwrap();
         let steam_id = parent.join("PublishedFileId.txt");
 
-        let mut file = File::open(steam_id.clone()).unwrap_or_else(|_| {
+        let mut file = File::open(steam_id).unwrap_or_else(|_| {
             eprintln!(
                 "Could not find PublishedFileId.txt in path {}",
                 parent.display()
@@ -96,12 +96,12 @@ pub fn list_path_abouts(path: &Path) -> Vec<PathBuf> {
 }
 
 pub trait ModVec {
-    fn parse(self) -> Mods;
-    fn load_from_path(path: &Path) -> Mods;
+    fn parse(self) -> (Mods, usize);
+    fn load_from_path(path: &Path) -> (Mods, usize);
 }
 
 impl ModVec for Vec<Vec<ModPaths>> {
-    fn parse(self) -> Mods {
+    fn parse(self) -> (Mods, usize) {
         const L_FIELDS: [&str; 6] = [
             "version",
             "identifier",
@@ -111,16 +111,22 @@ impl ModVec for Vec<Vec<ModPaths>> {
             "targetVersion",
         ];
 
+        let mut biggest_name_size: usize = 0;
         let mut mods = vec![];
         self.iter().for_each(|m| {
             let values = EVector::build_from(m, &L_FIELDS);
-            mods.push(values.to_mod(&m.get(0).unwrap()));
+            let m = values.to_mod(m.get(0).unwrap());
+            let name_size = m.name.len();
+            if name_size > biggest_name_size {
+                biggest_name_size = name_size;
+            }
+            mods.push(m);
         });
 
-        mods
+        (mods, biggest_name_size)
     }
 
-    fn load_from_path(path: &Path) -> Mods {
+    fn load_from_path(path: &Path) -> (Mods, usize) {
         crate::mods_at(path).parse()
     }
 }
@@ -130,7 +136,7 @@ pub type EVector = Vec<Element>;
 pub trait ElementVector {
     fn to_hash(self) -> HashMap<String, String>;
     fn to_mod(self, m: &ModPaths) -> crate::mod_obj::Mod;
-    fn build_from(m: &Vec<ModPaths>, with_fields: &[&str]) -> EVector;
+    fn build_from(m: &[ModPaths], with_fields: &[&str]) -> EVector;
 }
 
 impl ElementVector for EVector {
@@ -144,21 +150,21 @@ impl ElementVector for EVector {
     }
 
     fn to_mod(self, m: &ModPaths) -> crate::mod_obj::Mod {
-        crate::mod_obj::Mod::from_evec(self, &m)
+        crate::mod_obj::Mod::from_evec(self, m)
     }
 
-    fn build_from(m: &Vec<ModPaths>, with_fields: &[&str]) -> EVector {
+    fn build_from(m: &[ModPaths], with_fields: &[&str]) -> EVector {
         let mut values = vec![];
         m.iter().for_each(|m| {
             if let Some(about) = &m.about {
                 let file = File::open(about.to_str().unwrap()).unwrap();
-                let value = file.values_of(&with_fields);
+                let value = file.values_of(with_fields);
                 value.into_iter().for_each(|value| values.push(value));
             }
 
             if let Some(manifest) = &m.manifest {
                 let file = File::open(manifest.to_str().unwrap()).unwrap();
-                let value = file.values_of(&with_fields);
+                let value = file.values_of(with_fields);
                 value.into_iter().for_each(|value| values.push(value));
             }
         });
