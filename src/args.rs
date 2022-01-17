@@ -1,3 +1,4 @@
+use std::path::{PathBuf};
 use crate::utils::*;
 use clap::{AppSettings, Parser, Subcommand};
 
@@ -17,7 +18,7 @@ pub struct Args {
         required = false,
         default_value = "None"
     )]
-    pub(crate) game_path: String,
+    pub(crate) game_path: PathBuf,
 }
 
 #[derive(Subcommand, Debug)]

@@ -1,7 +1,8 @@
+use std::path::Path;
 use crate::utils::*;
 use fuzzy_matcher::*;
 
-pub fn search_locally(game_path: &str, word: &str) {
+pub fn search_locally(game_path: &Path, word: &str) {
     let mods = GameMods::from(try_get_path(game_path));
     let matcher = skim::SkimMatcherV2::default();
 
