@@ -12,8 +12,9 @@ pub const RW_DEFAULT_PATH: [&str; 3] = [
     r"~/.local/share/Steam/steamapps/common/RimWorld"
 ];
 #[cfg(target_os = "windows")]
-pub const RW_DEFAULT_PATH: [&str; 1] = [
-    r"C:\Program Files (x86)\Steam\steamapps\common\RimWorld"
+pub const RW_DEFAULT_PATH: [&str; 2] = [
+    r"C:\Program Files (x86)\Steam\steamapps\common\RimWorld",
+    r"C:\Program Files\Steam\steamapps\common\RimWorld"
 ];
 
 pub fn dir_exists(path: &str) -> bool {
