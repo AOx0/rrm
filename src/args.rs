@@ -1,4 +1,5 @@
 use clap::{AppSettings, Parser, Subcommand};
+use crate::utils::*;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -59,7 +60,7 @@ pub enum Commands {
 
     #[clap(
         visible_alias = "l",
-        about = crate::statics::LIST_DESCRIPTION
+        about = LIST_DESCRIPTION
     )]
     List {
         /// The path where RimWorld is installed

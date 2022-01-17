@@ -1,4 +1,4 @@
-mod statics;
+mod utils;
 mod args;
 mod list;
 

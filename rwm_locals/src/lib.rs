@@ -56,3 +56,15 @@ impl From<&str> for GameMods {
         }
     }
 }
+
+
+impl From<GamePath> for GameMods {
+    fn from(path: GamePath) -> Self {
+        let mods: Mods = mods_at(&path.path().join("Mods")).parse();
+
+        GameMods{
+            mods,
+            display_type: None
+        }
+    }
+}
