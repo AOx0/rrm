@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::exit;
 
 pub struct GamePath(Box<Path>);
@@ -46,5 +46,12 @@ impl From<&Path> for GamePath {
 impl GamePath {
     pub fn path(&self) -> Box<Path> {
         self.0.clone()
+    }
+}
+
+
+impl From<&PathBuf> for GamePath {
+    fn from(path: &PathBuf) -> Self {
+        GamePath::create(path.as_path())
     }
 }
