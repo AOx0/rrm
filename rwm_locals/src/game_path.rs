@@ -49,7 +49,6 @@ impl GamePath {
     }
 }
 
-
 impl From<&PathBuf> for GamePath {
     fn from(path: &PathBuf) -> Self {
         GamePath::create(path.as_path())

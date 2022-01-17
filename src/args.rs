@@ -1,6 +1,6 @@
-use std::path::{PathBuf};
 use crate::utils::*;
 use clap::{AppSettings, Parser, Subcommand};
+use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -44,14 +44,34 @@ pub enum Commands {
 
     #[clap(
         visible_alias = "sl",
-        setting(AppSettings::Hidden),
-        about = "Search for mods locally, where RimWorld is installed",
-        override_usage = "rwm search local <MOD>"
+        setting(AppSettings::Hidden | AppSettings::DisableVersionFlag),
+        about = "Search for mods locally, where RimWorld is installed [with no flags searches by name]",
+        override_usage = "rwm search local [OPTIONS] <STRING>"
     )]
     SearchLocally {
-        /// The name or id of the RimWorld mod
+        /// The pattern to search
         #[clap(required = true)]
-        r#mod: String,
+        r#string: String,
+
+        /// Search by author(s) name(s)
+        #[clap(short, long)]
+        authors: bool,
+
+        /// Search by version
+        #[clap(short, long)]
+        version: bool,
+
+        /// Search by Steam ID
+        #[clap(short, long)]
+        steam_id: bool,
+
+        /// Search by mod name
+        #[clap(short, long)]
+        name: bool,
+
+        /// Search by all fields
+        #[clap(long, conflicts_with_all = &["authors", "version", "steam-id", "name"])]
+        all: bool,
     },
 
     #[clap(
@@ -88,12 +108,33 @@ pub enum Search {
 
     #[clap(
         visible_aliases = &["l", "sl (global)"],
-        about = "Search for mods locally, where RimWorld is installed",
+        setting(AppSettings::DisableVersionFlag),
+        about = "Search for mods locally, where RimWorld is installed [with no flags searches by name]",
     )]
     Local {
-        /// The name or id of the RimWorld mod
+        /// The pattern to search
         #[clap(required = true)]
-        r#mod: String,
+        r#string: String,
+
+        /// Search by author(s) name(s)
+        #[clap(short, long)]
+        authors: bool,
+
+        /// Search by version
+        #[clap(short, long)]
+        version: bool,
+
+        /// Search by Steam ID
+        #[clap(short, long)]
+        steam_id: bool,
+
+        /// Search by mod name
+        #[clap(short, long)]
+        name: bool,
+
+        /// Search by all fields
+        #[clap(long, conflicts_with_all = &["authors", "version", "steam-id", "name"])]
+        all: bool,
     },
 }
 

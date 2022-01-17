@@ -12,19 +12,33 @@ async fn main() {
         args::Commands::List { large } => list::list(&path, rwm_locals::DisplayType::from(large)),
 
         args::Commands::Search { command } => match command {
-            args::Search::Local { r#mod: m } => {
-                search::search_locally(&path, &m);
+            args::Search::Local {
+                string: m,
+                authors,
+                version,
+                steam_id,
+                name,
+                all,
+            } => {
+                search::search_locally(&path, &m, authors, version, steam_id, name, all);
             }
-            args::Search::Steam { r#mod: m } => {
+            args::Search::Steam { r#mod: _m } => {
                 todo!()
             }
         },
 
-        args::Commands::SearchLocally { r#mod: m } => {
-            search::search_locally(&path, &m);
+        args::Commands::SearchLocally {
+            string: m,
+            authors,
+            version,
+            steam_id,
+            name,
+            all,
+        } => {
+            search::search_locally(&path, &m, authors, version, steam_id, name, all);
         }
 
-        args::Commands::SearchSteam { r#mod: m } => {
+        args::Commands::SearchSteam { r#mod: _m } => {
             todo!()
         }
 
