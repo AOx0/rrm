@@ -47,11 +47,11 @@ impl Mod {
     pub fn gen_headers() -> String {
         "".to_string()
             .add_s(format!("{:>15}", "Steam ID"))
-            .add_s(format!("   {:^10}", "Version"))
+            .add_s(format!("   {:<10}", "Version"))
             .add_s(format!("   {:<50}", "Name"))
             .add_s(format!("   {:<20}", "Author"))
             .add_s(format!("\n{:>15}", "--------"))
-            .add_s(format!("   {:^10}", "--------"))
+            .add_s(format!("   {:<10}", "--------"))
             .add_s(format!("   {:<50}", "--------"))
             .add_s(format!("   {:<20}", "--------"))
     }
@@ -91,7 +91,7 @@ impl Mod {
         "".to_string()
             .add_s(format!("{:>15}", self.steam_id))
             .add_s(format!(
-                "   {:^10}",
+                "   {:<10}",
                 self.version.clone().unwrap_or(" ".to_string())
             ))
             .add_s(format!("   {:<50}", self.name))
