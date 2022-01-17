@@ -1,13 +1,12 @@
 use rwm_xml::{Element, XMLFile};
 use std::collections::HashMap;
 
-
+use crate::Mods;
 use path_absolutize::Absolutize;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::exit;
-use crate::Mods;
 
 #[derive(Debug)]
 pub struct ModPaths {
@@ -125,7 +124,6 @@ impl ModVec for Vec<Vec<ModPaths>> {
         crate::mods_at(path).parse()
     }
 }
-
 
 pub type EVector = Vec<Element>;
 
