@@ -14,6 +14,7 @@ pub type Mods = Vec<Mod>;
 #[derive(Clone)]
 pub struct GameMods {
     mods: Mods,
+    pub biggest_name_size: usize,
     display_type: Option<DisplayType>,
 }
 
@@ -31,10 +32,10 @@ impl GameMods {
         });
 
         if let DisplayType::Short = d_type {
-            println!("{}", Mod::gen_headers());
+            println!("{}", Mod::gen_headers(self.biggest_name_size));
         }
 
-        self.mods.iter().for_each(|m| m.display(d_type))
+        self.mods.iter().for_each(|m| m.display(d_type, self.biggest_name_size))
     }
 }
 
@@ -49,22 +50,18 @@ impl Deref for GameMods {
 impl From<&str> for GameMods {
     fn from(path: &str) -> Self {
         let game_path: GamePath = GamePath::from(path);
-        let mods: Mods = mods_at(&game_path.path().join("Mods")).parse();
-
-        GameMods {
-            mods,
-            display_type: None,
-        }
+        GameMods::from(game_path)
     }
 }
 
 impl From<GamePath> for GameMods {
     fn from(path: GamePath) -> Self {
-        let mods: Mods = mods_at(&path.path().join("Mods")).parse();
+        let (mods, biggest ) = mods_at(&path.path().join("Mods")).parse();
 
         GameMods {
             mods,
             display_type: None,
+            biggest_name_size: biggest
         }
     }
 }

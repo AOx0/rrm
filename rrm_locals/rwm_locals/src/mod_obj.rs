@@ -44,15 +44,15 @@ impl Mod {
         }
     }
 
-    pub fn gen_headers() -> String {
+    pub fn gen_headers(biggest_name: usize) -> String {
         "".to_string()
             .add_s(format!("{:>15}", "Steam ID"))
             .add_s(format!("   {:<10}", "Version"))
-            .add_s(format!("   {:<50}", "Name"))
+            .add_s(format!(" {:<size$}", "Name", size = biggest_name))
             .add_s(format!("   {:<20}", "Author"))
             .add_s(format!("\n{:>15}", "--------"))
             .add_s(format!("   {:<10}", "--------"))
-            .add_s(format!("   {:<50}", "--------"))
+            .add_s(format!(" {:<size$}", "--------", size = biggest_name))
             .add_s(format!("   {:<20}", "--------"))
     }
 
@@ -87,24 +87,24 @@ impl Mod {
         result
     }
 
-    pub fn gen_short(&self) -> String {
+    pub fn gen_short(&self, biggest_name: usize) -> String {
         "".to_string()
             .add_s(format!("{:>15}", self.steam_id))
             .add_s(format!(
                 "   {:<10}",
-                self.version.clone().unwrap_or(" ".to_string())
+                self.version.clone().unwrap_or_else(||" ".to_string())
             ))
-            .add_s(format!("   {:<50}", self.name))
+            .add_s(format!(" {:<size$}", self.name,  size = biggest_name))
             .add_s(format!("   {:<20}", self.author))
     }
 
-    pub fn display(&self, form: &DisplayType) {
+    pub fn display(&self, form: &DisplayType, biggest_name: usize) {
         let mut f: Stdout = std::io::stdout();
 
         if let DisplayType::Long = form {
-            write!(f, "{}\n", self.gen_large()).unwrap()
+            writeln!(f, "{}", self.gen_large()).unwrap()
         } else {
-            write!(f, "{}\n", self.gen_short()).unwrap()
+            writeln!(f, "{}", self.gen_short(biggest_name)).unwrap()
         }
     }
 }
