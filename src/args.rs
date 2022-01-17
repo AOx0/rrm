@@ -6,6 +6,10 @@ use clap::{AppSettings, Parser, Subcommand};
 pub struct Args {
     #[clap(subcommand)]
     pub(crate) command: Commands,
+
+    /// The path where RimWorld is installed
+    #[clap(short, long, env="GAME_PATH", global = true, required = false, default_value = "None")]
+    pub(crate) game_path: String,
 }
 
 #[derive(Subcommand, Debug)]
@@ -55,13 +59,9 @@ pub enum Commands {
 
     #[clap(
         visible_alias = "l",
-        about = crate::statics::LIST_DESCRIPTION)
-    ]
+        about = crate::statics::LIST_DESCRIPTION
+    )]
     List {
-        /// The path where RimWorld is installed
-        #[clap(required = false, default_value = "None", env="GAME_PATH")]
-        game_path: String,
-
         /// The path where RimWorld is installed
         #[clap(short, long)]
         large: bool,
