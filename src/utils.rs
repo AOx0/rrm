@@ -1,5 +1,5 @@
 pub use rwm_locals::{DisplayType, GameMods, GamePath, Mod, Mods};
-use std::path::{Path, PathBuf};
+pub use std::path::{Path, PathBuf};
 use std::process::exit;
 
 #[cfg(target_os = "macos")]

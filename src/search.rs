@@ -1,6 +1,5 @@
 use crate::utils::*;
 use fuzzy_matcher::*;
-use std::path::Path;
 
 pub fn search_locally(
     game_path: &Path,
@@ -29,7 +28,7 @@ pub fn search_locally(
                 false
             }) || (if version || all {
                 matcher
-                    .fuzzy_match(&m.version.clone().unwrap_or("".to_string()), word)
+                    .fuzzy_match(&m.version.clone().unwrap_or_else(|| "".to_string()), word)
                     .is_some()
             } else {
                 false

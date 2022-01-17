@@ -1,6 +1,5 @@
 use crate::utils::*;
 use clap::{AppSettings, Parser, Subcommand};
-use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
