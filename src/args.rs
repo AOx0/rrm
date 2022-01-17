@@ -1,5 +1,5 @@
-use clap::{AppSettings, Parser, Subcommand};
 use crate::utils::*;
+use clap::{AppSettings, Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -9,16 +9,20 @@ pub struct Args {
     pub(crate) command: Commands,
 
     /// The path where RimWorld is installed
-    #[clap(short, long, env="GAME_PATH", global = true, required = false, default_value = "None")]
+    #[clap(
+        short,
+        long,
+        env = "GAME_PATH",
+        global = true,
+        required = false,
+        default_value = "None"
+    )]
     pub(crate) game_path: String,
 }
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-    #[clap(
-        visible_alias = "i",
-        about = "Install a RimWorld Mod by name or ID"
-    )]
+    #[clap(visible_alias = "i", about = "Install a RimWorld Mod by name or ID")]
     Install {
         /// The name or id of the RimWorld mod
         #[clap(required = true)]
@@ -89,7 +93,7 @@ pub enum Search {
         /// The name or id of the RimWorld mod
         #[clap(required = true)]
         r#mod: String,
-    }
+    },
 }
 
 impl Args {

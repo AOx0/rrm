@@ -5,10 +5,13 @@ pub struct GamePath(Box<Path>);
 
 impl GamePath {
     fn create(path: &Path) -> Self {
-        let has_mods_dir = path.read_dir().unwrap_or_else(|_| {
-            eprintln!("Failed to read contents inside {}", path.display());
-            exit(1);
-        }).any(|path| path.unwrap().file_name() == "Mods");
+        let has_mods_dir = path
+            .read_dir()
+            .unwrap_or_else(|_| {
+                eprintln!("Failed to read contents inside {}", path.display());
+                exit(1);
+            })
+            .any(|path| path.unwrap().file_name() == "Mods");
 
         if path.exists() && has_mods_dir {
             GamePath(Box::from(path))
@@ -19,7 +22,10 @@ impl GamePath {
             eprintln!("Failed to read contents inside {}", path.display());
             exit(1);
         } else {
-            eprintln!("Unknown error when trying to create GamePath with path: {}", path.display());
+            eprintln!(
+                "Unknown error when trying to create GamePath with path: {}",
+                path.display()
+            );
             exit(1);
         }
     }

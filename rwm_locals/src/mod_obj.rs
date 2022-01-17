@@ -1,32 +1,35 @@
 use crate::mod_paths::ModPaths;
 use crate::*;
-use std::io::{Write, Stdout};
+use std::io::{Stdout, Write};
 
 #[derive(Clone, Copy)]
-pub enum DisplayType { Short, Long }
+pub enum DisplayType {
+    Short,
+    Long,
+}
 
 impl From<bool> for DisplayType {
     fn from(t: bool) -> Self {
         if t {
             DisplayType::Long
-        }  else {
+        } else {
             DisplayType::Short
         }
     }
 }
 
+#[derive(Clone)]
 pub struct Mod {
-    path: String,
-    name: String,
-    author: String,
-    steam_id: String,
-    version: Option<String>,
-    package_id: Option<String>,
-    identifier: Option<String>,
+    pub path: String,
+    pub name: String,
+    pub author: String,
+    pub steam_id: String,
+    pub version: Option<String>,
+    pub package_id: Option<String>,
+    pub identifier: Option<String>,
 }
 
 impl Mod {
-
     pub fn from_evec(e_vec: EVector, m: &ModPaths) -> Self {
         let mods = e_vec.to_hash();
 
@@ -37,7 +40,7 @@ impl Mod {
             steam_id: m.steam_id.clone(),
             version: mods.get("version").cloned(),
             package_id: mods.get("packageId").cloned(),
-            identifier: mods.get("identifier").cloned()
+            identifier: mods.get("identifier").cloned(),
         }
     }
 
@@ -105,7 +108,6 @@ impl Mod {
         }
     }
 }
-
 
 trait InfoString {
     fn add_s(&self, msg: String) -> String;
