@@ -2,6 +2,7 @@ use clap::{AppSettings, Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
+#[clap(global_setting(AppSettings::ArgRequiredElseHelp))]
 pub struct Args {
     #[clap(subcommand)]
     pub(crate) command: Commands,
@@ -10,7 +11,6 @@ pub struct Args {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     #[clap(
-        setting(AppSettings::ArgRequiredElseHelp),
         visible_alias = "i",
         about = "Install a RimWorld Mod by name or ID"
     )]
@@ -21,14 +21,36 @@ pub enum Commands {
     },
 
     #[clap(
-        setting(AppSettings::ArgRequiredElseHelp),
-        visible_alias = "s",
-        about = "Search for mods by id or name in Steam within your terminal"
+        visible_alias = "ss",
+        setting(AppSettings::Hidden),
+        about = "Search for mods in Steam",
+        override_usage = "rwm search steam <MOD>"
     )]
-    Search {
+    SearchSteam {
         /// The name or id of the RimWorld mod
         #[clap(required = true)]
         r#mod: String,
+    },
+
+    #[clap(
+        visible_alias = "sl",
+        setting(AppSettings::Hidden),
+        about = "Search for mods locally, where RimWorld is installed",
+        override_usage = "rwm search local <MOD>"
+    )]
+    SearchLocally {
+        /// The name or id of the RimWorld mod
+        #[clap(required = true)]
+        r#mod: String,
+    },
+
+    #[clap(
+        visible_alias = "s",
+        about = "Search for mods by id or name locally or in Steam within your terminal"
+    )]
+    Search {
+        #[clap(subcommand)]
+        command: Search,
     },
 
     #[clap(
@@ -44,6 +66,29 @@ pub enum Commands {
         #[clap(short, long)]
         large: bool,
     },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum Search {
+    #[clap(
+        visible_aliases = &["s", "ss (global)"],
+        about = "Search for mods in Steam",
+    )]
+    Steam {
+        /// The name or id of the RimWorld mod
+        #[clap(required = true)]
+        r#mod: String,
+    },
+
+    #[clap(
+        visible_aliases = &["l", "sl (global)"],
+        about = "Search for mods locally, where RimWorld is installed",
+    )]
+    Local {
+        /// The name or id of the RimWorld mod
+        #[clap(required = true)]
+        r#mod: String,
+    }
 }
 
 impl Args {
