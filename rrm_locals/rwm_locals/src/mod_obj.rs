@@ -109,7 +109,7 @@ impl Mod {
     }
 }
 
-trait InfoString {
+pub trait InfoString {
     fn add_s(&self, msg: String) -> String;
 }
 
