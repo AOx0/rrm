@@ -54,9 +54,12 @@ pub fn search_locally(
         .collect();
 
     if !matches.is_empty() {
-        println!("{}", Mod::gen_headers(size));
 
-        matches.iter().for_each(|m| m.display(&DisplayType::Short, size))
+        if let DisplayType::Short = d_type {
+            println!("{}", Mod::gen_headers(size));
+        }
+
+        matches.iter().for_each(|m| m.display(&d_type, size))
     } else {
         println!("No results found")
     }
