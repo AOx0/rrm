@@ -9,8 +9,11 @@ pub fn search_locally(
     steam_id: bool,
     name: bool,
     all: bool,
+    d_type: DisplayType
 ) {
-    let mods = GameMods::from(try_get_path(game_path));
+    let mods = GameMods::from(try_get_path(game_path))
+        .with_display(d_type);
+
     let matcher = skim::SkimMatcherV2::default();
 
     let all_false = !(authors || version || steam_id || name || all);
@@ -57,4 +60,12 @@ pub fn search_locally(
     } else {
         println!("No results found")
     }
+}
+
+pub async fn search_steam(name: &str, d_type: DisplayType) {
+    let mods = SteamMods::search(name)
+        .await
+        .with_display(d_type);
+
+    mods.display();
 }

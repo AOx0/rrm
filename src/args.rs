@@ -36,9 +36,13 @@ pub enum Commands {
         override_usage = "rwm search steam <MOD>"
     )]
     SearchSteam {
-        /// The name or id of the RimWorld mod
+        /// The name of the RimWorld mod
         #[clap(required = true)]
         r#mod: String,
+
+        /// Display the larger message
+        #[clap(short, long)]
+        large: bool,
     },
 
     #[clap(
@@ -49,7 +53,11 @@ pub enum Commands {
     )]
     SearchLocally {
         #[clap(flatten)]
-        args: Local
+        args: Local,
+
+        /// Display the larger message
+        #[clap(short, long)]
+        large: bool,
     },
 
     #[clap(
@@ -66,7 +74,7 @@ pub enum Commands {
         about = LIST_DESCRIPTION
     )]
     List {
-        /// The path where RimWorld is installed
+        /// Display the larger message
         #[clap(short, long)]
         large: bool,
     },
@@ -79,9 +87,13 @@ pub enum Search {
         about = "Search for mods in Steam",
     )]
     Steam {
-        /// The name or id of the RimWorld mod
+        /// The name of the RimWorld mod
         #[clap(required = true)]
         r#mod: String,
+
+        /// Display the larger message
+        #[clap(short, long)]
+        large: bool,
     },
 
     #[clap(
@@ -91,7 +103,11 @@ pub enum Search {
     )]
     Local {
         #[clap(flatten)]
-        args: Local
+        args: Local,
+
+        /// Display the larger message
+        #[clap(short, long)]
+        large: bool,
     },
 }
 

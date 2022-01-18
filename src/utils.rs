@@ -1,4 +1,5 @@
 pub use rwm_locals::{DisplayType, GameMods, GamePath, Mod, Mods};
+pub use rwm_scrap::*;
 pub use std::path::{Path, PathBuf};
 use std::process::exit;
 
