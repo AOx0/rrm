@@ -4,6 +4,14 @@ Inspired by Spoons [rmm][1]. This is a cross-platform Mod Manager for RimWorld i
 
 Up to now, you must have `steamcmd` installed and available within your `PATH`.
 
+
+
+# Current features demo:
+
+![Example](./media/Demo1.svg)
+
+
+
 ## Installation
 Make sure you have `steamcmd` installed and available within your `PATH`. Check Section [`Install steamcmd`][2]
 
