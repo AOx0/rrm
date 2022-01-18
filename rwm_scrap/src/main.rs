@@ -1,4 +1,14 @@
+use rwm_locals::DisplayType;
+use rwm_scrap::SteamMods;
+
 #[tokio::main]
 async fn main() {
-    rwm_scrap::look_for_mod("Fluffy").await;
+    let mods = SteamMods::search("Fluffy").await
+        .with_display(DisplayType::Long);
+
+    mods.display();
+
+    let mods = mods.with_display(DisplayType::Short);
+
+    mods.display();
 }

@@ -1,6 +1,9 @@
+use std::io::Write;
+use std::io::Stdout;
 use lazy_regex::*;
 use reqwest::Response;
 use std::process::exit;
+use rwm_locals::{DisplayType, InfoString};
 
 fn capitalize(s: &str) -> String {
     let mut c = s.chars();
@@ -24,7 +27,7 @@ async fn get_contents(url: &str) -> String {
     resp
 }
 
-pub async fn look_for_mod(mod_name: &str) {
+pub async fn look_for_mod(mod_name: &str) -> (Vec<ModSteamInfo>, usize) {
     use scraper::{Html, Selector};
 
     let contents: String = get_contents(
@@ -66,18 +69,11 @@ pub async fn look_for_mod(mod_name: &str) {
         m.remove(m.len() - 1);
         m.remove(m.len() - 1);
 
-        let ms: Vec<String> = m
-            .split(",")
-            .collect::<Vec<&str>>()
-            .into_iter()
-            .map(|m| m.trim().to_string())
-            .collect();
-
         let mut msf = vec![];
 
-        ms.into_iter().for_each(|m| {
+        m.split(',').into_iter().for_each(|m| {
             if m.contains("\"id") || m.contains("\"title") || m.contains("\"description") {
-                msf.push(m.replace("\"", ""));
+                msf.push(m.trim().replace("\"", ""));
             }
         });
 
@@ -90,35 +86,96 @@ pub async fn look_for_mod(mod_name: &str) {
     }
 
     let author: Selector = Selector::parse("#profileBlock > div > div.workshopBrowseItems > div > div.workshopItemAuthorName.ellipsis > a").unwrap();
+    let mut size: usize = 0;
 
-    let mut i = 0;
-    for element in contents.select(&author) {
+    for (i, element) in contents.select(&author).enumerate() {
         mods_steam_info[i].author = element.inner_html().to_string();
+        if mods_steam_info[i].title.len() > size {
+            size = mods_steam_info[i].title.len();
+        }
+    };
 
-        println!("{}", mods_steam_info[i]);
-
-        i += 1;
-    }
+    (mods_steam_info, size)
 }
 
 #[derive(Default)]
-struct ModSteamInfo {
+pub struct ModSteamInfo {
     pub id: String,
     pub title: String,
     pub description: String,
     pub author: String,
 }
 
-impl std::fmt::Display for ModSteamInfo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "\
-                Title: {} [ID: {}]\n\
-                Author: {}\n\
-                Description: {}\n\
-        ",
-            self.title, self.id, self.author, self.description
-        )
+impl ModSteamInfo {
+    fn gen_headers(size: usize) -> String {
+        "".to_string()
+            .add_s(format!("{:>15}", "Steam ID"))
+            .add_s(format!("   {:<size$}", "Name", size = size))
+            .add_s(format!("   {:<20}", "Uploader"))
+            .add_s(format!("\n{:>15}", "--------"))
+            .add_s(format!("   {:<size$}", "--------", size = size))
+            .add_s(format!("   {:<20}", "--------"))
+    }
+
+    pub fn gen_large(&self) -> String {
+        "".to_string()
+            .add_s(format!("Name     : {}\n", self.title))
+            .add_s(format!("Steam ID : {}\n", self.id))
+            .add_s(format!("Author   : {}\n", self.author))
+            .add_s(format!("Description: {}\n", self.description))
+    }
+
+    pub fn gen_short(&self, biggest_name: usize) -> String {
+        "".to_string()
+            .add_s(format!("{:>15}", self.id))
+            .add_s(format!("   {:<size$}", self.title,  size = biggest_name))
+            .add_s(format!("   {:<20}", self.author))
+    }
+
+    pub fn display(&self, form: &DisplayType, biggest_name: usize) {
+        let mut f: Stdout = std::io::stdout();
+
+        if let DisplayType::Long = form {
+            writeln!(f, "{}", self.gen_large()).unwrap()
+        } else {
+            writeln!(f, "{}", self.gen_short(biggest_name)).unwrap()
+        }
+    }
+}
+
+pub struct SteamMods {
+    pub mods: Vec<ModSteamInfo>,
+    pub biggest_name_size: usize,
+    pub display_type: Option<DisplayType>
+}
+
+impl SteamMods {
+    pub async fn search(m: &str) -> Self {
+        let (mods, biggest_name_size) = look_for_mod(m).await;
+
+        SteamMods {
+            mods,
+            biggest_name_size,
+            display_type: None
+        }
+    }
+
+    pub fn with_display(self, t: DisplayType) -> Self {
+        let mut s = self;
+        s.display_type = Some(t);
+        s
+    }
+
+    pub fn display(&self) {
+        let d_type = self.display_type.as_ref().unwrap_or_else(|| {
+            eprintln!("Error, make sure to set display_type to a variant of DisplayType");
+            exit(1);
+        });
+
+        if let DisplayType::Short = d_type {
+            println!("{}", ModSteamInfo::gen_headers(self.biggest_name_size));
+        }
+
+        self.mods.iter().for_each(|m| m.display(d_type, self.biggest_name_size))
     }
 }
