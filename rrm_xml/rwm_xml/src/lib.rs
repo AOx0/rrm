@@ -91,12 +91,9 @@ fn rm_bom(contents: &mut Vec<u8>) {
 
     let err = contents.windows(pat.len()).position(|w| w.eq(&pat));
 
-    match err {
-        Some(i) => {
-            for _ in 0..3 {
-                contents.remove(i);
-            }
+    if let Some(i) = err {
+        for _ in 0..3 {
+            contents.remove(i);
         }
-        _ => {}
     }
 }
