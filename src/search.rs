@@ -11,7 +11,8 @@ pub fn search_locally(
     all: bool,
     d_type: DisplayType
 ) {
-    let mods = GameMods::from(try_get_path(game_path))
+    let info = try_get_path(Some(game_path));
+    let mods = GameMods::from(GamePath::from(&info.rim_install.unwrap()))
         .with_display(d_type);
 
     let matcher = skim::SkimMatcherV2::default();

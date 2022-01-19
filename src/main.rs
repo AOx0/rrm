@@ -1,3 +1,7 @@
+use std::process::exit;
+use rwm_locals::GamePath;
+use rwm_installer::Installer;
+
 mod args;
 mod list;
 mod search;
@@ -12,7 +16,25 @@ macro_rules! d {
 #[tokio::main]
 async fn main() {
     let args = args::App::load();
-    let path = args.game_path;
+    let path = args.game_path.unwrap_or_else(
+        || {
+            let installer = Installer::new(Some(GamePath::from(&utils::try_get_path(None).rim_install.unwrap_or_else(
+                || {
+                    eprintln!("Error");
+                    exit(1);
+                }
+            ))));
+            if let Some(installer) = installer {
+                installer.rim_install.unwrap_or_else(|| {
+                    eprintln!("Error");
+                    exit(1);
+                })
+            } else {
+                eprintln!("Error");
+                exit(1);
+            }
+        }
+    );
 
     match args.command {
         args::Commands::List { large } => list::list(&path, d!(large)),

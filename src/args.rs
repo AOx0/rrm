@@ -15,9 +15,8 @@ pub struct App {
         env = "GAME_PATH",
         global = true,
         required = false,
-        default_value = "None"
     )]
-    pub(crate) game_path: PathBuf,
+    pub(crate) game_path: Option<PathBuf>,
 }
 
 #[derive(Subcommand, Debug)]

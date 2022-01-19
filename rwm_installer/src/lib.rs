@@ -110,7 +110,7 @@ impl Installer {
         serde_json::from_slice(&res)
     }
 
-    pub fn new(with_path: Option<GamePath>) -> Self {
+    pub fn new(with_path: Option<GamePath>) -> Option<Self> {
 
         let installer = if let Some(path)  = with_path {
             Installer::init_with_path(path)
@@ -121,12 +121,11 @@ impl Installer {
             if let Ok(installer) = old_config {
                 installer
             } else {
-                installer
+                return None;
             }
         };
 
         installer.write_config();
-        installer
-
+        Some(installer)
     }
 }
