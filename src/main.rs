@@ -23,17 +23,8 @@ async fn main() {
         args::Commands::List { large } => list::list(installer, d!(large)),
 
         args::Commands::Search { command } => match command {
-            args::Search::Local { args, large } => {
-                search::search_locally(
-                    installer,
-                    &args.string,
-                    args.authors,
-                    args.version,
-                    args.steam_id,
-                    args.name,
-                    args.all,
-                    d!(large),
-                );
+            args::Search::Local { args } => {
+                search::search_locally(installer, args);
             }
             args::Search::Steam { args } => {
                 search::search_steam(&args.r#mod, d!(args.large)).await;
@@ -41,16 +32,7 @@ async fn main() {
         },
 
         args::Commands::SearchLocally { args } => {
-            search::search_locally(
-                installer,
-                &args.string,
-                args.authors,
-                args.version,
-                args.steam_id,
-                args.name,
-                args.all,
-                d!(args.large),
-            );
+            search::search_locally(installer, args);
         }
 
         args::Commands::SearchSteam { args } => {

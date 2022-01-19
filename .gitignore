@@ -1,3 +1,4 @@
 **/target/
-/.idea/
-/rwm_list/target/
+**/.rwm_config
+**/.idea/
+

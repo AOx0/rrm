@@ -82,10 +82,6 @@ pub enum Search {
     Local {
         #[clap(flatten)]
         args: Local,
-
-        /// Display the larger message
-        #[clap(short, long)]
-        large: bool,
     },
 }
 

@@ -1,44 +1,40 @@
 use crate::utils::*;
 use fuzzy_matcher::*;
 use rwm_installer::Installer;
+use crate::args::Local;
 
 pub fn search_locally(
-    i: Installer,
-    word: &str,
-    authors: bool,
-    version: bool,
-    steam_id: bool,
-    name: bool,
-    all: bool,
-    d_type: DisplayType,
+    i: Installer, args: Local
 ) {
-    let mods = GameMods::from(i.rim_install.unwrap()).with_display(d_type);
+    let d_type = rwm_locals::DisplayType::from(args.large);
+    let mods = GameMods::from(i.rim_install.unwrap())
+        .with_display( d_type);
 
     let matcher = skim::SkimMatcherV2::default();
 
-    let all_false = !(authors || version || steam_id || name || all);
+    let all_false = !(args.authors || args.version || args.steam_id || args.name || args.all);
 
     let mut size: usize = 0;
 
     let matches: Vec<&Mod> = mods
         .iter()
         .filter(|m| {
-            let result = (if name || all || all_false {
-                matcher.fuzzy_match(&m.name, word).is_some()
+            let result = (if args.name || args.all || all_false {
+                matcher.fuzzy_match(&m.name, &args.string).is_some()
             } else {
                 false
-            }) || (if authors || all {
-                matcher.fuzzy_match(&m.author, word).is_some()
+            }) || (if args.authors || args.all {
+                matcher.fuzzy_match(&m.author, &args.string).is_some()
             } else {
                 false
-            }) || (if version || all {
+            }) || (if args.version || args.all {
                 matcher
-                    .fuzzy_match(&m.version.clone().unwrap_or_else(|| "".to_string()), word)
+                    .fuzzy_match(&m.version.clone().unwrap_or_else(|| "".to_string()), &args.string)
                     .is_some()
             } else {
                 false
-            }) || (if steam_id || all {
-                matcher.fuzzy_match(&m.steam_id, word).is_some()
+            }) || (if args.steam_id || args.all {
+                matcher.fuzzy_match(&m.steam_id, &args.string).is_some()
             } else {
                 false
             });
