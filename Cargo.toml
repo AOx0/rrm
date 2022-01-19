@@ -11,7 +11,7 @@ description = "RimWorld command-line interface mod manager"
 
 [dependencies]
 execute = "0.2.9"
-clap = { version= "3.0.7", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
+clap = { version= "3.0.10", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
 tokio =  { version= "1.15.0", features=["full"] }
 fuzzy-matcher = "0.3.7"
 

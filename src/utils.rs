@@ -1,8 +1,8 @@
+use rwm_installer::Installer;
 pub use rwm_locals::{DisplayType, GameMods, GamePath, Mod, Mods};
 pub use rwm_scrap::*;
 pub use std::path::{Path, PathBuf};
 use std::process::exit;
-use rwm_installer::Installer;
 
 #[cfg(target_os = "macos")]
 pub const RW_DEFAULT_PATH: [&str; 2] = [
@@ -32,7 +32,6 @@ pub const LIST_DESCRIPTION: &str = r#"List installed Mods in C:\Path\To\RimWorld
 
 pub fn try_get_path(game_path: Option<&Path>) -> Installer {
     if let Some(game_path) = game_path {
-
         if dir_exists(game_path) {
             Installer::new(Some(GamePath::from(game_path))).unwrap()
         } else {
@@ -40,27 +39,40 @@ pub fn try_get_path(game_path: Option<&Path>) -> Installer {
                 "Error: \"{}\" is not a valid RimWorld installation path.",
                 game_path.display()
             );
-            exit(1);
+            exit(1)
         }
     } else if let Some(installer) = Installer::new(None) {
-        return installer;
-    } else {
-        let mut result = None;
-        RW_DEFAULT_PATH.into_iter().for_each(|path| {
-            if dir_exists(&PathBuf::from(path)) {
-                result = Some(Installer::new(Some(GamePath::from(path)))).unwrap()
-            }
-        });
+        if installer.rim_install.is_some() {
+            installer
+        } else if installer.rim_install.is_none() {
+            let mut result = None;
+            RW_DEFAULT_PATH.into_iter().for_each(|path| {
+                if dir_exists(&PathBuf::from(path)) {
+                    result = Some(Installer::new(Some(GamePath::from(path)))).unwrap()
+                }
+            });
 
-        result.unwrap_or_else(|| {
+            result.unwrap_or_else(|| {
+                eprintln!(
+                    "\
+                    Error: Unable to find RimWorld installation path.\n\
+                    Try specifying the path:\n\
+                    \trwm list -g <GAME_PATH>        <--- Like this\
+                "
+                );
+                exit(1);
+            })
+        } else {
             eprintln!(
                 "\
-            Error: Unable to find RimWorld installation path.\n\
-            Try specifying the path:\n\
-            \trwm list -g <GAME_PATH>        <--- Like this\
-        "
+                    Error: Unable to find RimWorld installation path.\n\
+                    Try specifying the path:\n\
+                    \trwm list -g <GAME_PATH>        <--- Like this\
+                "
             );
             exit(1);
-        })
+        }
+    } else {
+        exit(1);
     }
 }

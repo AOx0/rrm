@@ -1,21 +1,14 @@
 use crate::utils::*;
-use clap::{AppSettings, Parser, Subcommand, Args};
+use clap::{AppSettings, Args, Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
-#[clap(global_setting(AppSettings::ArgRequiredElseHelp))]
 pub struct App {
     #[clap(subcommand)]
     pub(crate) command: Commands,
 
     /// The path where RimWorld is installed
-    #[clap(
-        short,
-        long,
-        env = "GAME_PATH",
-        global = true,
-        required = false,
-    )]
+    #[clap(short, long, env = "GAME_PATH", global = true, required = false)]
     pub(crate) game_path: Option<PathBuf>,
 }
 
@@ -35,13 +28,8 @@ pub enum Commands {
         override_usage = "rwm search steam <MOD>"
     )]
     SearchSteam {
-        /// The name of the RimWorld mod
-        #[clap(required = true)]
-        r#mod: String,
-
-        /// Display the larger message
-        #[clap(short, long)]
-        large: bool,
+        #[clap(flatten)]
+        args: Steam,
     },
 
     #[clap(
@@ -53,10 +41,6 @@ pub enum Commands {
     SearchLocally {
         #[clap(flatten)]
         args: Local,
-
-        /// Display the larger message
-        #[clap(short, long)]
-        large: bool,
     },
 
     #[clap(
@@ -86,13 +70,8 @@ pub enum Search {
         about = "Search for mods in Steam",
     )]
     Steam {
-        /// The name of the RimWorld mod
-        #[clap(required = true)]
-        r#mod: String,
-
-        /// Display the larger message
-        #[clap(short, long)]
-        large: bool,
+        #[clap(flatten)]
+        args: Steam,
     },
 
     #[clap(
@@ -111,6 +90,19 @@ pub enum Search {
 }
 
 #[derive(Args, Debug)]
+#[clap(setting(AppSettings::ArgRequiredElseHelp))]
+pub struct Steam {
+    /// The name of the RimWorld mod
+    #[clap(required = true)]
+    pub(crate) r#mod: String,
+
+    /// Display the larger message
+    #[clap(short, long)]
+    pub(crate) large: bool,
+}
+
+#[derive(Args, Debug)]
+#[clap(setting(AppSettings::ArgRequiredElseHelp))]
 pub struct Local {
     /// The pattern to search
     #[clap(required = true)]
@@ -135,12 +127,14 @@ pub struct Local {
     /// Search by all fields
     #[clap(long, conflicts_with_all = &["authors", "version", "steam-id", "name"])]
     pub(crate) all: bool,
-}
 
+    /// Display the larger message
+    #[clap(short, long)]
+    pub(crate) large: bool,
+}
 
 impl App {
     pub fn load() -> App {
         App::parse()
     }
 }
-

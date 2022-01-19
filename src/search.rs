@@ -1,19 +1,18 @@
 use crate::utils::*;
 use fuzzy_matcher::*;
+use rwm_installer::Installer;
 
 pub fn search_locally(
-    game_path: &Path,
+    i: Installer,
     word: &str,
     authors: bool,
     version: bool,
     steam_id: bool,
     name: bool,
     all: bool,
-    d_type: DisplayType
+    d_type: DisplayType,
 ) {
-    let info = try_get_path(Some(game_path));
-    let mods = GameMods::from(GamePath::from(&info.rim_install.unwrap()))
-        .with_display(d_type);
+    let mods = GameMods::from(i.rim_install.unwrap()).with_display(d_type);
 
     let matcher = skim::SkimMatcherV2::default();
 
@@ -24,8 +23,6 @@ pub fn search_locally(
     let matches: Vec<&Mod> = mods
         .iter()
         .filter(|m| {
-
-
             let result = (if name || all || all_false {
                 matcher.fuzzy_match(&m.name, word).is_some()
             } else {
@@ -55,7 +52,6 @@ pub fn search_locally(
         .collect();
 
     if !matches.is_empty() {
-
         if let DisplayType::Short = d_type {
             println!("{}", Mod::gen_headers(size));
         }
@@ -67,9 +63,7 @@ pub fn search_locally(
 }
 
 pub async fn search_steam(name: &str, d_type: DisplayType) {
-    let mods = SteamMods::search(name)
-        .await
-        .with_display(d_type);
+    let mods = SteamMods::search(name).await.with_display(d_type);
 
     mods.display();
 }

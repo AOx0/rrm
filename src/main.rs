@@ -1,7 +1,3 @@
-use std::process::exit;
-use rwm_locals::GamePath;
-use rwm_installer::Installer;
-
 mod args;
 mod list;
 mod search;
@@ -16,48 +12,49 @@ macro_rules! d {
 #[tokio::main]
 async fn main() {
     let args = args::App::load();
-    let path = args.game_path.unwrap_or_else(
-        || {
-            let installer = Installer::new(Some(GamePath::from(&utils::try_get_path(None).rim_install.unwrap_or_else(
-                || {
-                    eprintln!("Error");
-                    exit(1);
-                }
-            ))));
-            if let Some(installer) = installer {
-                installer.rim_install.unwrap_or_else(|| {
-                    eprintln!("Error");
-                    exit(1);
-                })
-            } else {
-                eprintln!("Error");
-                exit(1);
-            }
-        }
-    );
+
+    let installer = if args.game_path.is_none() {
+        utils::try_get_path(None)
+    } else {
+        utils::try_get_path(Some(&args.game_path.unwrap()))
+    };
 
     match args.command {
-        args::Commands::List { large } => list::list(&path, d!(large)),
+        args::Commands::List { large } => list::list(installer, d!(large)),
 
         args::Commands::Search { command } => match command {
-            args::Search::Local {
-                 args, large
-            } => {
-                search::search_locally(&path, &args.string, args.authors, args.version, args.steam_id, args.name, args.all, d!(large));
+            args::Search::Local { args, large } => {
+                search::search_locally(
+                    installer,
+                    &args.string,
+                    args.authors,
+                    args.version,
+                    args.steam_id,
+                    args.name,
+                    args.all,
+                    d!(large),
+                );
             }
-            args::Search::Steam { r#mod: m, large } => {
-                search::search_steam(&m, d!(large)).await;
+            args::Search::Steam { args } => {
+                search::search_steam(&args.r#mod, d!(args.large)).await;
             }
         },
 
-        args::Commands::SearchLocally {
-            args, large
-        } => {
-            search::search_locally(&path,  &args.string, args.authors, args.version, args.steam_id, args.name, args.all, d!(large));
+        args::Commands::SearchLocally { args } => {
+            search::search_locally(
+                installer,
+                &args.string,
+                args.authors,
+                args.version,
+                args.steam_id,
+                args.name,
+                args.all,
+                d!(args.large),
+            );
         }
 
-        args::Commands::SearchSteam { r#mod: m, large } => {
-            search::search_steam(&m, d!(large)).await;
+        args::Commands::SearchSteam { args } => {
+            search::search_steam(&args.r#mod, d!(args.large)).await;
         }
 
         _ => {}

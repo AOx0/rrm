@@ -35,7 +35,9 @@ impl GameMods {
             println!("{}", Mod::gen_headers(self.biggest_name_size));
         }
 
-        self.mods.iter().for_each(|m| m.display(d_type, self.biggest_name_size))
+        self.mods
+            .iter()
+            .for_each(|m| m.display(d_type, self.biggest_name_size))
     }
 }
 
@@ -56,12 +58,12 @@ impl From<&str> for GameMods {
 
 impl From<GamePath> for GameMods {
     fn from(path: GamePath) -> Self {
-        let (mods, biggest ) = mods_at(&path.path().join("Mods")).parse();
+        let (mods, biggest) = mods_at(&path.path().join("Mods")).parse();
 
         GameMods {
             mods,
             display_type: None,
-            biggest_name_size: biggest
+            biggest_name_size: biggest,
         }
     }
 }
