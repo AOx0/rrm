@@ -17,3 +17,4 @@ fuzzy-matcher = "0.3.7"
 
 rwm_locals = {path="rwm_locals"}
 rwm_scrap = {path="rwm_scrap"}
+rwm_installer = {path="rwm_installer"}

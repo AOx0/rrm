@@ -1,0 +1,19 @@
+[package]
+name = "rwm_installer"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+dev = []
+
+
+[dependencies]
+serde = {version = "1.0.133", features = ["derive"]}
+serde_json = "1.0.75"
+
+directories = "4.0.1"
+dotenv = "0.15.0"
+
+rwm_locals = {path="../rwm_locals"}
