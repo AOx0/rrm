@@ -92,9 +92,9 @@ impl Mod {
             .add_s(format!("{:>15}", self.steam_id))
             .add_s(format!(
                 "   {:<10}",
-                self.version.clone().unwrap_or_else(||" ".to_string())
+                self.version.clone().unwrap_or_else(|| " ".to_string())
             ))
-            .add_s(format!(" {:<size$}", self.name,  size = biggest_name))
+            .add_s(format!(" {:<size$}", self.name, size = biggest_name))
             .add_s(format!("   {:<20}", self.author))
     }
 

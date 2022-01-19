@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::process::exit;
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GamePath(Box<Path>);
 
 impl GamePath {
