@@ -1,7 +1,7 @@
 use crate::utils::*;
 use fuzzy_matcher::*;
 use rwm_installer::Installer;
-use crate::args::Local;
+use crate::args::{Local, Steam};
 
 pub fn search_locally(
     i: Installer, args: Local
@@ -58,8 +58,10 @@ pub fn search_locally(
     }
 }
 
-pub async fn search_steam(name: &str, d_type: DisplayType) {
-    let mods = SteamMods::search(name).await.with_display(d_type);
+pub async fn search_steam(args: Steam) {
+    let mods = SteamMods::search(&args.r#mod)
+        .await
+        .with_display(rwm_locals::DisplayType::from(args.large));
 
     mods.display();
 }
