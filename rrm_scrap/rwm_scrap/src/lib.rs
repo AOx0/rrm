@@ -1,9 +1,9 @@
-use std::io::Write;
-use std::io::Stdout;
 use lazy_regex::*;
 use reqwest::Response;
-use std::process::exit;
 use rwm_locals::{DisplayType, InfoString};
+use std::io::Stdout;
+use std::io::Write;
+use std::process::exit;
 
 fn capitalize(s: &str) -> String {
     let mut c = s.chars();
@@ -93,7 +93,7 @@ pub async fn look_for_mod(mod_name: &str) -> (Vec<ModSteamInfo>, usize) {
         if mods_steam_info[i].title.len() > size {
             size = mods_steam_info[i].title.len();
         }
-    };
+    }
 
     (mods_steam_info, size)
 }
@@ -128,7 +128,7 @@ impl ModSteamInfo {
     pub fn gen_short(&self, biggest_name: usize) -> String {
         "".to_string()
             .add_s(format!("{:>15}", self.id))
-            .add_s(format!("   {:<size$}", self.title,  size = biggest_name))
+            .add_s(format!("   {:<size$}", self.title, size = biggest_name))
             .add_s(format!("   {:<20}", self.author))
     }
 
@@ -146,7 +146,7 @@ impl ModSteamInfo {
 pub struct SteamMods {
     pub mods: Vec<ModSteamInfo>,
     pub biggest_name_size: usize,
-    pub display_type: Option<DisplayType>
+    pub display_type: Option<DisplayType>,
 }
 
 impl SteamMods {
@@ -156,7 +156,7 @@ impl SteamMods {
         SteamMods {
             mods,
             biggest_name_size,
-            display_type: None
+            display_type: None,
         }
     }
 
@@ -176,6 +176,8 @@ impl SteamMods {
             println!("{}", ModSteamInfo::gen_headers(self.biggest_name_size));
         }
 
-        self.mods.iter().for_each(|m| m.display(d_type, self.biggest_name_size))
+        self.mods
+            .iter()
+            .for_each(|m| m.display(d_type, self.biggest_name_size))
     }
 }
