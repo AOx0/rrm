@@ -1,11 +1,9 @@
-use std::env::current_dir;
-use serde::{Serialize, Deserialize};
+use rwm_locals::GamePath;
+use serde::{Deserialize, Serialize};
 use std::fs::{File, OpenOptions};
-use std::io::{BufReader, Read, Seek, SeekFrom, Write};
+use std::io::{BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::exit;
-use directories::UserDirs;
-use rwm_locals::GamePath;
 
 #[cfg(test)]
 mod tests {
@@ -22,22 +20,23 @@ fn config_exists(home: &Path) -> bool {
 }
 
 fn get_home() -> Option<PathBuf> {
-    if let Some(user_dirs) = UserDirs::new() {
-        let home: &Path = user_dirs.home_dir();
-        #[cfg(feature = "dev")]
-            return Some(current_dir().unwrap());
-        #[cfg(not(feature = "dev"))]
-            return Some(home.to_path_buf());
-    } else {
-        None
-    }
+    #[cfg(feature = "dev")]
+        return Some(std::env::current_dir().unwrap());
+
+    #[cfg(not(feature = "dev"))]
+        if let Some(user_dirs) = directories::UserDirs::new() {
+            let home: &Path = user_dirs.home_dir();
+            Some(home.to_path_buf())
+        } else {
+            None
+        }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Installer {
     pub config: PathBuf,
     pub home: PathBuf,
-    pub rim_install: Option<PathBuf>
+    pub rim_install: Option<GamePath>,
 }
 
 fn create_config(at: &Path) {
@@ -69,8 +68,12 @@ impl Installer {
             }
         };
 
+        let path = path.map(|path| GamePath::from(&path));
+
         Installer {
-            home, rim_install: path, config
+            home,
+            rim_install: path,
+            config,
         }
     }
 
@@ -79,22 +82,21 @@ impl Installer {
         Installer::init(Some(rim_install))
     }
 
-    pub fn write_config(&self, ) {
+    pub fn write_config(&self) {
         let json = serde_json::to_string_pretty(self).unwrap();
         let mut config = OpenOptions::new()
             .append(false)
             .create(true)
             .write(true)
             .read(false)
-            .open(&self.config).unwrap_or_else(|err| {
-            eprintln!("Failed to open config file at {}", &self.config.display());
-            eprintln!("Error: {}", err);
-            exit(1);
-        });
-
+            .open(&self.config)
+            .unwrap_or_else(|err| {
+                eprintln!("Failed to open config file at {}", &self.config.display());
+                eprintln!("Error: {}", err);
+                exit(1);
+            });
 
         config.write_all(json.as_bytes()).unwrap();
-
     }
 
     pub fn load_config(path: &Path) -> serde_json::Result<Installer> {
@@ -111,17 +113,16 @@ impl Installer {
     }
 
     pub fn new(with_path: Option<GamePath>) -> Option<Self> {
-
-        let installer = if let Some(path)  = with_path {
+        let installer = if let Some(path) = with_path {
             Installer::init_with_path(path)
         } else {
             let installer = Installer::init(None);
             let old_config = Installer::load_config(&installer.config);
 
-            if let Ok(installer) = old_config {
-                installer
+            if let Ok(i) = old_config {
+                i
             } else {
-                return None;
+                installer
             }
         };
 
