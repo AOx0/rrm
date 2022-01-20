@@ -92,10 +92,12 @@ impl Installer {
 
     pub fn write_config(&self) {
         let json = serde_json::to_string_pretty(self).unwrap();
+
         let mut config = OpenOptions::new()
             .append(false)
             .create(true)
             .write(true)
+            .truncate(true)
             .read(false)
             .open(&self.config)
             .unwrap_or_else(|err| {
