@@ -130,13 +130,17 @@ impl Installer {
             let old_config = Installer::load_config(&installer.config);
 
             if let Ok(i) = old_config {
-                let rim = i.rim_install.as_ref().unwrap().path();
-                if rim.exists() {
-                    i
+                if i.rim_install.as_ref().is_some() {
+                    let rim = i.rim_install.as_ref().unwrap().path();
+                    if rim.exists() {
+                        i
+                    } else {
+                        println!("Error: Previous saved game location \"{}\" no longer exists.",
+                                 rim.display());
+                        installer
+                    }
                 } else {
-                    println!("Previous saved game location \"{}\" no longer exists.",
-                             rim.display());
-                    Installer::init(None)
+                    installer
                 }
             } else {
                 installer
