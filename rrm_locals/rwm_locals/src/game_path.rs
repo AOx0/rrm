@@ -13,8 +13,9 @@ impl GamePath {
                 eprintln!("Failed to read contents inside {}", path.display());
                 exit(1);
             })
-            .any(|path| path.unwrap().file_name() == "Mods");
+            .any(|path| path.as_ref().unwrap().file_name() == "Mods" && path.unwrap().path().is_dir());
 
+        println!("Does not exist: {}", path.display());
         if path.exists() && has_mods_dir {
             GamePath(Box::from(path))
         } else if !path.exists() {
