@@ -1,3 +1,6 @@
+extern crate core;
+
+use std::fs;
 use rwm_locals::GamePath;
 use serde::{Deserialize, Serialize};
 use std::fs::{File, OpenOptions};
@@ -15,7 +18,7 @@ mod tests {
 }
 
 fn config_exists(home: &Path) -> bool {
-    let config = home.join(".rwm_config");
+    let config = home.join(".rwm").join("config");
     config.exists() && config.is_file()
 }
 
@@ -40,6 +43,11 @@ pub struct Installer {
 }
 
 fn create_config(at: &Path) {
+    fs::create_dir(at.parent().unwrap()).unwrap_or_else(|err| {
+        if !at.parent().unwrap().is_dir() {
+            panic!("{}", err);
+        }
+    });
     File::create(at).unwrap_or_else(|err| {
         eprintln!("Something happened while trying to create {}", at.display());
         eprintln!("Error: {}", err);
@@ -56,7 +64,7 @@ impl Installer {
             exit(1);
         };
 
-        let config_file = home.join(".rwm_config");
+        let config_file = home.join(".rwm").join("config");
         let config = if config_exists(&home) {
             config_file
         } else {
@@ -120,7 +128,14 @@ impl Installer {
             let old_config = Installer::load_config(&installer.config);
 
             if let Ok(i) = old_config {
-                i
+                let rim = i.rim_install.as_ref().unwrap().path();
+                if rim.exists() {
+                    i
+                } else {
+                    println!("Previous saved game location \"{}\" no longer exists.",
+                             rim.display());
+                    Installer::init(None)
+                }
             } else {
                 installer
             }
