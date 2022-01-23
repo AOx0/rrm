@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 path-absolutize = "3.0.11"
 serde = "1.0.133"
+pager = "0.16.0"
 rwm_xml = {path = "../rwm_xml"}
