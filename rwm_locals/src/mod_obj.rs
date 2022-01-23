@@ -98,14 +98,17 @@ impl Mod {
             .add_s(format!("   {:<20}", self.author))
     }
 
+    pub fn gen_display(&self, form: &DisplayType, biggest_name: usize) -> String {
+        if let DisplayType::Long = form {
+            self.gen_large()
+        } else {
+            self.gen_short(biggest_name)
+        }
+    }
+
     pub fn display(&self, form: &DisplayType, biggest_name: usize) {
         let mut f: Stdout = std::io::stdout();
-
-        if let DisplayType::Long = form {
-            writeln!(f, "{}", self.gen_large()).unwrap()
-        } else {
-            writeln!(f, "{}", self.gen_short(biggest_name)).unwrap()
-        }
+        writeln!(f, "{}", self.gen_display(form, biggest_name)).unwrap()
     }
 }
 

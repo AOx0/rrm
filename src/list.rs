@@ -5,5 +5,5 @@ pub fn list(i: Installer, display_type: DisplayType) {
     let mods: GameMods = GameMods::from(i.rim_install.unwrap())
         .with_display(display_type);
 
-    mods.display();
+    mods.more_display();
 }
