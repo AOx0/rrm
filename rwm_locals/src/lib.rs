@@ -51,12 +51,17 @@ impl GameMods {
     pub fn more_display(&self) {
         let output = self.gen_display();
 
-        let mut more = std::process::Command::new("more")
+        #[cfg(target_os = "windows")]
+        const MORE: &'static str = r"C:\Windows\System32\more.com";
+
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        const MORE: &'static str = r"more";
+
+        let mut more = std::process::Command::new(MORE)
             .stdin(Stdio::piped())
             .spawn().unwrap();
 
         let more_stdin = more.stdin.as_mut().unwrap();
-
         more_stdin.write_all(output.as_bytes());
 
         more.wait().unwrap();
