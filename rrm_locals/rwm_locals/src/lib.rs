@@ -49,10 +49,17 @@ impl GameMods {
     }
 
     pub fn more_display(&self) {
-        pager::Pager::with_default_pager("more").setup();
         let output = self.gen_display();
 
-        println!("{}", output);
+        let mut more = std::process::Command::new("more")
+            .stdin(Stdio::piped())
+            .spawn().unwrap();
+
+        let more_stdin = more.stdin.as_mut().unwrap();
+
+        more_stdin.write_all(output.as_bytes());
+
+        more.wait().unwrap();
     }
 
     pub fn display(&self) {
