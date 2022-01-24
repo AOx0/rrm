@@ -1,4 +1,5 @@
 use crate::utils::*;
+use rwm_locals::{FilterBy, FlagSet};
 use clap::{AppSettings, Args, Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -127,6 +128,36 @@ pub struct Local {
     /// Display the larger message
     #[clap(short, long)]
     pub(crate) large: bool,
+}
+
+macro_rules! a_if {
+    ($cond: expr, $add: expr) => {
+        if $cond { $add } else { FilterBy::None }
+    };
+}
+
+
+impl Local {
+    pub fn to_filter_obj(&self) -> FlagSet<FilterBy> {
+        let mut result: FlagSet<FilterBy> = FlagSet::from(FilterBy::None);
+
+        if self.all {
+            return FlagSet::from(FilterBy::All);
+        }
+
+        result |= a_if!(self.name, FilterBy::Name);
+        result |= a_if!(self.authors, FilterBy::Author);
+        result |= a_if!(self.version, FilterBy::Version);
+        result |= a_if!(self.steam_id, FilterBy::SteamID);
+
+        if result.bits() == 0 {
+            result |= FilterBy::Name;
+        }
+
+        result -= FilterBy::None;
+
+        result
+    }
 }
 
 impl App {

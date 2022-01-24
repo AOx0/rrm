@@ -24,6 +24,8 @@ async fn main() {
 
         args::Commands::Search { command } => match command {
             args::Search::Local { args } => {
+                let f = args.to_filter_obj();
+                println!("{:?}", f);
                 search::search_locally(installer, args);
             }
             args::Search::Steam { args } => {
