@@ -7,6 +7,7 @@ pub use mod_obj::*;
 pub use mod_paths::*;
 use std::ops::{Add, Deref};
 
+pub use flagset::*;
 use std::process::{exit, Stdio};
 use std::io::Write;
 
@@ -107,5 +108,16 @@ impl From<GamePath> for GameMods {
             display_type: None,
             biggest_name_size: biggest,
         }
+    }
+}
+
+flags! {
+    pub enum FilterBy: u8 {
+        Author  = 0b00001,
+        Name    = 0b00010,
+        Version = 0b00100,
+        SteamID = 0b01000,
+        None    = 0b10000,
+        All = (FilterBy::Author | FilterBy::Name | FilterBy::Version | FilterBy::SteamID).bits(),
     }
 }
