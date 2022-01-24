@@ -41,6 +41,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
 
 [[package]]
+name = "flagset"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1207393e01e20804589a3fc9781c9df2a70687cd81362ca58e33b2a726ec83cf"
+
+[[package]]
 name = "getrandom"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -139,6 +145,7 @@ dependencies = [
 name = "rwm_locals"
 version = "0.1.0"
 dependencies = [
+ "flagset",
  "path-absolutize",
  "rwm_xml",
  "serde",
