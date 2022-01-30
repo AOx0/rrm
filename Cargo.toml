@@ -11,9 +11,12 @@ description = "RimWorld command-line interface mod manager"
 
 [dependencies]
 execute = "0.2.9"
-clap = { version= "3.0.10", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
-tokio =  { version= "1.15.0", features=["full"] }
+clap = { version= "3.0.13", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
+tokio =  { version= "1.16.1", features=["full"] }
 
 rwm_locals = {path="rwm_locals"}
 rwm_scrap = {path="rwm_scrap"}
+
+# Note feature "dev" is used.
+# This overwrites $HOME location to the current directory when creating config and installation files.
 rwm_installer = {path="rwm_installer", features=["dev"]}
