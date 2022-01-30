@@ -59,16 +59,10 @@ impl GameMods {
         result
     }
 
-    pub fn more_display(&self) {
+    pub fn more_display(&self, with_pager: &str) {
         let output = self.gen_display();
 
-        #[cfg(target_os = "windows")]
-        const MORE: &'static str = r"C:\Windows\System32\more.com";
-
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        const MORE: &'static str = r"more";
-
-        let mut more = std::process::Command::new(MORE)
+        let mut more = std::process::Command::new(with_pager)
             .stdin(Stdio::piped())
             .spawn().unwrap();
 
