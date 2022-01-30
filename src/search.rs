@@ -1,5 +1,5 @@
 use crate::utils::*;
-use fuzzy_matcher::*;
+use rwm_locals::Filtrable;
 use rwm_installer::Installer;
 use crate::args::{Local, Steam};
 
@@ -10,49 +10,10 @@ pub fn search_locally(
     let mods = GameMods::from(i.rim_install.unwrap())
         .with_display( d_type);
 
-    let matcher = skim::SkimMatcherV2::default();
+    let filtered = mods.filter_by(args.to_filter_obj(), &args.string);
 
-    let all_false = !(args.authors || args.version || args.steam_id || args.name || args.all);
-
-    let mut size: usize = 0;
-
-    let matches: Vec<&Mod> = mods
-        .iter()
-        .filter(|m| {
-            let result = (if args.name || args.all || all_false {
-                matcher.fuzzy_match(&m.name, &args.string).is_some()
-            } else {
-                false
-            }) || (if args.authors || args.all {
-                matcher.fuzzy_match(&m.author, &args.string).is_some()
-            } else {
-                false
-            }) || (if args.version || args.all {
-                matcher
-                    .fuzzy_match(&m.version.clone().unwrap_or_else(|| "".to_string()), &args.string)
-                    .is_some()
-            } else {
-                false
-            }) || (if args.steam_id || args.all {
-                matcher.fuzzy_match(&m.steam_id, &args.string).is_some()
-            } else {
-                false
-            });
-
-            if result && m.name.len() > size {
-                size = m.name.len();
-            };
-
-            result
-        })
-        .collect();
-
-    if !matches.is_empty() {
-        if let DisplayType::Short = d_type {
-            println!("{}", Mod::gen_headers(size));
-        }
-
-        matches.iter().for_each(|m| m.display(&d_type, size))
+    if !filtered.is_empty() {
+        filtered.display();
     } else {
         println!("No results found")
     }

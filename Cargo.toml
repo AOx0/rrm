@@ -13,7 +13,6 @@ description = "RimWorld command-line interface mod manager"
 execute = "0.2.9"
 clap = { version= "3.0.10", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
 tokio =  { version= "1.15.0", features=["full"] }
-fuzzy-matcher = "0.3.7"
 
 rwm_locals = {path="rwm_locals"}
 rwm_scrap = {path="rwm_scrap"}

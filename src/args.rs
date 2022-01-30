@@ -107,7 +107,7 @@ pub struct Local {
 
     /// Search by author(s) name(s)
     #[clap(short, long)]
-    pub(crate) authors: bool,
+    pub(crate) author: bool,
 
     /// Search by version
     #[clap(short, long)]
@@ -146,15 +146,16 @@ impl Local {
         }
 
         result |= a_if!(self.name, FilterBy::Name);
-        result |= a_if!(self.authors, FilterBy::Author);
+        result |= a_if!(self.author, FilterBy::Author);
         result |= a_if!(self.version, FilterBy::Version);
         result |= a_if!(self.steam_id, FilterBy::SteamID);
 
-        if result.bits() == 0 {
+        result -= FilterBy::None;
+
+        if result.is_empty() {
             result |= FilterBy::Name;
         }
 
-        result -= FilterBy::None;
 
         result
     }

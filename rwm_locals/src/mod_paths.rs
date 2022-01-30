@@ -6,7 +6,6 @@ use path_absolutize::Absolutize;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use std::process::exit;
 
 #[derive(Debug)]
 pub struct ModPaths {
@@ -35,7 +34,7 @@ fn get_mods(about_dir: &Path) -> Vec<ModPaths> {
         let parent = path.parent().unwrap();
         let steam_id = parent.join("PublishedFileId.txt");
 
-        let mut file : std::io::Result<File> = File::open(steam_id);
+        let file : std::io::Result<File> = File::open(steam_id);
         let mut steam_id: Vec<u8> = Vec::new();
 
         if file.is_err() {

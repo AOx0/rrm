@@ -1126,7 +1126,6 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "execute",
- "fuzzy-matcher",
  "rwm_installer",
  "rwm_locals",
  "rwm_scrap",
@@ -1149,6 +1148,7 @@ name = "rwm_locals"
 version = "0.1.0"
 dependencies = [
  "flagset",
+ "fuzzy-matcher",
  "path-absolutize",
  "rwm_xml",
  "serde",
