@@ -16,7 +16,4 @@ tokio =  { version= "1.16.1", features=["full"] }
 
 rwm_locals = {path="rwm_locals"}
 rwm_scrap = {path="rwm_scrap"}
-
-# Note feature "dev" is used.
-# This overwrites $HOME location to the current directory when creating config and installation files.
-rwm_installer = {path="rwm_installer", features=["dev"]}
+rwm_installer = {path="rwm_installer"}
