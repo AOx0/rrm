@@ -6,7 +6,7 @@ pub fn list(i: Installer, display_type: DisplayType) {
         .with_display(display_type);
 
     if i.use_more {
-        mods.more_display();
+        mods.more_display(&i.with_paging);
     } else {
         mods.display();
     }

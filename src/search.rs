@@ -15,7 +15,7 @@ pub fn search_locally(
 
     if !filtered.is_empty() {
         if i.use_more {
-            filtered.more_display()
+            filtered.more_display(&i.with_paging)
         } else {
             filtered.display()
         }

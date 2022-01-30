@@ -8,6 +8,13 @@ use std::io::{BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::exit;
 
+#[cfg(target_os = "windows")]
+static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
+
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+static DEFAULT_PAGING_SOFTWARE: &str = r"more";
+
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -52,7 +59,8 @@ pub struct Installer {
     pub config: PathBuf,
     pub home: PathBuf,
     pub rim_install: Option<GamePath>,
-    pub use_more: bool
+    pub use_more: bool,
+    pub with_paging: String
 }
 
 fn create_config(at: &Path) {
@@ -92,6 +100,7 @@ impl Installer {
         let path = path.map(|path| GamePath::from(&path));
 
         Installer {
+            with_paging: DEFAULT_PAGING_SOFTWARE.to_string(),
             home,
             rim_install: path,
             config,
