@@ -12,8 +12,13 @@ pub fn search_locally(
 
     let filtered = mods.filter_by(args.to_filter_obj(), &args.string);
 
+
     if !filtered.is_empty() {
-        filtered.display();
+        if i.use_more {
+            filtered.more_display()
+        } else {
+            filtered.display()
+        }
     } else {
         println!("No results found")
     }

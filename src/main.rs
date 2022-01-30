@@ -15,11 +15,10 @@ macro_rules! d {
 async fn main() {
     let args = args::App::load();
 
-    let will_set = if let args::Commands::Set {command} = &args.command {
-        matches!(command, Options::GamePath { .. })
-    } else { false };
-
-    let mut installer = utils::try_get_path(None, will_set);
+    let mut installer = utils::try_get_path(
+        None,
+        matches!(&args.command, args::Commands::Set {command: Options::GamePath { .. }})
+    );
 
     match args.command {
         args::Commands::Set { command } => {
