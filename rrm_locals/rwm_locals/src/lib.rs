@@ -5,7 +5,8 @@ mod mod_paths;
 pub use game_path::*;
 pub use mod_obj::*;
 pub use mod_paths::*;
-use std::ops::{Add, Deref};
+use std::ops::{Deref};
+use fuzzy_matcher::*;
 
 pub use flagset::*;
 use std::process::{exit, Stdio};
@@ -21,6 +22,15 @@ pub struct GameMods {
 }
 
 impl GameMods {
+
+    pub fn new() -> Self {
+        GameMods {
+            mods: Vec::new(),
+            biggest_name_size: 0,
+            display_type: None
+        }
+    }
+
     pub fn with_display(self, t: DisplayType) -> Self {
         let mut s = self;
         s.display_type = Some(t);
@@ -63,7 +73,10 @@ impl GameMods {
             .spawn().unwrap();
 
         let more_stdin = more.stdin.as_mut().unwrap();
-        more_stdin.write_all(output.as_bytes());
+        more_stdin.write_all(output.as_bytes()).unwrap_or_else(|err| {
+            eprintln!("Something went wrong while writing contents to `more`.\n\
+            Error: {err}")
+        } );
 
         more.wait().unwrap();
     }
@@ -119,5 +132,60 @@ flags! {
         SteamID = 0b01000,
         None    = 0b10000,
         All = (FilterBy::Author | FilterBy::Name | FilterBy::Version | FilterBy::SteamID).bits(),
+    }
+}
+
+pub trait Filtrable<T: flagset::Flags>: Sized {
+    fn filter_by(&self, filter: FlagSet<T>, value: &str) -> Self;
+}
+
+impl Filtrable<FilterBy> for GameMods {
+    fn filter_by(&self, filter: FlagSet<FilterBy>, value: &str) -> Self {
+        use FilterBy::*;
+
+        let mut filtered = GameMods::new();
+        let mods: Vec<Mod> = self.mods.clone();
+
+        let matcher = skim::SkimMatcherV2::default();
+
+        filtered.display_type = self.display_type;
+
+        mods
+            .into_iter()
+            .for_each(|m| {
+                let result =
+                    {
+                        (if filter.contains(All) || filter.contains(Name) || filter.contains(Name) {
+                            matcher.fuzzy_match(&m.name, &value).is_some()
+                        } else {
+                            false
+                        }) || (if filter.contains(Author) || filter.contains( All) {
+                            matcher.fuzzy_match(&m.author, &value).is_some()
+                        } else {
+                            false
+                        }) || (if filter.contains(Version) || filter.contains( All) {
+                            matcher
+                                .fuzzy_match(&m.version.clone().unwrap_or_else(|| "".to_string()), &value)
+                                .is_some()
+                        } else {
+                            false
+                        }) || (if filter.contains(SteamID) || filter.contains( All) {
+                            matcher.fuzzy_match(&m.steam_id, &value).is_some()
+                        } else {
+                            false
+                        })
+                    };
+
+                if result {
+                    if m.name.len() > filtered.biggest_name_size {
+                        filtered.biggest_name_size = m.name.len();
+                    }
+
+                    filtered.mods.push(m);
+                };
+            });
+
+
+        filtered
     }
 }
