@@ -42,8 +42,9 @@ Help message:
 	    rwm set <OPTION> <VALUE>
 	
 	OPTIONS:
-	    game-path    Set the path where RimWorld is installed [alias: \"path\"]
-	    use-more     Set if rwm should use more to display output [values: false, true, 0, 1] [alias: \"more\"]
+	    game-path    Set the path where RimWorld is installed [alias: 'path']
+	    pager        Set the paging software to use, like bat, more or less [alias: 'paging']
+	    use-pager    Set if rwm should use more to display output [values: false, true, 0, 1] [alias: 'use-paging']
 
 
 <br/><br/> 

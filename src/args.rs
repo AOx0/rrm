@@ -18,12 +18,13 @@ USAGE:
     rwm set <OPTION> <VALUE>
 
 OPTIONS:
-    game-path    Set the path where RimWorld is installed [alias: \"path\"]
-    use-more     Set if rwm should use more to display output [values: false, true, 0, 1] [alias: \"more\"]
+    game-path    Set the path where RimWorld is installed [alias: 'path']
+    pager        Set the paging software to use, like bat, more or less [alias: 'paging']
+    use-pager    Set if rwm should use more to display output [values: false, true, 0, 1] [alias: 'use-paging']
 ")]
 pub enum Options {
-    #[clap(about = "Set if rwm should use `more` to display output [values: false, true, 0, 1]", visible_alias = "more")]
-    UseMore {
+    #[clap(about = "Set if rwm should use paging software to display output [values: false, true, 0, 1]", visible_alias = "use-paging")]
+    UsePager {
         #[clap(required = true, possible_values= &["true", "false", "0", "1"])]
         value: String,
     },
@@ -31,6 +32,19 @@ pub enum Options {
     #[clap(about = "Set the path where RimWorld is installed",  visible_alias = "path")]
     GamePath {
         /// The path where RimWorld is installed
+        #[clap(required = true)]
+        value: PathBuf,
+    },
+
+    #[clap(about = "Set the paging software to use, like bat, more or less", visible_alias = "paging")]
+    Pager {
+        #[cfg(target_os = "windows")]
+        /// The path where the paging software is, for example: C:\Windows\System32\more.com
+        #[clap(required = true)]
+        value: PathBuf,
+
+        #[cfg(any(target_os = "macos", target_os = "linux"))]
+        /// The name of the paging software, for example: bat, more
         #[clap(required = true)]
         value: PathBuf,
     }

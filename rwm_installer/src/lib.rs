@@ -184,4 +184,33 @@ impl Installer {
         self.rim_install = Some(GamePath::from(value.as_path()));
         self.write_config();
     }
+
+    pub fn set_paging_software(&mut self, value: &str) {
+        let try_execute_pager = std::process::Command::new(value)
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .spawn().unwrap_or_else(|error| {
+            eprintln!("Could not execute pager successfully, make sure the path or name\n\
+                        is correct or that it is available within the PATH.\n\
+                        Error: {}", error);
+            exit(1);
+        }).wait().unwrap_or_else(
+            |error| {
+                eprintln!("Could not execute pager successfully, make sure the path or name\n\
+                        is correct or that it is available within the PATH.\n\
+                        Error: {}", error);
+                exit(1);
+            }
+        ).code();
+
+        if let Some(code) = try_execute_pager {
+            if code == 0 {
+                self.with_paging = value.to_string();
+                self.write_config()
+            }
+        } else {
+            eprintln!("Could not execute pager successfully, make sure the path or name\n\
+                        is correct or that it is available within the PATH.");
+        }
+    }
 }

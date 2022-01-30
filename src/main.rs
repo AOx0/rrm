@@ -23,12 +23,16 @@ async fn main() {
     match args.command {
         args::Commands::Set { command } => {
             match command {
-                Options::UseMore { value } => {
+                Options::UsePager { value } => {
                     installer.set_more_value(value == "true" || value == "1")
                 },
 
                 Options::GamePath { value } => {
                     installer.set_path_value(value);
+                },
+
+                Options::Pager { value } => {
+                    installer.set_paging_software(value.to_str().unwrap());
                 }
             }
         }
