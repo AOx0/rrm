@@ -8,7 +8,7 @@ Up to now, you must have `steamcmd` installed and available within your `PATH`.
 
 # Current features demo:
 
-![Example](./media/Demo1.svg)
+![Example][image-1]
 
 
 
@@ -22,12 +22,23 @@ To install run:
 	cargo install --git https://github.com/AOx0/rwm
 
 
+## Configuration
+`rwm` automatically changes its default configuration with the flags you use while calling it.
+For example, non-standard game paths are automatically remembered by `rwm` once you specify it with the flag `-g` (`--game-path`).
+
+The configuration file is available in `$USER_HOME/.rwm/config` on macOS, Linux, and Windows with a JSON format. 
+
+Auto-saved config:
+	--game-path -g		Specify the game path where it's installed.
+	--no-more 			Do not wrap output with `more` when searching locally or in steam. [Available with `rwm list`] 
+
+
 <br/><br/> 
-## Install  `steamcmd`
+## Install `steamcmd`
 Information extracted from [SteamCMD website][4]
 
 ### \> macOS
-You can install  `steamcmd` via [Homebrew][5] with:
+You can install `steamcmd` via [Homebrew][5] with:
 
 	brew install steamcmd
 
@@ -49,7 +60,7 @@ You can install it via:
 
 	sudo apt install steamcmd
 
- **Note**: 	If you are using a 64 bit machine you will need to add multiverse
+ **Note**: 	If you are using a 64 bit machine, you will need to add multiverse
 
 	sudo add-apt-repository multiverse
 	sudo dpkg --add-architecture i386
@@ -66,3 +77,5 @@ Available [here][7]
 [5]:	https://brew.sh "Homebrew"
 [6]:	https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip
 [7]:	https://github.com/AOx0/rwm/projects/1
+
+[image-1]:	./media/Demo1.svg
