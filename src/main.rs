@@ -1,3 +1,5 @@
+use crate::args::Options;
+
 mod args;
 mod list;
 mod search;
@@ -13,13 +15,25 @@ macro_rules! d {
 async fn main() {
     let args = args::App::load();
 
-    let installer = if args.game_path.is_none() {
-        utils::try_get_path(None)
-    } else {
-        utils::try_get_path(Some(&args.game_path.unwrap()))
-    };
+    let will_set = if let args::Commands::Set {command} = &args.command {
+        matches!(command, Options::GamePath { .. })
+    } else { false };
+
+    let mut installer = utils::try_get_path(None, will_set);
 
     match args.command {
+        args::Commands::Set { command } => {
+            match command {
+                Options::UseMore { value } => {
+                    installer.set_more_value(value == "true" || value == "1")
+                },
+
+                Options::GamePath { value } => {
+                    installer.set_path_value(value);
+                }
+            }
+        }
+
         args::Commands::List { large } => list::list(installer, d!(large)),
 
         args::Commands::Search { command } => match command {

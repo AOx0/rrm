@@ -30,7 +30,7 @@ pub const LIST_DESCRIPTION: &str = "List installed Mods in Path/To/RimWorld/Mods
 #[cfg(target_os = "windows")]
 pub const LIST_DESCRIPTION: &str = r#"List installed Mods in C:\Path\To\RimWorld\Mods"#;
 
-pub fn try_get_path(game_path: Option<&Path>) -> Installer {
+pub fn try_get_path(game_path: Option<&Path>, will_set: bool) -> Installer {
     if let Some(game_path) = game_path {
         if dir_exists(game_path) {
             Installer::new(Some(GamePath::from(game_path))).unwrap()
@@ -44,11 +44,14 @@ pub fn try_get_path(game_path: Option<&Path>) -> Installer {
     } else if let Some(installer) = Installer::new(None) {
         if installer.rim_install.is_some() {
             installer
-        } else if installer.rim_install.is_none() {
+        } else if installer.rim_install.is_none() && !will_set {
             let mut result = None;
             RW_DEFAULT_PATH.into_iter().for_each(|path| {
                 if dir_exists(&PathBuf::from(path)) {
-                    result = Some(Installer::new(Some(GamePath::from(path)))).unwrap()
+                    eprintln!("Warning: Found RimWorld installation path at {}", PathBuf::from(path).display());
+                    let mut installer = Installer::new(None).unwrap();
+                    installer.set_path_value(path.parse().unwrap());
+                    result = Some(installer);
                 }
             });
 
@@ -57,17 +60,19 @@ pub fn try_get_path(game_path: Option<&Path>) -> Installer {
                     "\
                     Error: Unable to find RimWorld installation path.\n\
                     Try specifying the path:\n\
-                    \trwm list -g <GAME_PATH>        <--- Like this\
+                    \trwm set path <GAME_PATH>        <--- Like this\
                 "
                 );
                 exit(1);
             })
+        } else if installer.rim_install.is_none() && will_set {
+            installer
         } else {
             eprintln!(
                 "\
                     Error: Unable to find RimWorld installation path.\n\
                     Try specifying the path:\n\
-                    \trwm list -g <GAME_PATH>        <--- Like this\
+                    \trwm set path <GAME_PATH>        <--- Like this\
                 "
             );
             exit(1);

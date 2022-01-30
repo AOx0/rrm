@@ -6,11 +6,34 @@ use clap::{AppSettings, Args, Parser, Subcommand};
 #[clap(author, version, about, long_about = None)]
 pub struct App {
     #[clap(subcommand)]
-    pub(crate) command: Commands,
+    pub(crate) command: Commands
+}
 
-    /// The path where RimWorld is installed
-    #[clap(short, long, env = "GAME_PATH", global = true, required = false)]
-    pub(crate) game_path: Option<PathBuf>,
+#[derive(Subcommand, Debug)]
+#[clap(override_help = "\
+rwm-set
+Set new configuration values
+
+USAGE:
+    rwm set <OPTION> <VALUE>
+
+OPTIONS:
+    game-path    Set the path where RimWorld is installed [alias: \"path\"]
+    use-more     Set if rwm should use more to display output [values: false, true, 0, 1] [alias: \"more\"]
+")]
+pub enum Options {
+    #[clap(about = "Set if rwm should use `more` to display output [values: false, true, 0, 1]", visible_alias = "more")]
+    UseMore {
+        #[clap(required = true, possible_values= &["true", "false", "0", "1"])]
+        value: String,
+    },
+
+    #[clap(about = "Set the path where RimWorld is installed",  visible_alias = "path")]
+    GamePath {
+        /// The path where RimWorld is installed
+        #[clap(required = true)]
+        value: PathBuf,
+    }
 }
 
 #[derive(Subcommand, Debug)]
@@ -42,6 +65,12 @@ pub enum Commands {
     SearchLocally {
         #[clap(flatten)]
         args: Local,
+    },
+
+    #[clap(about = "Set new configuration values")]
+    Set {
+        #[clap(subcommand)]
+        command: Options,
     },
 
     #[clap(

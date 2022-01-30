@@ -17,6 +17,18 @@ mod tests {
     }
 }
 
+pub fn config_does_exists() -> bool {
+    let home = if let Some(home) = get_home() {
+        home
+    } else {
+        eprintln!("Something failed while getting the user's home dir");
+        exit(1);
+    };
+
+    let config = home.join(".rwm").join("config");
+    config.exists() && config.is_file()
+}
+
 fn config_exists(home: &Path) -> bool {
     let config = home.join(".rwm").join("config");
     config.exists() && config.is_file()
@@ -40,6 +52,7 @@ pub struct Installer {
     pub config: PathBuf,
     pub home: PathBuf,
     pub rim_install: Option<GamePath>,
+    pub use_more: bool
 }
 
 fn create_config(at: &Path) {
@@ -82,6 +95,7 @@ impl Installer {
             home,
             rim_install: path,
             config,
+            use_more: true
         }
     }
 
@@ -129,18 +143,19 @@ impl Installer {
             let installer = Installer::init(None);
             let old_config = Installer::load_config(&installer.config);
 
-            if let Ok(i) = old_config {
+            if let Ok(mut i) = old_config {
                 if i.rim_install.as_ref().is_some() {
                     let rim = i.rim_install.as_ref().unwrap().path();
                     if rim.exists() {
                         i
                     } else {
-                        println!("Error: Previous saved game location \"{}\" no longer exists.",
+                        eprintln!("Warning: Previous saved game location \"{}\" no longer exists.",
                                  rim.display());
-                        installer
+                        i.rim_install = None;
+                        i
                     }
                 } else {
-                    installer
+                    i
                 }
             } else {
                 installer
@@ -149,5 +164,15 @@ impl Installer {
 
         installer.write_config();
         Some(installer)
+    }
+
+    pub fn set_more_value(&mut self, value: bool) {
+        self.use_more = value;
+        self.write_config();
+    }
+
+    pub fn set_path_value(&mut self, value: PathBuf) {
+        self.rim_install = Some(GamePath::from(value.as_path()));
+        self.write_config();
     }
 }

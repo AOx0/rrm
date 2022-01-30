@@ -21,16 +21,29 @@ To install run:
 
 	cargo install --git https://github.com/AOx0/rwm
 
-
+<br/> <br/>
 ## Configuration
-`rwm` automatically changes its default configuration with the flags you use while calling it.
-For example, non-standard game paths are automatically remembered by `rwm` once you specify it with the flag `-g` (`--game-path`).
+To set configuration values like game installation path and whether `rwm` should use `more` to display its output or not, you can use the `set` subcommand. The configuration file is available in `$USER_HOME/.rwm/config` on macOS, Linux, and Windows with a JSON format. 
 
-The configuration file is available in `$USER_HOME/.rwm/config` on macOS, Linux, and Windows with a JSON format. 
+For example, to set the path were RimWorld is installed, you can use:
 
-Auto-saved config:
-	--game-path -g		Specify the game path where it's installed.
-	--no-more 			Do not wrap output with `more` when searching locally or in steam. [Available with `rwm list`] 
+	rwm set game-path /Applications/RimWorld.app
+
+Or with its alias:
+
+	rwm set path /Applications/RimWorld.app
+
+Help message:
+
+	rwm-set
+	Set new configuration values
+	
+	USAGE:
+	    rwm set <OPTION> <VALUE>
+	
+	OPTIONS:
+	    game-path    Set the path where RimWorld is installed [alias: \"path\"]
+	    use-more     Set if rwm should use more to display output [values: false, true, 0, 1] [alias: \"more\"]
 
 
 <br/><br/> 
