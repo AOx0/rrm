@@ -105,13 +105,27 @@ fn run_steam_command(c: &str, config_path: &Path) {
     #[cfg(target_os = "windows")]
         let steam = config_path.join("steamcmd").join("steamcmd.exe");
 
+    #[cfg(target_os = "windows")]
     let try_execute_steam = std::process::Command::new(steam.as_path().to_str().unwrap())
         .args("+login anonymous {} +quit".replace("{}", c).split(" "))
         .stdin(std::process::Stdio::null())
         .spawn().unwrap_or_else(|error| {
-        eprintln!("Could not execute steamcmd successfully, make sure the path or name\n\
-                        is correct or that it is available within the PATH.\n\
-                        Error: {}", error);
+        eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
+        exit(1);
+    }).wait().unwrap().code().unwrap();
+
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+        let try_execute_steam = std::process::Command::new("env")
+        .args(
+            r#"HOME=PATH [] +login anonymous {} +quit"#
+                .replace("PATH", steam.as_path().parent().unwrap().parent().unwrap().to_str().unwrap())
+                .replace("[]", steam.as_path().to_str().unwrap())
+                .replace("{}", c)
+                .split(" ")
+        )
+        .stdin(std::process::Stdio::null())
+        .spawn().unwrap_or_else(|error| {
+        eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
         exit(1);
     }).wait().unwrap().code().unwrap();
 }
