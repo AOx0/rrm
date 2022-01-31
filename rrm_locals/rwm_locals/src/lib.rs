@@ -2,15 +2,15 @@ mod game_path;
 mod mod_obj;
 mod mod_paths;
 
+use fuzzy_matcher::*;
 pub use game_path::*;
 pub use mod_obj::*;
 pub use mod_paths::*;
-use std::ops::{Deref};
-use fuzzy_matcher::*;
+use std::ops::Deref;
 
 pub use flagset::*;
-use std::process::{exit, Stdio};
 use std::io::Write;
+use std::process::{exit, Stdio};
 
 pub type Mods = Vec<Mod>;
 
@@ -22,12 +22,11 @@ pub struct GameMods {
 }
 
 impl GameMods {
-
     pub fn new() -> Self {
         GameMods {
             mods: Vec::new(),
             biggest_name_size: 0,
-            display_type: None
+            display_type: None,
         }
     }
 
@@ -46,15 +45,15 @@ impl GameMods {
         });
 
         if let DisplayType::Short = d_type {
-            result.push_str( &format!("{}\n", Mod::gen_headers(self.biggest_name_size)));
+            result.push_str(&format!("{}\n", Mod::gen_headers(self.biggest_name_size)));
         }
 
-        self.mods
-            .iter()
-            .for_each(
-            |m|
-                result.push_str(&format!("{}\n", m.gen_display(d_type, self.biggest_name_size)))
-            );
+        self.mods.iter().for_each(|m| {
+            result.push_str(&format!(
+                "{}\n",
+                m.gen_display(d_type, self.biggest_name_size)
+            ))
+        });
 
         result
     }
@@ -64,13 +63,18 @@ impl GameMods {
 
         let mut more = std::process::Command::new(with_pager)
             .stdin(Stdio::piped())
-            .spawn().unwrap();
+            .spawn()
+            .unwrap();
 
         let more_stdin = more.stdin.as_mut().unwrap();
-        more_stdin.write_all(output.as_bytes()).unwrap_or_else(|err| {
-            eprintln!("Something went wrong while writing contents to `more`.\n\
-            Error: {err}")
-        } );
+        more_stdin
+            .write_all(output.as_bytes())
+            .unwrap_or_else(|err| {
+                eprintln!(
+                    "Something went wrong while writing contents to `more`.\n\
+            Error: {err}"
+                )
+            });
 
         more.wait().unwrap();
     }
@@ -144,41 +148,37 @@ impl Filtrable<FilterBy> for GameMods {
 
         filtered.display_type = self.display_type;
 
-        mods
-            .into_iter()
-            .for_each(|m| {
-                let result =
-                    {
-                        (if filter.contains(All) || filter.contains(Name) || filter.contains(Name) {
-                            matcher.fuzzy_match(&m.name, &value).is_some()
-                        } else {
-                            false
-                        }) || (if filter.contains(Author) || filter.contains( All) {
-                            matcher.fuzzy_match(&m.author, &value).is_some()
-                        } else {
-                            false
-                        }) || (if filter.contains(Version) || filter.contains( All) {
-                            matcher
-                                .fuzzy_match(&m.version.clone().unwrap_or_else(|| "".to_string()), &value)
-                                .is_some()
-                        } else {
-                            false
-                        }) || (if filter.contains(SteamID) || filter.contains( All) {
-                            matcher.fuzzy_match(&m.steam_id, &value).is_some()
-                        } else {
-                            false
-                        })
-                    };
+        mods.into_iter().for_each(|m| {
+            let result = {
+                (if filter.contains(All) || filter.contains(Name) || filter.contains(Name) {
+                    matcher.fuzzy_match(&m.name, &value).is_some()
+                } else {
+                    false
+                }) || (if filter.contains(Author) || filter.contains(All) {
+                    matcher.fuzzy_match(&m.author, &value).is_some()
+                } else {
+                    false
+                }) || (if filter.contains(Version) || filter.contains(All) {
+                    matcher
+                        .fuzzy_match(&m.version.clone().unwrap_or_else(|| "".to_string()), &value)
+                        .is_some()
+                } else {
+                    false
+                }) || (if filter.contains(SteamID) || filter.contains(All) {
+                    matcher.fuzzy_match(&m.steam_id, &value).is_some()
+                } else {
+                    false
+                })
+            };
 
-                if result {
-                    if m.name.len() > filtered.biggest_name_size {
-                        filtered.biggest_name_size = m.name.len();
-                    }
+            if result {
+                if m.name.len() > filtered.biggest_name_size {
+                    filtered.biggest_name_size = m.name.len();
+                }
 
-                    filtered.mods.push(m);
-                };
-            });
-
+                filtered.mods.push(m);
+            };
+        });
 
         filtered
     }
