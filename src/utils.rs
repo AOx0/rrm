@@ -48,7 +48,10 @@ pub fn try_get_path(game_path: Option<&Path>, will_set: bool) -> Installer {
             let mut result = None;
             RW_DEFAULT_PATH.into_iter().for_each(|path| {
                 if dir_exists(&PathBuf::from(path)) {
-                    eprintln!("Warning: Found RimWorld installation path at {}", PathBuf::from(path).display());
+                    eprintln!(
+                        "Warning: Found RimWorld installation path at {}",
+                        PathBuf::from(path).display()
+                    );
                     let mut installer = Installer::new(None).unwrap();
                     installer.set_path_value(path.parse().unwrap());
                     result = Some(installer);

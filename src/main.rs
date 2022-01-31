@@ -17,25 +17,28 @@ async fn main() {
 
     let mut installer = utils::try_get_path(
         None,
-        matches!(&args.command, args::Commands::Set {command: Options::GamePath { .. }})
+        matches!(
+            &args.command,
+            args::Commands::Set {
+                command: Options::GamePath { .. }
+            }
+        ),
     );
 
     match args.command {
-        args::Commands::Set { command } => {
-            match command {
-                Options::UsePager { value } => {
-                    installer.set_more_value(value == "true" || value == "1")
-                },
-
-                Options::GamePath { value } => {
-                    installer.set_path_value(value);
-                },
-
-                Options::Pager { value } => {
-                    installer.set_paging_software(value.to_str().unwrap());
-                }
+        args::Commands::Set { command } => match command {
+            Options::UsePager { value } => {
+                installer.set_more_value(value == "true" || value == "1")
             }
-        }
+
+            Options::GamePath { value } => {
+                installer.set_path_value(value);
+            }
+
+            Options::Pager { value } => {
+                installer.set_paging_software(value.to_str().unwrap());
+            }
+        },
 
         args::Commands::List { large } => list::list(installer, d!(large)),
 
