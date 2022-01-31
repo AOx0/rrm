@@ -3,13 +3,24 @@ extern crate core;
 use std::fs;
 use rwm_locals::GamePath;
 use serde::{Deserialize, Serialize};
-use std::fs::{File, OpenOptions};
+use std::fs::{File, FileType, OpenOptions};
 use std::io::{BufReader, Read, Write};
+use std::os::unix::fs::PermissionsExt;
+use include_dir::{include_dir, Dir};
 use std::path::{Path, PathBuf};
 use std::process::exit;
 
 #[cfg(target_os = "windows")]
 static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
+
+#[cfg(target_os = "macos")]
+static PROJECT_DIR: Dir = include_dir!("./rwm_installer/src/steamcmd/macos");
+
+#[cfg(target_os = "windows")]
+static PROJECT_DIR: Dir = include_dir!("./rwm_installer/src/steamcmd/windows");
+
+#[cfg(target_os = "linux")]
+static PROJECT_DIR: Dir = include_dir!("./rwm_installer/src/steamcmd/linux");
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 static DEFAULT_PAGING_SOFTWARE: &str = r"more";
@@ -69,11 +80,52 @@ fn create_config(at: &Path) {
             panic!("{}", err);
         }
     });
+
+
+
     File::create(at).unwrap_or_else(|err| {
         eprintln!("Something happened while trying to create {}", at.display());
         eprintln!("Error: {}", err);
         exit(1);
     });
+}
+
+fn run_steam_command(c: &str, config_path: &Path) {
+    #[cfg(target_os = "macos")]
+        let steam = config_path.join("steamcmd").join("steamcmd");
+
+    #[cfg(target_os = "linux")]
+        let steam = config_path.join("steamcmd").join("steamcmd.sh");
+
+    #[cfg(target_os = "windows")]
+        let steam = config_path.join("steamcmd").join("steamcmd.exe");
+
+    let try_execute_steam = std::process::Command::new(steam.as_path().to_str().unwrap())
+        .args("+login anonymous {} +quit".replace("{}", c).split(" "))
+        .stdin(std::process::Stdio::null())
+        .spawn().unwrap_or_else(|error| {
+        eprintln!("Could not execute steamcmd successfully, make sure the path or name\n\
+                        is correct or that it is available within the PATH.\n\
+                        Error: {}", error);
+        exit(1);
+    }).wait().unwrap().code().unwrap();
+}
+
+fn set_permissions_for_steamcmd(path: &Path) {
+    let files = path.read_dir().unwrap();
+
+    for file in files {
+        let file = file.unwrap();
+
+        if !file.file_type().unwrap().is_dir(){
+            let mut perms = fs::metadata(file.path()).unwrap().permissions();
+            perms.set_mode(0o744);
+            std::fs::set_permissions(file.path(), perms).unwrap();
+        } else {
+            set_permissions_for_steamcmd(&file.path());
+        }
+
+    }
 }
 
 impl Installer {
@@ -91,6 +143,19 @@ impl Installer {
         } else {
             create_config(&config_file);
             if config_exists(&home) {
+                let config_path = config_file.clone();
+                let config_path = config_path.as_path().parent().unwrap();
+                let steamcmd_path = config_path.join("steamcmd");
+                fs::create_dir(&steamcmd_path).unwrap_or_else(|err| {
+                    if !steamcmd_path.is_dir() {
+                        panic!("{}", err);
+                    }
+                });
+
+                PROJECT_DIR.extract(steamcmd_path.as_path()).unwrap();
+
+                set_permissions_for_steamcmd(steamcmd_path.as_path());
+
                 config_file
             } else {
                 exit(1);
@@ -98,6 +163,10 @@ impl Installer {
         };
 
         let path = path.map(|path| GamePath::from(&path));
+
+        std::env::set_current_dir(home.join(".rwm").as_path());
+
+        run_steam_command("", config.parent().unwrap().to_str().unwrap().as_ref());
 
         Installer {
             with_paging: DEFAULT_PAGING_SOFTWARE.to_string(),
