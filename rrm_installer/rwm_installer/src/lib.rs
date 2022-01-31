@@ -1,8 +1,8 @@
 extern crate core;
 
-use std::fs;
 use rwm_locals::GamePath;
 use serde::{Deserialize, Serialize};
+use std::fs;
 use std::fs::{File, FileType, OpenOptions};
 use std::io::{BufReader, Read, Write};
 
@@ -13,10 +13,8 @@ use std::process::exit;
 #[cfg(any(target_os = "macos", target_os = "linux"))]
 use std::os::unix::fs::PermissionsExt;
 
-
 #[cfg(target_os = "windows")]
-    static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
-
+static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
 
 #[cfg(target_os = "macos")]
 static PROJECT_DIR: Dir = include_dir!("./rwm_installer/src/steamcmd/macos");
@@ -29,7 +27,6 @@ static PROJECT_DIR: Dir = include_dir!("./rwm_installer/src/steamcmd/linux");
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 static DEFAULT_PAGING_SOFTWARE: &str = r"more";
-
 
 #[cfg(test)]
 mod tests {
@@ -59,15 +56,15 @@ fn config_exists(home: &Path) -> bool {
 
 fn get_home() -> Option<PathBuf> {
     #[cfg(feature = "dev")]
-        return Some(std::env::current_dir().unwrap());
+    return Some(std::env::current_dir().unwrap());
 
     #[cfg(not(feature = "dev"))]
-        if let Some(user_dirs) = directories::UserDirs::new() {
-            let home: &Path = user_dirs.home_dir();
-            Some(home.to_path_buf())
-        } else {
-            None
-        }
+    if let Some(user_dirs) = directories::UserDirs::new() {
+        let home: &Path = user_dirs.home_dir();
+        Some(home.to_path_buf())
+    } else {
+        None
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -76,7 +73,7 @@ pub struct Installer {
     pub home: PathBuf,
     pub rim_install: Option<GamePath>,
     pub use_more: bool,
-    pub with_paging: String
+    pub with_paging: String,
 }
 
 fn create_config(at: &Path) {
@@ -85,8 +82,6 @@ fn create_config(at: &Path) {
             panic!("{}", err);
         }
     });
-
-
 
     File::create(at).unwrap_or_else(|err| {
         eprintln!("Something happened while trying to create {}", at.display());
@@ -97,39 +92,58 @@ fn create_config(at: &Path) {
 
 fn run_steam_command(c: &str, config_path: &Path) {
     #[cfg(target_os = "macos")]
-        let steam = config_path.join("steamcmd").join("steamcmd");
+    let steam = config_path.join("steamcmd").join("steamcmd");
 
     #[cfg(target_os = "linux")]
-        let steam = config_path.join("steamcmd").join("steamcmd.sh");
+    let steam = config_path.join("steamcmd").join("steamcmd.sh");
 
     #[cfg(target_os = "windows")]
-        let steam = config_path.join("steamcmd").join("steamcmd.exe");
+    let steam = config_path.join("steamcmd").join("steamcmd.exe");
 
     #[cfg(target_os = "windows")]
     let try_execute_steam = std::process::Command::new(steam.as_path().to_str().unwrap())
         .args("+login anonymous {} +quit".replace("{}", c).split(" "))
         .stdin(std::process::Stdio::null())
-        .spawn().unwrap_or_else(|error| {
-        eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
-        exit(1);
-    }).wait().unwrap().code().unwrap();
+        .spawn()
+        .unwrap_or_else(|error| {
+            eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
+            exit(1);
+        })
+        .wait()
+        .unwrap()
+        .code()
+        .unwrap();
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-        let try_execute_steam = std::process::Command::new("env")
+    let try_execute_steam = std::process::Command::new("env")
         .args(
             r#"HOME=PATH [] +login anonymous {} +quit"#
-                .replace("PATH", steam.as_path().parent().unwrap().parent().unwrap().to_str().unwrap())
+                .replace(
+                    "PATH",
+                    steam
+                        .as_path()
+                        .parent()
+                        .unwrap()
+                        .parent()
+                        .unwrap()
+                        .to_str()
+                        .unwrap(),
+                )
                 .replace("[]", steam.as_path().to_str().unwrap())
                 .replace("{}", c)
-                .split(" ")
+                .split(" "),
         )
         .stdin(std::process::Stdio::null())
-        .spawn().unwrap_or_else(|error| {
-        eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
-        exit(1);
-    }).wait().unwrap().code().unwrap();
+        .spawn()
+        .unwrap_or_else(|error| {
+            eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
+            exit(1);
+        })
+        .wait()
+        .unwrap()
+        .code()
+        .unwrap();
 }
-
 
 #[cfg(any(target_os = "macos", target_os = "linux"))]
 fn set_permissions_for_steamcmd(path: &Path) {
@@ -138,14 +152,13 @@ fn set_permissions_for_steamcmd(path: &Path) {
     for file in files {
         let file = file.unwrap();
 
-        if !file.file_type().unwrap().is_dir(){
+        if !file.file_type().unwrap().is_dir() {
             let mut perms = fs::metadata(file.path()).unwrap().permissions();
             perms.set_mode(0o744);
             std::fs::set_permissions(file.path(), perms).unwrap();
         } else {
             set_permissions_for_steamcmd(&file.path());
         }
-
     }
 }
 
@@ -195,7 +208,7 @@ impl Installer {
             home,
             rim_install: path,
             config,
-            use_more: true
+            use_more: true,
         }
     }
 
@@ -249,8 +262,10 @@ impl Installer {
                     if rim.exists() {
                         i
                     } else {
-                        eprintln!("Warning: Previous saved game location \"{}\" no longer exists.",
-                                 rim.display());
+                        eprintln!(
+                            "Warning: Previous saved game location \"{}\" no longer exists.",
+                            rim.display()
+                        );
                         i.rim_install = None;
                         i
                     }
@@ -280,19 +295,27 @@ impl Installer {
         let try_execute_pager = std::process::Command::new(value)
             .stdin(std::process::Stdio::null())
             .stdout(std::process::Stdio::null())
-            .spawn().unwrap_or_else(|error| {
-            eprintln!("Could not execute pager successfully, make sure the path or name\n\
+            .spawn()
+            .unwrap_or_else(|error| {
+                eprintln!(
+                    "Could not execute pager successfully, make sure the path or name\n\
                         is correct or that it is available within the PATH.\n\
-                        Error: {}", error);
-            exit(1);
-        }).wait().unwrap_or_else(
-            |error| {
-                eprintln!("Could not execute pager successfully, make sure the path or name\n\
-                        is correct or that it is available within the PATH.\n\
-                        Error: {}", error);
+                        Error: {}",
+                    error
+                );
                 exit(1);
-            }
-        ).code();
+            })
+            .wait()
+            .unwrap_or_else(|error| {
+                eprintln!(
+                    "Could not execute pager successfully, make sure the path or name\n\
+                        is correct or that it is available within the PATH.\n\
+                        Error: {}",
+                    error
+                );
+                exit(1);
+            })
+            .code();
 
         if let Some(code) = try_execute_pager {
             if code == 0 {
@@ -300,8 +323,10 @@ impl Installer {
                 self.write_config()
             }
         } else {
-            eprintln!("Could not execute pager successfully, make sure the path or name\n\
-                        is correct or that it is available within the PATH.");
+            eprintln!(
+                "Could not execute pager successfully, make sure the path or name\n\
+                        is correct or that it is available within the PATH."
+            );
         }
     }
 }
