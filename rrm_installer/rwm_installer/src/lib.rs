@@ -5,13 +5,18 @@ use rwm_locals::GamePath;
 use serde::{Deserialize, Serialize};
 use std::fs::{File, FileType, OpenOptions};
 use std::io::{BufReader, Read, Write};
-use std::os::unix::fs::PermissionsExt;
+
 use include_dir::{include_dir, Dir};
 use std::path::{Path, PathBuf};
 use std::process::exit;
 
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+use std::os::unix::fs::PermissionsExt;
+
+
 #[cfg(target_os = "windows")]
-static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
+    static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
+
 
 #[cfg(target_os = "macos")]
 static PROJECT_DIR: Dir = include_dir!("./rwm_installer/src/steamcmd/macos");
@@ -111,6 +116,8 @@ fn run_steam_command(c: &str, config_path: &Path) {
     }).wait().unwrap().code().unwrap();
 }
 
+
+#[cfg(any(target_os = "macos", target_os = "linux"))]
 fn set_permissions_for_steamcmd(path: &Path) {
     let files = path.read_dir().unwrap();
 
@@ -154,6 +161,7 @@ impl Installer {
 
                 PROJECT_DIR.extract(steamcmd_path.as_path()).unwrap();
 
+                #[cfg(any(target_os = "macos", target_os = "linux"))]
                 set_permissions_for_steamcmd(steamcmd_path.as_path());
 
                 config_file
