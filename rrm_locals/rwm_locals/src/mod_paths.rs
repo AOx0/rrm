@@ -34,12 +34,15 @@ fn get_mods(about_dir: &Path) -> Vec<ModPaths> {
         let parent = path.parent().unwrap();
         let steam_id = parent.join("PublishedFileId.txt");
 
-        let file : std::io::Result<File> = File::open(steam_id);
+        let file: std::io::Result<File> = File::open(steam_id);
         let mut steam_id: Vec<u8> = Vec::new();
 
         if file.is_err() {
             steam_id = Vec::from("NOT FOUND".as_bytes());
-            eprintln!("Warning: Could not find PublishedFileId.txt in path {}", parent.display());
+            eprintln!(
+                "Warning: Could not find PublishedFileId.txt in path {}",
+                parent.display()
+            );
         } else {
             file.unwrap().read_to_end(&mut steam_id).unwrap();
         }
