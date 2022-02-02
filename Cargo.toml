@@ -3,6 +3,7 @@ name = "rwm"
 version = "0.1.0"
 edition = "2021"
 authors = ["AOx0"]
+rust-version = "1.58.1"
 description = "RimWorld command-line interface mod manager"
 
 

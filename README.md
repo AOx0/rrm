@@ -1,11 +1,13 @@
 <div><img src="https://img.shields.io/badge/Status-Unstable-red"></img></div>
 
+</br>
+
+TODOs are available [here][1]. Discussions, PRs and Issues are open for anyone who is willing to contribute. 
+
+---- 
 # rwm
 
-Inspired by Spoons [rmm][1]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
-
-Up to now, you must have `steamcmd` installed and available within your `PATH`.
-
+Inspired by Spoons [rmm][2]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
 
 
 # Current features demo:
@@ -13,15 +15,28 @@ Up to now, you must have `steamcmd` installed and available within your `PATH`.
 ![Example][image-1]
 
 
-
+<br/> <br/>
 ## Installation
-Make sure you have `steamcmd` installed and available within your `PATH`. Check Section [`Install steamcmd`][2]
+This program is installable with `cargo`. Install `rust` along with `cargo` [here][3]. It’s bundled with anything it needs to work. For security reasons, the minimum `rustc` version to compile the program is `1.58.1`.
 
-This program is installable with `cargo`. Install `rust` along with `cargo` [here][3].
+You can update rustc with:
 
+	rustup update
+
+### Install
 To install run:
 
 	cargo install --git https://github.com/AOx0/rwm
+
+### Linux additional steps
+Additionally, if you are using **_linux_** on a 64 bit machine, you will need to add multiverse with:
+
+	sudo add-apt-repository multiverse
+	sudo dpkg --add-architecture i386
+	sudo apt update
+	sudo apt install lib32gcc1 steamcmd 
+
+
 
 <br/> <br/>
 ## Configuration
@@ -52,49 +67,8 @@ You can bypass configured values with special flags.
 - `-—no-pager`: Disables the pager output display no matter what configurations says. Does not change the configuration’s value.
 -  `-—pager`: Enables the pager output display no matter what configurations says. Does not change the configuration’s value.
 
-<br/><br/> 
-## Install `steamcmd`
-Information extracted from [SteamCMD website][4]
-
-### \> macOS
-You can install `steamcmd` via [Homebrew][5] with:
-
-	brew install steamcmd
-
-Or with the following command, which requires you to manually add it to the `PATH`.
-
-	curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_osx.tar.gz" | tar zxvf -
-
-
-### \> Windows
-1. Create a folder for SteamCMD. For example:
-
-	C:\steamcmd
-
-2. Download SteamCMD for Windows: [https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip][6]
-3. Extract the contents of the zip to the folder.
-
-### \> Linux
-You can install it via:
-
-	sudo apt install steamcmd
-
- **Note**: 	If you are using a 64 bit machine, you will need to add multiverse
-
-	sudo add-apt-repository multiverse
-	sudo dpkg --add-architecture i386
-	sudo apt update
-	sudo apt install lib32gcc1 steamcmd 
-
-# To do
-Available [here][7]
-
-[1]:	https://github.com/Spoons/rmm "rmm"
-[2]:	https://github.com/AOx0/rwm#install--steamcmd
+[1]:	https://github.com/AOx0/rwm/projects/1
+[2]:	https://github.com/Spoons/rmm "rmm"
 [3]:	https://www.rust-lang.org/tools/install
-[4]:	https://developer.valvesoftware.com/wiki/SteamCMD "SteamCMD website"
-[5]:	https://brew.sh "Homebrew"
-[6]:	https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip
-[7]:	https://github.com/AOx0/rwm/projects/1
 
 [image-1]:	./media/Demo1.svg
