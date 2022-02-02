@@ -41,19 +41,37 @@ impl XMLFile for File {
 
         let parser = EventReader::from_str(&contents);
         let mut depth = 0;
+        let mut dep = false;
         for e in parser {
             match e {
                 Ok(XmlEvent::StartElement { name, .. }) => {
                     depth += 1;
                     record.name = name.to_string();
+                    if record.name.as_str() == "modDependencies" { dep = true };
                 }
                 Ok(XmlEvent::Characters(value)) => {
                     if keys.contains(&&*record.name) && ([0, 1, 2].contains(&depth)) {
                         record.value = value;
                         r.push(record.clone());
+                    } else if dep && record.name == "steamWorkshopUrl" {
+                        let value = value
+                            .to_string();
+
+                        let value: Vec<&str> = value
+                            .split("")
+                            .into_iter()
+                            .filter(
+                                |c| ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+                                    .contains(c)
+                            )
+                            .collect();
+
+                        record.value = value.join("");
+                        r.push(record.clone());
                     }
                 }
                 Ok(XmlEvent::EndElement { .. }) => {
+                    if record.name.as_str() == "modDependencies" { dep = false };
                     depth -= 1;
                 }
                 Err(e) => {
@@ -72,6 +90,10 @@ fn test() {
     use crate::*;
 
     let file = File::open("/Applications/RimWorld.app/Mods/Achtung/About/Manifest.xml").unwrap();
+    let r = file.values_of(&["version", "identifier"]);
+    println!("{:?}", r);
+
+    let file = File::open("/Applications/RimWorld.app/Mods/Achtung/About/About.xml").unwrap();
     let r = file.values_of(&["version", "identifier"]);
     println!("{:?}", r);
 
