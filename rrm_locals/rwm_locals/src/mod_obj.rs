@@ -27,13 +27,15 @@ pub struct Mod {
     pub version: Option<String>,
     pub package_id: Option<String>,
     pub identifier: Option<String>,
+    pub dependencies: Option<Vec<String>>
 }
 
 impl Mod {
     pub fn from_evec(e_vec: EVector, m: &ModPaths) -> Self {
-        let mods = e_vec.to_hash();
+        let (mods, dependencies) = e_vec.to_hash();
 
         Mod {
+            dependencies,
             path: m.path.parent().unwrap().display().to_string(),
             name: mods["name"].clone(),
             author: mods["author"].clone(),
@@ -79,6 +81,13 @@ impl Mod {
             result.push_str(&format!(
                 "identifier : {}\n",
                 self.identifier.clone().unwrap()
+            ))
+        }
+
+        if self.dependencies.is_some() {
+            result.push_str(&format!(
+                "dependencies IDs : {}\n",
+                self.dependencies.as_ref().unwrap().join(" ")
             ))
         }
 
