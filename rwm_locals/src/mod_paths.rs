@@ -136,19 +136,26 @@ impl ModVec for Vec<Vec<ModPaths>> {
 pub type EVector = Vec<Element>;
 
 pub trait ElementVector {
-    fn to_hash(self) -> HashMap<String, String>;
+    fn to_hash(self) ->  (HashMap<String, String>, Option<Vec<String>>) ;
     fn to_mod(self, m: &ModPaths) -> crate::mod_obj::Mod;
     fn build_from(m: &[ModPaths], with_fields: &[&str]) -> EVector;
 }
 
 impl ElementVector for EVector {
-    fn to_hash(self) -> HashMap<String, String> {
+    fn to_hash(self) -> (HashMap<String, String>, Option<Vec<String>>) {
         let mut basic_info = HashMap::new();
+        let mut dependencies: Vec<String> = Vec::new();
         self.into_iter().for_each(|m| {
-            basic_info.insert(m.name, m.value);
+            if m.name == "steamWorkshopUrl" {
+                dependencies.push(m.value)
+            } else {
+                basic_info.insert(m.name, m.value);
+            }
         });
 
-        basic_info
+
+        let dependencies = if dependencies.is_empty() { None } else { Some(dependencies) };
+        (basic_info, dependencies)
     }
 
     fn to_mod(self, m: &ModPaths) -> crate::mod_obj::Mod {
