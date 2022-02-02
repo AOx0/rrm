@@ -1,14 +1,14 @@
+use crate::args::DisplayOptions;
 use crate::utils::*;
 use rwm_installer::Installer;
 
-pub fn list(i: Installer, display_type: DisplayType) {
-    let mods: GameMods = GameMods::from(i.rim_install.unwrap())
-        .with_display(display_type);
+pub fn list(i: Installer, d: DisplayOptions) {
+    let mods: GameMods =
+        GameMods::from(i.rim_install.unwrap()).with_display(DisplayType::from(d.large));
 
-    if i.use_more {
+    if d.pager || i.use_more && !d.no_pager {
         mods.more_display(&i.with_paging);
     } else {
         mods.display();
     }
-
 }

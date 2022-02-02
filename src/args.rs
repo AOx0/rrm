@@ -1,12 +1,12 @@
 use crate::utils::*;
-use rwm_locals::{FilterBy, FlagSet};
 use clap::{AppSettings, Args, Parser, Subcommand};
+use rwm_locals::{FilterBy, FlagSet};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 pub struct App {
     #[clap(subcommand)]
-    pub(crate) command: Commands
+    pub(crate) command: Commands,
 }
 
 #[derive(Subcommand, Debug)]
@@ -23,20 +23,29 @@ OPTIONS:
     use-pager    Set if rwm should use more to display output [values: false, true, 0, 1] [alias: 'use-paging']
 ")]
 pub enum Options {
-    #[clap(about = "Set if rwm should use paging software to display output [values: false, true, 0, 1]", visible_alias = "use-paging")]
+    #[clap(
+        about = "Set if rwm should use paging software to display output [values: false, true, 0, 1]",
+        visible_alias = "use-paging"
+    )]
     UsePager {
         #[clap(required = true, possible_values= &["true", "false", "0", "1"])]
         value: String,
     },
 
-    #[clap(about = "Set the path where RimWorld is installed",  visible_alias = "path")]
+    #[clap(
+        about = "Set the path where RimWorld is installed",
+        visible_alias = "path"
+    )]
     GamePath {
         /// The path where RimWorld is installed
         #[clap(required = true)]
         value: PathBuf,
     },
 
-    #[clap(about = "Set the paging software to use, like bat, more or less", visible_alias = "paging")]
+    #[clap(
+        about = "Set the paging software to use, like bat, more or less",
+        visible_alias = "paging"
+    )]
     Pager {
         #[cfg(target_os = "windows")]
         /// The path where the paging software is, for example: C:\Windows\System32\more.com
@@ -47,7 +56,7 @@ pub enum Options {
         /// The name of the paging software, for example: bat, more
         #[clap(required = true)]
         value: PathBuf,
-    }
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -101,10 +110,24 @@ pub enum Commands {
         about = LIST_DESCRIPTION
     )]
     List {
-        /// Display the larger message
-        #[clap(short, long)]
-        large: bool,
+        #[clap(flatten)]
+        display: DisplayOptions,
     },
+}
+
+#[derive(Args, Debug)]
+pub struct DisplayOptions {
+    /// Display the larger message
+    #[clap(short, long)]
+    pub large: bool,
+
+    /// Force rwm to use paging software to display the output.
+    #[clap(short, long)]
+    pub pager: bool,
+
+    /// Force rwm not to use paging software to display the output.
+    #[clap(short, long)]
+    pub no_pager: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -132,18 +155,20 @@ pub enum Search {
 #[derive(Args, Debug)]
 #[clap(setting(AppSettings::ArgRequiredElseHelp))]
 pub struct Steam {
+    #[clap(flatten)]
+    pub display: DisplayOptions,
+
     /// The name of the RimWorld mod
     #[clap(required = true)]
     pub(crate) r#mod: String,
-
-    /// Display the larger message
-    #[clap(short, long)]
-    pub(crate) large: bool,
 }
 
 #[derive(Args, Debug)]
 #[clap(setting(AppSettings::ArgRequiredElseHelp))]
 pub struct Local {
+    #[clap(flatten)]
+    pub display: DisplayOptions,
+
     /// The pattern to search
     #[clap(required = true)]
     pub(crate) r#string: String,
@@ -167,18 +192,17 @@ pub struct Local {
     /// Search by all fields
     #[clap(long, conflicts_with_all = &["authors", "version", "steam-id", "name"])]
     pub(crate) all: bool,
-
-    /// Display the larger message
-    #[clap(short, long)]
-    pub(crate) large: bool,
 }
 
 macro_rules! a_if {
     ($cond: expr, $add: expr) => {
-        if $cond { $add } else { FilterBy::None }
+        if $cond {
+            $add
+        } else {
+            FilterBy::None
+        }
     };
 }
-
 
 impl Local {
     pub fn to_filter_obj(&self) -> FlagSet<FilterBy> {
@@ -198,7 +222,6 @@ impl Local {
         if result.is_empty() {
             result |= FilterBy::Name;
         }
-
 
         result
     }

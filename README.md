@@ -1,3 +1,5 @@
+<div><img src="https://img.shields.io/badge/Status-Unstable-red"></img></div>
+
 # rwm
 
 Inspired by Spoons [rmm][1]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
@@ -46,6 +48,9 @@ Help message:
 	    pager        Set the paging software to use, like bat, more or less [alias: 'paging']
 	    use-pager    Set if rwm should use more to display output [values: false, true, 0, 1] [alias: 'use-paging']
 
+You can bypass configured values with special flags. 
+- `-—no-pager`: Disables the pager output display no matter what configurations says. Does not change the configuration’s value.
+-  `-—pager`: Enables the pager output display no matter what configurations says. Does not change the configuration’s value.
 
 <br/><br/> 
 ## Install `steamcmd`
