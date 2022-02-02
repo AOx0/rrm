@@ -1,3 +1,5 @@
+<div><img src="https://img.shields.io/badge/Status-Unstable-red"></img></div>
+
 # rwm
 
 Inspired by Spoons [rmm][1]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
