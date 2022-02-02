@@ -110,10 +110,24 @@ pub enum Commands {
         about = LIST_DESCRIPTION
     )]
     List {
-        /// Display the larger message
-        #[clap(short, long)]
-        large: bool,
+        #[clap(flatten)]
+        display: DisplayOptions,
     },
+}
+
+#[derive(Args, Debug)]
+pub struct DisplayOptions {
+    /// Display the larger message
+    #[clap(short, long)]
+    pub large: bool,
+
+    /// Force rwm to use paging software to display the output.
+    #[clap(short, long)]
+    pub pager: bool,
+
+    /// Force rwm not to use paging software to display the output.
+    #[clap(short, long)]
+    pub no_pager: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -141,18 +155,20 @@ pub enum Search {
 #[derive(Args, Debug)]
 #[clap(setting(AppSettings::ArgRequiredElseHelp))]
 pub struct Steam {
+    #[clap(flatten)]
+    pub display: DisplayOptions,
+
     /// The name of the RimWorld mod
     #[clap(required = true)]
     pub(crate) r#mod: String,
-
-    /// Display the larger message
-    #[clap(short, long)]
-    pub(crate) large: bool,
 }
 
 #[derive(Args, Debug)]
 #[clap(setting(AppSettings::ArgRequiredElseHelp))]
 pub struct Local {
+    #[clap(flatten)]
+    pub display: DisplayOptions,
+
     /// The pattern to search
     #[clap(required = true)]
     pub(crate) r#string: String,
@@ -176,10 +192,6 @@ pub struct Local {
     /// Search by all fields
     #[clap(long, conflicts_with_all = &["authors", "version", "steam-id", "name"])]
     pub(crate) all: bool,
-
-    /// Display the larger message
-    #[clap(short, long)]
-    pub(crate) large: bool,
 }
 
 macro_rules! a_if {

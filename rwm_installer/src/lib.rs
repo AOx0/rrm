@@ -3,7 +3,7 @@ extern crate core;
 use rwm_locals::GamePath;
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::fs::{File, FileType, OpenOptions};
+use std::fs::{File, OpenOptions};
 use std::io::{BufReader, Read, Write};
 
 use include_dir::{include_dir, Dir};
@@ -115,7 +115,7 @@ fn run_steam_command(c: &str, config_path: &Path) {
         .unwrap();
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    let try_execute_steam = std::process::Command::new("env")
+    let _try_execute_steam = std::process::Command::new("env")
         .args(
             r#"HOME=PATH [] +login anonymous {} +quit"#
                 .replace(
@@ -199,7 +199,7 @@ impl Installer {
 
         let path = path.map(|path| GamePath::from(&path));
 
-        std::env::set_current_dir(home.join(".rwm").as_path());
+        std::env::set_current_dir(home.join(".rwm").as_path()).unwrap();
 
         run_steam_command("", config.parent().unwrap().to_str().unwrap().as_ref());
 

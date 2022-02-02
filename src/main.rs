@@ -5,12 +5,6 @@ mod list;
 mod search;
 mod utils;
 
-macro_rules! d {
-    ($value: expr) => {
-        rwm_locals::DisplayType::from($value)
-    };
-}
-
 #[tokio::main]
 async fn main() {
     let args = args::App::load();
@@ -40,7 +34,7 @@ async fn main() {
             }
         },
 
-        args::Commands::List { large } => list::list(installer, d!(large)),
+        args::Commands::List { display } => list::list(installer, display),
 
         args::Commands::Search { command } => match command {
             args::Search::Local { args } => {

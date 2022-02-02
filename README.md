@@ -46,6 +46,9 @@ Help message:
 	    pager        Set the paging software to use, like bat, more or less [alias: 'paging']
 	    use-pager    Set if rwm should use more to display output [values: false, true, 0, 1] [alias: 'use-paging']
 
+You can bypass configured values with special flags. 
+- `-—no-pager`: Disables the pager output display no matter what configurations says. Does not change the configuration’s value.
+-  `-—pager`: Enables the pager output display no matter what configurations says. Does not change the configuration’s value.
 
 <br/><br/> 
 ## Install `steamcmd`
