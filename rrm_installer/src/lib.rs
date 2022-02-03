@@ -17,13 +17,13 @@ use std::os::unix::fs::PermissionsExt;
 static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
 
 #[cfg(target_os = "macos")]
-static PROJECT_DIR: Dir = include_dir!("./rrm_installer/src/steamcmd/macos");
+static PROJECT_DIR: Dir = include_dir!("src/steamcmd/macos");
 
 #[cfg(target_os = "windows")]
-static PROJECT_DIR: Dir = include_dir!("./rrm_installer/src/steamcmd/windows");
+static PROJECT_DIR: Dir = include_dir!("src/steamcmd/windows");
 
 #[cfg(target_os = "linux")]
-static PROJECT_DIR: Dir = include_dir!("./rrm_installer/src/steamcmd/linux");
+static PROJECT_DIR: Dir = include_dir!("src/steamcmd/linux");
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 static DEFAULT_PAGING_SOFTWARE: &str = r"more";
