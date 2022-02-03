@@ -19,4 +19,4 @@ tokio =  { version= "1.16.1", features=["full"] }
 
 rrm_locals = {path="rrm_locals", version="0.0.1-alpha.0"}
 rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.0"}
-rrm_installer = {path="rrm_installer", version="0.0.1-alpha.0"}
+rrm_installer = {git="rrm_installer", version="0.0.1-alpha.0"}
