@@ -17,6 +17,6 @@ execute = "0.2.9"
 clap = { version= "3.0.13", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
 tokio =  { version= "1.16.1", features=["full"] }
 
-rrm_locals = {path="rrm_locals"}
-rrm_scrap = {path="rrm_scrap"}
-rrm_installer = {path="rrm_installer"}
+rrm_locals = {path="rrm_locals", version="0.0.1-alpha.0"}
+rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.0"}
+rrm_installer = {path="rrm_installer", version="0.0.1-alpha.0"}

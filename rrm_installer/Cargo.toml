@@ -1,6 +1,6 @@
 [package]
 name = "rrm_installer"
-version = "0.1.0"
+version = "0.0.1-alpha.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -16,4 +16,4 @@ include_dir = "0.7.2"
 directories = "4.0.1"
 dotenv = "0.15.0"
 
-rrm_locals = {path="../rrm_locals"}
+rrm_locals = {path="../rrm_locals", version="0.0.1-alpha.0"}
