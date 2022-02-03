@@ -1,4 +1,4 @@
-use rwm_xml::{Element, XMLFile};
+use rrm_xml::{Element, XMLFile};
 use std::collections::HashMap;
 
 use crate::Mods;
