@@ -1,6 +1,6 @@
 extern crate core;
 
-use rwm_locals::GamePath;
+use rrm_locals::GamePath;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::{File, OpenOptions};
@@ -17,13 +17,13 @@ use std::os::unix::fs::PermissionsExt;
 static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
 
 #[cfg(target_os = "macos")]
-static PROJECT_DIR: Dir = include_dir!("./rwm_installer/src/steamcmd/macos");
+static PROJECT_DIR: Dir = include_dir!("./rrm_installer/src/steamcmd/macos");
 
 #[cfg(target_os = "windows")]
-static PROJECT_DIR: Dir = include_dir!("./rwm_installer/src/steamcmd/windows");
+static PROJECT_DIR: Dir = include_dir!("./rrm_installer/src/steamcmd/windows");
 
 #[cfg(target_os = "linux")]
-static PROJECT_DIR: Dir = include_dir!("./rwm_installer/src/steamcmd/linux");
+static PROJECT_DIR: Dir = include_dir!("./rrm_installer/src/steamcmd/linux");
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 static DEFAULT_PAGING_SOFTWARE: &str = r"more";
@@ -45,12 +45,12 @@ pub fn config_does_exists() -> bool {
         exit(1);
     };
 
-    let config = home.join(".rwm").join("config");
+    let config = home.join(".rrm").join("config");
     config.exists() && config.is_file()
 }
 
 fn config_exists(home: &Path) -> bool {
-    let config = home.join(".rwm").join("config");
+    let config = home.join(".rrm").join("config");
     config.exists() && config.is_file()
 }
 
@@ -171,7 +171,7 @@ impl Installer {
             exit(1);
         };
 
-        let config_file = home.join(".rwm").join("config");
+        let config_file = home.join(".rrm").join("config");
         let config = if config_exists(&home) {
             config_file
         } else {
@@ -199,7 +199,7 @@ impl Installer {
 
         let path = path.map(|path| GamePath::from(&path));
 
-        std::env::set_current_dir(home.join(".rwm").as_path()).unwrap();
+        std::env::set_current_dir(home.join(".rrm").as_path()).unwrap();
 
         run_steam_command("", config.parent().unwrap().to_str().unwrap().as_ref());
 

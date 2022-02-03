@@ -1,5 +1,5 @@
 [package]
-name = "rwm_installer"
+name = "rrm_installer"
 version = "0.1.0"
 edition = "2021"
 
@@ -16,4 +16,4 @@ include_dir = "0.7.2"
 directories = "4.0.1"
 dotenv = "0.15.0"
 
-rwm_locals = {path="../rwm_locals"}
+rrm_locals = {path="../rrm_locals"}
