@@ -7,3 +7,6 @@
 [submodule "rrm_locals"]
 	path = rrm_locals
 	url = https://github.com/AOx0/rrm_locals
+[submodule "rrm_scrap"]
+	path = rrm_scrap
+	url = https://github.com/AOx0/rrm_scrap.git
