@@ -1,5 +1,5 @@
-use rwm_locals::DisplayType;
-use rwm_scrap::SteamMods;
+use rrm_locals::DisplayType;
+use rrm_scrap::SteamMods;
 
 #[tokio::main]
 async fn main() {
