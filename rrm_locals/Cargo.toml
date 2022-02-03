@@ -1,0 +1,20 @@
+[package]
+name = "rrm_locals"
+version = "0.0.1-alpha.0"
+edition = "2021"
+authors = ["AOx0 <aoxo.contact@gmail.com>"]
+rust-version = "1.58.1"
+description = "Part of rrm"
+repository = "https://github.com/AOx0/rrm_locals"
+homepage = "https://github.com/AOx0/rrm_locals"
+categories = ["rrm"]
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+path-absolutize = "3.0.11"
+serde = {version="1.0.133", features=["derive"]}
+flagset = "0.4.2"
+fuzzy-matcher = "0.3.7"
+rrm_xml = "0.0.1-alpha.0"
