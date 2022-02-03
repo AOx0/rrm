@@ -8,7 +8,8 @@ description = "Rusty RimWorld (mod) Manager is a cross-platform CLI mod manager 
 readme = "README.md"
 repository = "https://github.com/AOx0/rrm"
 homepage = "https://github.com/AOx0/rrm"
-categories = ["command-line-utilities", "rimworld"]
+categories = ["command-line-utilities"]
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -17,6 +18,6 @@ execute = "0.2.9"
 clap = { version= "3.0.13", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
 tokio =  { version= "1.16.1", features=["full"] }
 
-rrm_locals = {path="rrm_locals", version="0.0.1-alpha.0"}
-rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.0"}
-rrm_installer = {git="rrm_installer", version="0.0.1-alpha.0"}
+rrm_locals = "0.0.1-alpha.0"
+rrm_scrap = "0.0.1-alpha.0"
+rrm_installer = "0.0.1-alpha.0"

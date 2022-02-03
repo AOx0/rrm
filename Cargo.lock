@@ -1144,7 +1144,9 @@ dependencies = [
 
 [[package]]
 name = "rrm_installer"
-version = "0.1.0"
+version = "0.0.1-alpha.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96385b511530d639403aa88fc7b31e20015c01337c4b5fd850e7aced23b31c04"
 dependencies = [
  "directories",
  "dotenv",
@@ -1156,7 +1158,9 @@ dependencies = [
 
 [[package]]
 name = "rrm_locals"
-version = "0.1.0"
+version = "0.0.1-alpha.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73d0265c78ea51801389c7d138d416b96cfd400a63e74434f84da45da2fe947c"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
@@ -1167,7 +1171,9 @@ dependencies = [
 
 [[package]]
 name = "rrm_scrap"
-version = "0.1.0"
+version = "0.0.1-alpha.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0eec20d4939ba9a52b433c4effd585558c0f47fedf89d09947e907f03b8357f9"
 dependencies = [
  "html-escape",
  "lazy-regex",
@@ -1179,7 +1185,9 @@ dependencies = [
 
 [[package]]
 name = "rrm_xml"
-version = "0.1.0"
+version = "0.0.1-alpha.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "677fa1ac3f63485dcd4a2bc70dd4e4cefbbf20e93d003d609f882017f68b999a"
 dependencies = [
  "xml-rs",
 ]
