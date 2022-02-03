@@ -1131,66 +1131,66 @@ dependencies = [
 ]
 
 [[package]]
+name = "rrm"
+version = "0.0.1-alpha.0"
+dependencies = [
+ "clap",
+ "execute",
+ "rrm_installer",
+ "rrm_locals",
+ "rrm_scrap",
+ "tokio",
+]
+
+[[package]]
+name = "rrm_installer"
+version = "0.1.0"
+dependencies = [
+ "directories",
+ "dotenv",
+ "include_dir",
+ "rrm_locals",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "rrm_locals"
+version = "0.1.0"
+dependencies = [
+ "flagset",
+ "fuzzy-matcher",
+ "path-absolutize",
+ "rrm_xml",
+ "serde",
+]
+
+[[package]]
+name = "rrm_scrap"
+version = "0.1.0"
+dependencies = [
+ "html-escape",
+ "lazy-regex",
+ "reqwest",
+ "rrm_locals",
+ "scraper",
+ "tokio",
+]
+
+[[package]]
+name = "rrm_xml"
+version = "0.1.0"
+dependencies = [
+ "xml-rs",
+]
+
+[[package]]
 name = "rustc_version"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bfa0f585226d2e68097d4f95d113b15b83a82e819ab25717ec0590d9584ef366"
 dependencies = [
  "semver",
-]
-
-[[package]]
-name = "rwm"
-version = "0.1.0"
-dependencies = [
- "clap",
- "execute",
- "rwm_installer",
- "rwm_locals",
- "rwm_scrap",
- "tokio",
-]
-
-[[package]]
-name = "rwm_installer"
-version = "0.1.0"
-dependencies = [
- "directories",
- "dotenv",
- "include_dir",
- "rwm_locals",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "rwm_locals"
-version = "0.1.0"
-dependencies = [
- "flagset",
- "fuzzy-matcher",
- "path-absolutize",
- "rwm_xml",
- "serde",
-]
-
-[[package]]
-name = "rwm_scrap"
-version = "0.1.0"
-dependencies = [
- "html-escape",
- "lazy-regex",
- "reqwest",
- "rwm_locals",
- "scraper",
- "tokio",
-]
-
-[[package]]
-name = "rwm_xml"
-version = "0.1.0"
-dependencies = [
- "xml-rs",
 ]
 
 [[package]]

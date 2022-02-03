@@ -1,5 +1,5 @@
-use rwm_installer::*;
-use rwm_locals::GamePath;
+use rrm_installer::*;
+use rrm_locals::GamePath;
 
 fn main() {
     let installer = Installer::new(None);

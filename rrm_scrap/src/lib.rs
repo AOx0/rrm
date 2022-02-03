@@ -1,6 +1,6 @@
 use lazy_regex::*;
 use reqwest::Response;
-use rwm_locals::{DisplayType, InfoString};
+use rrm_locals::{DisplayType, InfoString};
 use std::io::Stdout;
 use std::io::Write;
 use std::process::exit;

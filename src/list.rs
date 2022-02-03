@@ -1,6 +1,6 @@
 use crate::args::DisplayOptions;
 use crate::utils::*;
-use rwm_installer::Installer;
+use rrm_installer::Installer;
 
 pub fn list(i: Installer, d: DisplayOptions) {
     let mods: GameMods =

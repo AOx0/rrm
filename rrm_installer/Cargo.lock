@@ -159,30 +159,30 @@ dependencies = [
 ]
 
 [[package]]
-name = "rwm_installer"
+name = "rrm_installer"
 version = "0.1.0"
 dependencies = [
  "directories",
  "dotenv",
  "include_dir",
- "rwm_locals",
+ "rrm_locals",
  "serde",
  "serde_json",
 ]
 
 [[package]]
-name = "rwm_locals"
+name = "rrm_locals"
 version = "0.1.0"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
  "path-absolutize",
- "rwm_xml",
+ "rrm_xml",
  "serde",
 ]
 
 [[package]]
-name = "rwm_xml"
+name = "rrm_xml"
 version = "0.1.0"
 dependencies = [
  "xml-rs",
@@ -234,14 +234,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-xid",
-]
-
-[[package]]
-name = "tests"
-version = "0.1.0"
-dependencies = [
- "rwm_installer",
- "rwm_locals",
 ]
 
 [[package]]

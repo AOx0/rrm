@@ -5,15 +5,9 @@
 TODOs are available [here][1]. Discussions, PRs and Issues are open for anyone who is willing to contribute. 
 
 ---- 
-# rwm
+# rrm
 
 Inspired by Spoons [rmm][2]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
-
-
-# Current features demo:
-
-![Example][image-1]
-
 
 <br/> <br/>
 ## Installation
@@ -26,7 +20,7 @@ You can update rustc with:
 ### Install
 To install run:
 
-	cargo install --git https://github.com/AOx0/rwm
+	cargo install --git https://github.com/AOx0/rrm
 
 ### Linux additional steps
 Additionally, if you are using **_linux_** on a 64 bit machine, you will need to add multiverse with:
@@ -40,34 +34,34 @@ Additionally, if you are using **_linux_** on a 64 bit machine, you will need to
 
 <br/> <br/>
 ## Configuration
-To set configuration values like game installation path and whether `rwm` should use `more` to display its output or not, you can use the `set` subcommand. The configuration file is available in `$USER_HOME/.rwm/config` on macOS, Linux, and Windows with a JSON format. 
+To set configuration values like game installation path and whether `rrm` should use `more` to display its output or not, you can use the `set` subcommand. The configuration file is available in `$USER_HOME/.rrm/config` on macOS, Linux, and Windows with a JSON format. 
 
 For example, to set the path were RimWorld is installed, you can use:
 
-	rwm set game-path /Applications/RimWorld.app
+	rrm set game-path /Applications/RimWorld.app
 
 Or with its alias:
 
-	rwm set path /Applications/RimWorld.app
+	rrm set path /Applications/RimWorld.app
 
 Help message:
 
-	rwm-set
+	rrm-set
 	Set new configuration values
 	
 	USAGE:
-	    rwm set <OPTION> <VALUE>
+	    rrm set <OPTION> <VALUE>
 	
 	OPTIONS:
 	    game-path    Set the path where RimWorld is installed [alias: 'path']
 	    pager        Set the paging software to use, like bat, more or less [alias: 'paging']
-	    use-pager    Set if rwm should use more to display output [values: false, true, 0, 1] [alias: 'use-paging']
+	    use-pager    Set if rrm should use more to display output [values: false, true, 0, 1] [alias: 'use-paging']
 
 You can bypass configured values with special flags. 
 - `-—no-pager`: Disables the pager output display no matter what configurations says. Does not change the configuration’s value.
 -  `-—pager`: Enables the pager output display no matter what configurations says. Does not change the configuration’s value.
 
-[1]:	https://github.com/AOx0/rwm/projects/1
+[1]:	https://github.com/AOx0/rrm/projects/1
 [2]:	https://github.com/Spoons/rmm "rmm"
 [3]:	https://www.rust-lang.org/tools/install
 

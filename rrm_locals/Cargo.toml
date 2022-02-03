@@ -1,5 +1,5 @@
 [package]
-name = "rwm_locals"
+name = "rrm_locals"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,4 +10,4 @@ path-absolutize = "3.0.11"
 serde = "1.0.133"
 flagset = "0.4.2"
 fuzzy-matcher = "0.3.7"
-rwm_xml = {path = "../rwm_xml"}
+rrm_xml = {path = "../rrm_xml"}

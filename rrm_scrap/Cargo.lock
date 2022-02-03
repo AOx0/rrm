@@ -959,30 +959,30 @@ dependencies = [
 ]
 
 [[package]]
-name = "rwm_locals"
+name = "rrm_locals"
 version = "0.1.0"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
  "path-absolutize",
- "rwm_xml",
+ "rrm_xml",
  "serde",
 ]
 
 [[package]]
-name = "rwm_scrap"
+name = "rrm_scrap"
 version = "0.1.0"
 dependencies = [
  "html-escape",
  "lazy-regex",
  "reqwest",
- "rwm_locals",
+ "rrm_locals",
  "scraper",
  "tokio",
 ]
 
 [[package]]
-name = "rwm_xml"
+name = "rrm_xml"
 version = "0.1.0"
 dependencies = [
  "xml-rs",

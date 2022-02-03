@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "rwm_xml"
+name = "rrm_xml"
 version = "0.1.0"
 dependencies = [
  "xml-rs",

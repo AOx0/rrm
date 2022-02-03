@@ -1,6 +1,6 @@
-use rwm_installer::Installer;
-pub use rwm_locals::{DisplayType, GameMods, GamePath, Mod, Mods};
-pub use rwm_scrap::*;
+use rrm_installer::Installer;
+pub use rrm_locals::{DisplayType, GameMods, GamePath, Mod, Mods};
+pub use rrm_scrap::*;
 pub use std::path::{Path, PathBuf};
 use std::process::exit;
 
@@ -63,7 +63,7 @@ pub fn try_get_path(game_path: Option<&Path>, will_set: bool) -> Installer {
                     "\
                     Error: Unable to find RimWorld installation path.\n\
                     Try specifying the path:\n\
-                    \trwm set path <GAME_PATH>        <--- Like this\
+                    \trrm set path <GAME_PATH>        <--- Like this\
                 "
                 );
                 exit(1);
@@ -75,7 +75,7 @@ pub fn try_get_path(game_path: Option<&Path>, will_set: bool) -> Installer {
                 "\
                     Error: Unable to find RimWorld installation path.\n\
                     Try specifying the path:\n\
-                    \trwm set path <GAME_PATH>        <--- Like this\
+                    \trrm set path <GAME_PATH>        <--- Like this\
                 "
             );
             exit(1);

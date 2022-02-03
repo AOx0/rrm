@@ -1,6 +1,6 @@
 use crate::utils::*;
 use clap::{AppSettings, Args, Parser, Subcommand};
-use rwm_locals::{FilterBy, FlagSet};
+use rrm_locals::{FilterBy, FlagSet};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -11,20 +11,20 @@ pub struct App {
 
 #[derive(Subcommand, Debug)]
 #[clap(override_help = "\
-rwm-set
+rrm-set
 Set new configuration values
 
 USAGE:
-    rwm set <OPTION> <VALUE>
+    rrm set <OPTION> <VALUE>
 
 OPTIONS:
     game-path    Set the path where RimWorld is installed [alias: 'path']
     pager        Set the paging software to use, like bat, more or less [alias: 'paging']
-    use-pager    Set if rwm should use more to display output [values: false, true, 0, 1] [alias: 'use-paging']
+    use-pager    Set if rrm should use more to display output [values: false, true, 0, 1] [alias: 'use-paging']
 ")]
 pub enum Options {
     #[clap(
-        about = "Set if rwm should use paging software to display output [values: false, true, 0, 1]",
+        about = "Set if rrm should use paging software to display output [values: false, true, 0, 1]",
         visible_alias = "use-paging"
     )]
     UsePager {
@@ -72,7 +72,7 @@ pub enum Commands {
         visible_alias = "ss",
         setting(AppSettings::Hidden),
         about = "Search for mods in Steam",
-        override_usage = "rwm search steam <MOD>"
+        override_usage = "rrm search steam <MOD>"
     )]
     SearchSteam {
         #[clap(flatten)]
@@ -83,7 +83,7 @@ pub enum Commands {
         visible_alias = "sl",
         setting(AppSettings::Hidden | AppSettings::DisableVersionFlag),
         about = "Search for mods locally, where RimWorld is installed [with no flags searches by name]",
-        override_usage = "rwm search local [OPTIONS] <STRING>"
+        override_usage = "rrm search local [OPTIONS] <STRING>"
     )]
     SearchLocally {
         #[clap(flatten)]
@@ -121,11 +121,11 @@ pub struct DisplayOptions {
     #[clap(short, long)]
     pub large: bool,
 
-    /// Force rwm to use paging software to display the output.
+    /// Force rrm to use paging software to display the output.
     #[clap(short, long)]
     pub pager: bool,
 
-    /// Force rwm not to use paging software to display the output.
+    /// Force rrm not to use paging software to display the output.
     #[clap(short, long)]
     pub no_pager: bool,
 }
