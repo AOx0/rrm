@@ -20,7 +20,7 @@ You can update rustc with:
 ### Install
 To install run:
 
-	cargo install --git https://github.com/AOx0/rrm
+	cargo install rrm
 
 ### Linux additional steps
 Additionally, if you are using **_linux_** on a 64 bit machine, you will need to add multiverse with:
