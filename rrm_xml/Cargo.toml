@@ -2,6 +2,13 @@
 name = "rrm_xml"
 version = "0.0.1-alpha.0"
 edition = "2021"
+authors = ["AOx0 <aoxo.contact@gmail.com>"]
+rust-version = "1.58.1"
+description = "XML parser for Rimworld mods. Part of rrm"
+repository = "https://github.com/AOx0/rrm_xml"
+homepage = "https://github.com/AOx0/rrm_xml"
+categories = ["rrm"]
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
