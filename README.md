@@ -1,15 +1,17 @@
-<div><img src="https://img.shields.io/badge/Status-Unstable-red"></img></div>
+<div><img src="https://img.shields.io/badge/Status-Unstable-red"></img> <img src="https://img.shields.io/badge/Version-0.0.1--alpha.1-red"></img></div>
 
 <br/>
 
 TODOs are available [here][1]. Discussions, PRs and Issues are open for anyone who is willing to contribute. 
 
----- 
+<br/>
+
 # rrm
 
 Inspired by Spoons [rmm][2]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
 
-<br/> <br/>
+<br/>
+
 ## Installation
 This program is installable with `cargo`. Install `rust` along with `cargo` [here][3]. It’s bundled with anything it needs to work. For security reasons, the minimum `rustc` version to compile the program is `1.58.1`.
 
