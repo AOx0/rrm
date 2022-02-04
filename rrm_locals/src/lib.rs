@@ -80,18 +80,7 @@ impl GameMods {
     }
 
     pub fn display(&self) {
-        let d_type = self.display_type.as_ref().unwrap_or_else(|| {
-            eprintln!("Error, make sure to set display_type to a variant of DisplayType");
-            exit(1);
-        });
-
-        if let DisplayType::Short = d_type {
-            println!("{}", Mod::gen_headers(self.biggest_name_size));
-        }
-
-        self.mods
-            .iter()
-            .for_each(|m| m.display(d_type, self.biggest_name_size))
+        print!("{}", self.gen_display())
     }
 }
 
