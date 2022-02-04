@@ -170,6 +170,7 @@ fn set_permissions_for_steamcmd(path: &Path) {
 
 impl Installer {
     fn init(path: Option<PathBuf>) -> Self {
+        let mut fresh_new = false;
         let home = if let Some(home) = get_home() {
             home
         } else {
@@ -181,6 +182,7 @@ impl Installer {
         let config = if config_exists(&home) {
             config_file
         } else {
+            fresh_new = true;
             create_config(&config_file);
             if config_exists(&home) {
                 let config_path = config_file.clone();
@@ -207,7 +209,10 @@ impl Installer {
 
         std::env::set_current_dir(home.join(".rrm").as_path()).unwrap();
 
-        run_steam_command("", config.parent().unwrap().to_str().unwrap().as_ref());
+        if fresh_new {
+            run_steam_command("", config.parent().unwrap().to_str().unwrap().as_ref());
+        }
+
 
         Installer {
             with_paging: DEFAULT_PAGING_SOFTWARE.to_string(),
