@@ -17,10 +17,14 @@ You can update rustc with:
 
 	rustup update
 
-### Install
+### Install (pre-release)
 To install run:
 
-	cargo install rrm
+	cargo install rrm --version "^0.0.1-alpha.0"
+	
+Or install the GitHub version:
+
+	cargo install rrm --git https://github.com/AOx0/rrm
 
 ### Linux additional steps
 Additionally, if you are using **_linux_** on a 64 bit machine, you will need to add multiverse with:
