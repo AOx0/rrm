@@ -110,6 +110,7 @@ fn run_steam_command(c: &str, config_path: &Path) {
     let try_execute_steam = std::process::Command::new(steam.as_path().to_str().unwrap())
         .args("+login anonymous {} +quit".replace("{}", c).split(" "))
         .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
         .spawn()
         .unwrap_or_else(|error| {
             eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
@@ -140,6 +141,7 @@ fn run_steam_command(c: &str, config_path: &Path) {
                 .split(" "),
         )
         .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
         .spawn()
         .unwrap_or_else(|error| {
             eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
