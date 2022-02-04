@@ -1,4 +1,4 @@
-<div><img src="https://img.shields.io/badge/Status-Unstable-red"></img> <img src="https://img.shields.io/badge/Version-0.0.1--alpha.1-red"></img></div>
+<div><img src="https://img.shields.io/badge/Status-Unstable-red"></img> <img src="https://img.shields.io/badge/Version-0.0.1--alpha.2-red"></img></div>
 
 <br/>
 
@@ -22,7 +22,7 @@ You can update rustc with:
 ### Install (pre-release)
 To install run:
 
-	cargo install rrm --version "^0.0.1-alpha.0"
+	cargo install rrm --version 0.0.1-alpha.2
 	
 Or install the GitHub version:
 
