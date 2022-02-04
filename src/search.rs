@@ -20,10 +20,18 @@ pub fn search_locally(i: Installer, args: Local) {
     }
 }
 
-pub async fn search_steam(args: Steam) {
+pub async fn search_steam(i: Installer, args: Steam) {
     let mods = SteamMods::search(&args.r#mod)
         .await
         .with_display(rrm_locals::DisplayType::from(args.display.large));
 
-    mods.display();
+    if !mods.is_empty() {
+        if args.display.pager || i.use_more && !args.display.no_pager {
+            mods.more_display(&i.with_paging)
+        } else {
+            mods.display()
+        }
+    } else {
+        println!("No results found")
+    }
 }

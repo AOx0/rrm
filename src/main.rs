@@ -41,7 +41,7 @@ async fn main() {
                 search::search_locally(installer, args);
             }
             args::Search::Steam { args } => {
-                search::search_steam(args).await;
+                search::search_steam(installer, args).await;
             }
         },
 
@@ -50,7 +50,7 @@ async fn main() {
         }
 
         args::Commands::SearchSteam { args } => {
-            search::search_steam(args).await;
+            search::search_steam(installer, args).await;
         }
 
         _ => {}

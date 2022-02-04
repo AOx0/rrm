@@ -1132,7 +1132,7 @@ dependencies = [
 
 [[package]]
 name = "rrm"
-version = "0.0.1-alpha.0"
+version = "0.0.1-alpha.1"
 dependencies = [
  "clap",
  "execute",
@@ -1144,7 +1144,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_installer"
-version = "0.0.1-alpha.0"
+version = "0.0.1-alpha.1"
 dependencies = [
  "directories",
  "dotenv",
@@ -1156,7 +1156,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_locals"
-version = "0.0.1-alpha.0"
+version = "0.0.1-alpha.1"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
@@ -1167,7 +1167,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_scrap"
-version = "0.0.1-alpha.0"
+version = "0.0.1-alpha.1"
 dependencies = [
  "html-escape",
  "lazy-regex",

@@ -21,6 +21,12 @@ pub const RW_DEFAULT_PATH: [&str; 2] = [
     r"C:\Program Files\Steam\steamapps\common\RimWorld",
 ];
 
+pub const RW_NOT_FOUND: &str = "\
+    Error: Unable to find RimWorld installation path.\n\
+    Try specifying the path:\n\
+    \trrm set path <GAME_PATH>        <--- Like this\
+";
+
 pub fn dir_exists(path: &Path) -> bool {
     path.exists() && path.is_dir()
 }
@@ -48,10 +54,10 @@ pub fn try_get_path(game_path: Option<&Path>, will_set: bool) -> Installer {
             let mut result = None;
             RW_DEFAULT_PATH.into_iter().for_each(|path| {
                 if dir_exists(&PathBuf::from(path)) {
-                    eprintln!(
+                    /*eprintln!(
                         "Warning: Found RimWorld installation path at {}",
                         PathBuf::from(path).display()
-                    );
+                    );*/
                     let mut installer = Installer::new(None).unwrap();
                     installer.set_path_value(path.parse().unwrap());
                     result = Some(installer);
@@ -59,25 +65,13 @@ pub fn try_get_path(game_path: Option<&Path>, will_set: bool) -> Installer {
             });
 
             result.unwrap_or_else(|| {
-                eprintln!(
-                    "\
-                    Error: Unable to find RimWorld installation path.\n\
-                    Try specifying the path:\n\
-                    \trrm set path <GAME_PATH>        <--- Like this\
-                "
-                );
+                eprintln!("{RW_NOT_FOUND}");
                 exit(1);
             })
         } else if installer.rim_install.is_none() && will_set {
             installer
         } else {
-            eprintln!(
-                "\
-                    Error: Unable to find RimWorld installation path.\n\
-                    Try specifying the path:\n\
-                    \trrm set path <GAME_PATH>        <--- Like this\
-                "
-            );
+            eprintln!("{RW_NOT_FOUND}");
             exit(1);
         }
     } else {
