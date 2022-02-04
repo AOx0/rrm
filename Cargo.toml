@@ -1,6 +1,6 @@
 [package]
 name = "rrm"
-version = "0.0.1-alpha.1"
+version = "0.0.1-alpha.2"
 edition = "2021"
 authors = ["AOx0 <aoxo.contact@gmail.com>"]
 rust-version = "1.58.1"
@@ -16,10 +16,10 @@ license = "MIT"
 
 [dependencies]
 execute = "0.2.9"
-clap = { version= "3.0.13", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
+clap = { version= "3.0.14", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
 tokio =  { version= "1.16.1", features=["full"] }
 
 
 rrm_locals = {path="rrm_locals", version="0.0.1-alpha.1"}
-rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.1"}
-rrm_installer = { path="rrm_installer", version="0.0.1-alpha.1" , features=["dev"] }
+rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.2"}
+rrm_installer = { path="rrm_installer", version="0.0.1-alpha.2" , features=["dev"] }

@@ -7,7 +7,8 @@ mod utils;
 
 #[tokio::main]
 async fn main() {
-    let args = args::App::load();
+    let args: args::App = args::App::load();
+
 
     let mut installer = utils::try_get_path(
         None,

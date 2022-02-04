@@ -61,9 +61,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "clap"
-version = "3.0.13"
+version = "3.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08799f92c961c7a1cf0cc398a9073da99e21ce388b46372c37f3191f2f3eed3e"
+checksum = "b63edc3f163b3c71ec8aa23f9bd6070f77edbf3d1d198b164afa90ff00e4ec62"
 dependencies = [
  "bitflags",
  "clap_derive",
@@ -1132,7 +1132,7 @@ dependencies = [
 
 [[package]]
 name = "rrm"
-version = "0.0.1-alpha.1"
+version = "0.0.1-alpha.2"
 dependencies = [
  "clap",
  "execute",
@@ -1144,7 +1144,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_installer"
-version = "0.0.1-alpha.1"
+version = "0.0.1-alpha.2"
 dependencies = [
  "directories",
  "dotenv",
@@ -1167,8 +1167,10 @@ dependencies = [
 
 [[package]]
 name = "rrm_scrap"
-version = "0.0.1-alpha.1"
+version = "0.0.1-alpha.2"
 dependencies = [
+ "flagset",
+ "fuzzy-matcher",
  "html-escape",
  "lazy-regex",
  "reqwest",
