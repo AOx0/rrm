@@ -3,7 +3,8 @@ use reqwest::Response;
 use rrm_locals::{DisplayType, InfoString};
 use std::io::Stdout;
 use std::io::Write;
-use std::process::exit;
+use std::ops::Deref;
+use std::process::{exit, Stdio};
 
 fn capitalize(s: &str) -> String {
     let mut c = s.chars();
@@ -141,6 +142,21 @@ impl ModSteamInfo {
             writeln!(f, "{}", self.gen_short(biggest_name)).unwrap()
         }
     }
+
+    pub fn gen_display(&self, form: &DisplayType, biggest_name: usize) -> String {
+
+        let mut result = String::new();
+
+        if let DisplayType::Long = form {
+            result.push_str(&self.gen_large());
+        } else {
+            result.push_str(&self.gen_short(biggest_name));
+        }
+
+        result.push_str("\n");
+
+        result
+    }
 }
 
 pub struct SteamMods {
@@ -166,18 +182,58 @@ impl SteamMods {
         s
     }
 
-    pub fn display(&self) {
+    pub fn gen_display(&self) -> String{
+        let mut result = "".to_string();
+
         let d_type = self.display_type.as_ref().unwrap_or_else(|| {
             eprintln!("Error, make sure to set display_type to a variant of DisplayType");
             exit(1);
         });
 
         if let DisplayType::Short = d_type {
-            println!("{}", ModSteamInfo::gen_headers(self.biggest_name_size));
+            result.push_str(&ModSteamInfo::gen_headers(self.biggest_name_size));
+            result.push_str("\n")
         }
 
         self.mods
             .iter()
-            .for_each(|m| m.display(d_type, self.biggest_name_size))
+            .for_each(|m| {
+                result.push_str(&m.gen_display(d_type, self.biggest_name_size));
+            });
+
+        result
+    }
+
+    pub fn more_display(&self, with_pager: &str) {
+        let output = self.gen_display();
+
+        let mut more = std::process::Command::new(with_pager)
+            .stdin(Stdio::piped())
+            .spawn()
+            .unwrap();
+
+        let more_stdin = more.stdin.as_mut().unwrap();
+        more_stdin
+            .write_all(output.as_bytes())
+            .unwrap_or_else(|err| {
+                eprintln!(
+                    "Something went wrong while writing contents to `more`.\n\
+            Error: {err}"
+                )
+            });
+
+        more.wait().unwrap();
+    }
+
+    pub fn display(&self) {
+        print!("{}",self.gen_display())
+    }
+}
+
+impl Deref for SteamMods {
+    type Target = Vec<ModSteamInfo>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.mods
     }
 }
