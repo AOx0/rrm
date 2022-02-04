@@ -16,14 +16,20 @@ use std::os::unix::fs::PermissionsExt;
 #[cfg(target_os = "windows")]
 static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
 
-#[cfg(target_os = "macos")]
-static PROJECT_DIR: Dir = include_dir!("src/steamcmd/macos");
+#[cfg(all(target_os = "macos", feature = "dev"))]
+    static PROJECT_DIR: Dir = include_dir!("rrm_installer/src/steamcmd/macos");
+#[cfg(all(target_os = "macos", not( feature = "dev")))]
+    static PROJECT_DIR: Dir = include_dir!("src/steamcmd/macos");
 
-#[cfg(target_os = "windows")]
-static PROJECT_DIR: Dir = include_dir!("src/steamcmd/windows");
+#[cfg(all(target_os = "windows", feature = "dev"))]
+    static PROJECT_DIR: Dir = include_dir!("rrm_installer/src/steamcmd/windows");
+#[cfg(all(target_os = "windows", not( feature = "dev")))]
+    static PROJECT_DIR: Dir = include_dir!("src/steamcmd/windows");
 
-#[cfg(target_os = "linux")]
-static PROJECT_DIR: Dir = include_dir!("src/steamcmd/linux");
+#[cfg(all(target_os = "linux", feature = "dev"))]
+    static PROJECT_DIR: Dir = include_dir!("rrm_installer/src/steamcmd/linux");
+#[cfg(all(target_os = "linux", not( feature = "dev")))]
+    static PROJECT_DIR: Dir = include_dir!("src/steamcmd/linux");
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 static DEFAULT_PAGING_SOFTWARE: &str = r"more";
