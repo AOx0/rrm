@@ -18,4 +18,4 @@ reqwest = { version = "0.11.9", features = ["json"] }
 tokio =  { version= "1.15.0", features=["full"] }
 lazy-regex = "2.2.2"
 html-escape = "0.2.9"
-rrm_locals = "0.0.1-alpha.0"
+rrm_locals = {path="../rrm_locals", version="0.0.1-alpha.0"}
