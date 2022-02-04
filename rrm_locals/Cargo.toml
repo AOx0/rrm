@@ -17,4 +17,4 @@ path-absolutize = "3.0.11"
 serde = {version="1.0.133", features=["derive"]}
 flagset = "0.4.2"
 fuzzy-matcher = "0.3.7"
-rrm_xml = "0.0.1-alpha.0"
+rrm_xml = {path="../rrm_xml", version="0.0.1-alpha.0"}
