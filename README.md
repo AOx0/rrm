@@ -1,6 +1,6 @@
 <div><img src="https://img.shields.io/badge/Status-Unstable-red"></img></div>
 
-</br>
+<br/>
 
 TODOs are available [here][1]. Discussions, PRs and Issues are open for anyone who is willing to contribute. 
 
