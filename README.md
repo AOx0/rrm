@@ -1,4 +1,5 @@
-<div><img src="https://img.shields.io/badge/Status-Unstable-red"></img> <img src="https://img.shields.io/badge/Version-0.0.1--alpha.2-red"></img></div>
+<div> <img src="https://img.shields.io/badge/Git%20Version-0.0.1--alpha.3-red"></img><img src="https://img.shields.io/badge/Status-Almost%20Done-yellow"></div>
+<div><a href="https://crates.io/crates/rrm"><img src="https://img.shields.io/badge/crates.io-0.0.1--alpha.2-green"></img></a><img src="https://img.shields.io/badge/Status-Unstable-red"></div>
 
 <br/>
 
