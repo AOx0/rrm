@@ -74,7 +74,7 @@ fn get_home() -> Option<PathBuf> {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Installer {
     pub config: PathBuf,
     pub home: PathBuf,
