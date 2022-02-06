@@ -1,5 +1,5 @@
 <div>
-	<img src="https://img.shields.io/badge/GitHub   Version-0.0.1--alpha.3-green">
+	<img src="https://img.shields.io/badge/GitHub   Version-0.0.1--alpha.4-green">
 	</img><img src="https://img.shields.io/badge/Status-Almost Done-yellow">
 </div>
 <div>
