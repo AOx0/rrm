@@ -12,8 +12,11 @@ use crate::{printf};
 pub async fn install(mut args: Install, i: Installer, d: usize, mut already_installed: HashSet<String>) {
 
     if args.r#mod.len() == 1 && args.r#mod.get(0).unwrap() == "None" {
+        args.r#mod = Vec::new();
         loop {
-            let n: String = read();
+            let n: String = read()
+                .replace("\n", "")
+                .replace(" ", "");;
 
             if n != "END" {
                 args.r#mod.push(n);
@@ -22,6 +25,8 @@ pub async fn install(mut args: Install, i: Installer, d: usize, mut already_inst
             }
         }
     }
+
+    if args.r#mod.is_empty() { std::process::exit(0); }
 
     use rrm_scrap::Filtrable;
 
