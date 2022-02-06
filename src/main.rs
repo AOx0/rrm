@@ -58,7 +58,7 @@ async fn main() {
         }
 
         args::Commands::Install { args } => {
-            install::install(args, installer).await;
+            install::install(args, installer, 0).await;
         }
     };
 }

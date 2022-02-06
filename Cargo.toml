@@ -16,6 +16,7 @@ license = "MIT"
 
 [dependencies]
 execute = "0.2.9"
+async-recursion = "1.0.0"
 clap = { version= "3.0.14", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
 tokio =  { version= "1.16.1", features=["full"] }
 symlink = "0.1.0"

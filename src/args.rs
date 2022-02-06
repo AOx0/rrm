@@ -216,7 +216,7 @@ pub struct Local {
     pub(crate) all: bool,
 }
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, Clone)]
 #[clap(setting(AppSettings::ArgRequiredElseHelp))]
 pub struct Install {
     /// The name of the RimWorld mod
@@ -247,9 +247,13 @@ pub struct Install {
     #[clap(long, conflicts_with_all = &["authors", "version", "steam-id", "name"], requires="filter")]
     pub(crate) all: bool,
 
-    /// Yes to all messages
-    #[clap(long)]
-    pub(crate) all_yes: bool,
+    /// Yes to all questions
+    #[clap(long, short)]
+    pub(crate) yes: bool,
+
+    /// Automatic dependencies installation
+    #[clap(long, short)]
+    pub(crate) resolve: bool,
 }
 
 macro_rules! a_if {
