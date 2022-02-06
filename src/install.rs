@@ -1,5 +1,6 @@
-
-use rrm_scrap::ModSteamInfo;
+use rrm_locals::{FilterBy, Filtrable};
+use fs_extra::dir;
+use rrm_scrap::{FlagSet, ModSteamInfo};
 use crate::utils::*;
 use crate::args::Install;
 use crate::{printf};
@@ -98,20 +99,26 @@ pub async fn install(args: Install, i: Installer) {
         }
     }
 
+    let rim_install = i.rim_install.unwrap();
+    let installed_mods =  GameMods::from(rim_install.path().to_str().unwrap()).with_display(DisplayType::Short);
 
     for id in successful_ids {
-        use fs_extra::dir;
-
         #[cfg(target_os="windows")]
             let source = format!("{}", i.config.parent().unwrap().join(r"steamcmd\steamapps\workshop\content\294100\").join(&id).display());
 
         #[cfg(target_os="macos")]
             let source = format!("{}", i.config.parent().unwrap().join("Library/Application Support/Steam/steamapps/workshop/content/294100").join(&id).display());
 
-        let destination = i.rim_install.as_ref().unwrap().path().join("Mods");
+        let destination = rim_install.path().join("Mods");
 
         let mut options = dir::CopyOptions::default();
         options.overwrite = true;
+
+        let filtered = installed_mods.filter_by(FlagSet::from(FilterBy::SteamID), &id);
+
+        for old_mod in filtered.mods {
+            dir::remove(old_mod.path).unwrap();
+        }
 
         dir::move_dir(&source, &destination, &options ).unwrap();
 
