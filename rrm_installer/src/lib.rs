@@ -99,64 +99,69 @@ fn create_config(at: &Path) {
 
 pub fn run_steam_command(c: &str, config_path: &Path, count: usize) -> String {
     #[cfg(target_os = "macos")]
-    let steam = config_path.join("steamcmd").join("steamcmd");
+        let steam = config_path.join("steamcmd").join("steamcmd");
 
     #[cfg(target_os = "linux")]
-    let steam = config_path.join("steamcmd").join("steamcmd.sh");
+        let steam = config_path.join("steamcmd").join("steamcmd.sh");
 
     #[cfg(target_os = "windows")]
-    let steam = config_path.join("steamcmd").join("steamcmd.exe");
+        let steam = config_path.join("steamcmd").join("steamcmd.exe");
 
     #[cfg(target_os = "windows")]
         let out = std::process::Command::new(steam.as_path().to_str().unwrap())
-        .args("+login anonymous {} +quit".replace("{}", c).split(" "))
-        .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::null())
-        .output()
-        .unwrap_or_else(|error| {
-            eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
-            exit(1);
-        });
+            .args("+login anonymous {} +quit".replace("{}", c).split(" "))
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::null())
+            .output()
+            .unwrap_or_else(|error| {
+                eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
+                exit(1);
+            });
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    let out = std::process::Command::new("env")
-        .args(
-            r#"HOME=PATH [] +login anonymous {} +quit"#
-                .replace(
-                    "PATH",
-                    steam
-                        .as_path()
-                        .parent()
-                        .unwrap()
-                        .parent()
-                        .unwrap()
-                        .to_str()
-                        .unwrap(),
-                )
-                .replace("[]", steam.as_path().to_str().unwrap())
-                .replace("{}", c)
-                .split(" "),
-        )
-        .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::null())
-        .output()
-        .unwrap_or_else(|error| {
-            eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
-            exit(1);
-        });
+        let out = std::process::Command::new("env")
+            .args(
+                r#"HOME=PATH [] +login anonymous {} +quit"#
+                    .replace(
+                        "PATH",
+                        steam
+                            .as_path()
+                            .parent()
+                            .unwrap()
+                            .parent()
+                            .unwrap()
+                            .to_str()
+                            .unwrap(),
+                    )
+                    .replace("[]", steam.as_path().to_str().unwrap())
+                    .replace("{}", c)
+                    .split(" "),
+            )
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::null())
+            .output()
+            .unwrap_or_else(|error| {
+                eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
+                exit(1);
+            });
 
-        if c.contains("+workshop_download_item 294100") && String::from_utf8(out.clone().stdout).unwrap().contains("Connecting anonymously to Steam Public...OK\nWaiting for client config...OK\nWaiting for user info...OK") {
-            String::from_utf8(out.stdout).unwrap()
-        } else if c.contains("+workshop_download_item 294100")  {
-            run_steam_command(c, config_path, count + 1)
-        } else if count == 5 {
-            "Error: Failed to install".to_string()
-        } else {
-            run_steam_command(c, config_path, count + 1)
-        }
+    let out = String::from_utf8(out.clone().stdout).unwrap();
 
+    if
+    c.contains("+workshop_download_item 294100") &&
+        out.contains("Connecting anonymously to Steam Public...OK") &&
+        out.contains("Waiting for client config...OK") &&
+        out.contains("Waiting for user info...OK") {
+            out
+    } else if c.contains("+workshop_download_item 294100")  {
+        run_steam_command(c, config_path, count + 1)
+    } else if count == 5 {
+        "Error: Failed to install".to_string()
+    } else {
+        run_steam_command(c, config_path, count + 1)
+    }
 }
 
 #[cfg(any(target_os = "macos", target_os = "linux"))]
