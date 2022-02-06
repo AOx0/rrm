@@ -4,7 +4,7 @@
 </div>
 <div>
 	<a href="https://crates.io/crates/rrm">
-		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.3-green"></img>
+		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.4-green"></img>
 	</a>
 	<img src="https://img.shields.io/badge/Status-Almost Done-yellow">
 </div>
@@ -20,8 +20,8 @@ TODOs are available [here][1]. Discussions, PRs and Issues are open for anyone w
 Inspired by Spoons [rmm][2]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
 
 ## Usage
-All documentation, as well as usage examples and help is available in the [Wiki][3].
-Or you can ask via [Discussion][4]  
+- All documentation, as well as usage examples and help is available in the [Wiki][3]. Or you can ask via [Discussion][4]  
+- Mod installation demo available [here][7]
 
 <br/>
 
@@ -37,9 +37,9 @@ You can update `rustc` with:
 ### Install
 To install the `crates.io` pre-release version run:
 
-	cargo install rrm --version 0.0.1-alpha.3
+	cargo install rrm --version 0.0.1-alpha.4
 
-Or install the GitHub version. Although it's not recommended since it has a 'dev' flag which changes the installer:
+Or install the GitHub version. Although it's not recommended since it has a 'dev' flag which changes the installer behaviour:
 
 	git clone https://github.com/AOx0/rrm --recursive
 	cargo install rrm --path rrm/
@@ -89,3 +89,4 @@ You can bypass configured values with special flags.
 [4]:	https://github.com/AOx0/rrm/discussions
 [5]:	https://www.rust-lang.org/tools/install
 [6]:	https://www.cve.org/CVERecord?id=CVE-2022-21658
+[7]:    https://youtu.be/Fp5Y89DeLBY
