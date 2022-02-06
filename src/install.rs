@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::collections::HashSet;
 use async_recursion::async_recursion;
 use rrm_locals::{FilterBy, Filtrable};
 use fs_extra::dir;
@@ -8,13 +9,41 @@ use crate::args::Install;
 use crate::{printf};
 
 #[async_recursion]
-pub async fn install(mut args: Install, i: Installer, d: usize) {
+pub async fn install(mut args: Install, i: Installer, d: usize, mut already_installed: HashSet<String>) {
+
+    if args.r#mod.len() == 1 && args.r#mod.get(0).unwrap() == "None" {
+        loop {
+            let n: String = read();
+
+            if n != "END" {
+                args.r#mod.push(n);
+            } else {
+                break;
+            }
+        }
+    }
+
     use rrm_scrap::Filtrable;
 
     let mut to_install : Vec<ModSteamInfo> = Vec::new();
     let filter_obj = args.to_filter_obj();
     for m in &args.r#mod {
         if m.chars().all(char::is_numeric) {
+            to_install.push(ModSteamInfo {
+                id: m.clone(),
+                title: m.clone(),
+                description: "".to_string(),
+                author: "".to_string()
+            });
+            continue;
+        }
+
+        if m.contains("https://steamcommunity.com/sharedfiles/filedetails/?id=") {
+            let m = m
+                .replace("https://steamcommunity.com/sharedfiles/filedetails/?id=", "")
+                .replace("\n", "")
+                .replace(" ", "");
+
             to_install.push(ModSteamInfo {
                 id: m.clone(),
                 title: m.clone(),
@@ -91,20 +120,20 @@ pub async fn install(mut args: Install, i: Installer, d: usize) {
     if d == 0 {printf!("Installing mod{}...", if &args.r#mod.len() > &1 { "s" } else {""});};
     let (_, result) = i.install(&ids);
 
-    let mut successful_ids = Vec::new();
+    let mut successful_ids = HashSet::new();
 
     for line in result.split("\n") {
         if line.contains("Success") {
             let line = line.replace("Success. Downloaded item ", "");
             //println!("{}", line);
             let words = line.split(" ").next().unwrap();
-            successful_ids.push(words.to_string());
+            successful_ids.insert(words.to_string());
         }
     }
 
     let rim_install = i.rim_install.as_ref().unwrap();
 
-    let mut dependencies_ids = RefCell::new(Vec::new());
+    let mut dependencies_ids = RefCell::new(HashSet::new());
 
     for id in successful_ids {
 
@@ -127,6 +156,7 @@ pub async fn install(mut args: Install, i: Installer, d: usize) {
         let filtered = installed_mods.filter_by(FlagSet::from(FilterBy::SteamID), &id);
 
         for old_mod in filtered.mods {
+            //dbg!(&old_mod.path);
             dir::remove(old_mod.path).unwrap();
         }
 
@@ -135,23 +165,31 @@ pub async fn install(mut args: Install, i: Installer, d: usize) {
         let installed_mods =  GameMods::from(rim_install.path().to_str().unwrap()).with_display(DisplayType::Short);
         let filtered = installed_mods.filter_by(FlagSet::from(FilterBy::SteamID), &id);
 
-        if filtered.mods.len() == 1 {
+        already_installed.insert(id.clone());
+
+        if filtered.mods.len() == 1 && !filtered.mods.is_empty() {
             let m = filtered.mods[0].clone();
             if let Some(dependencies) = m.dependencies {
                 for id in  dependencies {
-                    dependencies_ids.get_mut().push(id);
+                    if !already_installed.contains(&id) {
+                        dependencies_ids.get_mut().insert(id);
+                    }
                 }
             }
+        } else {
+            eprintln!("There's a duplicated mod. {}", filtered.mods[0].steam_id );
         }
+    }
 
-        if d == 0 { println!("Done!"); };
+    if d == 0 { printf!("Done!\n"); };
 
-        if args.resolve && dependencies_ids.get_mut().len() != 0 {
-            if d == 0 { printf!("Installing dependencies recursively..."); };
-            args.r#mod = dependencies_ids.get_mut().clone();
-            install(args.clone(), i.clone(), d + 1).await;
-            if d == 0 { println!("Done!"); };
-        }
+    //dbg!(&dependencies_ids);
+
+    if args.resolve && dependencies_ids.get_mut().len() != 0 {
+        if d == 0 { printf!("Installing dependencies recursively..."); };
+        args.r#mod = Vec::from_iter(dependencies_ids.get_mut().clone());
+        install(args.clone(), i.clone(), d + 1, already_installed).await;
+        if d == 0 { printf!("Done!\n"); };
     }
 }
 

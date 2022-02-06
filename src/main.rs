@@ -1,5 +1,6 @@
 extern crate core;
 
+use std::collections::HashSet;
 use crate::args::Options;
 
 mod args;
@@ -58,7 +59,7 @@ async fn main() {
         }
 
         args::Commands::Install { args } => {
-            install::install(args, installer, 0).await;
+            install::install(args, installer, 0, HashSet::new()).await;
         }
     };
 }

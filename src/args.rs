@@ -219,8 +219,8 @@ pub struct Local {
 #[derive(Args, Debug, Clone)]
 #[clap(setting(AppSettings::ArgRequiredElseHelp))]
 pub struct Install {
-    /// The name of the RimWorld mod
-    #[clap(required = true)]
+    /// The name of the RimWorld mod(s)
+    #[clap(required = true, default_value = "None")]
     pub(crate) r#mod: Vec<String>,
 
     /// The name of the RimWorld mod
