@@ -4,9 +4,9 @@
 </div>
 <div>
 	<a href="https://crates.io/crates/rrm">
-		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.2-green"></img>
+		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.3-green"></img>
 	</a>
-	<img src="https://img.shields.io/badge/Status-Unstable-red">
+	<img src="https://img.shields.io/badge/Status-Almost Done-yellow">
 </div>
 
 <br/>
@@ -37,7 +37,7 @@ You can update `rustc` with:
 ### Install
 To install the `crates.io` pre-release version run:
 
-	cargo install rrm --version 0.0.1-alpha.2
+	cargo install rrm --version 0.0.1-alpha.3
 
 Or install the GitHub version:
 
