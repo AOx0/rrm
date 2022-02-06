@@ -16,7 +16,7 @@ pub type Mods = Vec<Mod>;
 
 #[derive(Clone)]
 pub struct GameMods {
-    mods: Mods,
+    pub mods: Mods,
     pub biggest_name_size: usize,
     display_type: Option<DisplayType>,
 }
