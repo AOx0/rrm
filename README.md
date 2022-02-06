@@ -1,5 +1,13 @@
-<div> <img src="https://img.shields.io/badge/Git%20Version-0.0.1--alpha.3-red"></img><img src="https://img.shields.io/badge/Status-Almost%20Done-yellow"></div>
-<div><a href="https://crates.io/crates/rrm"><img src="https://img.shields.io/badge/crates.io-0.0.1--alpha.2-green"></img></a><img src="https://img.shields.io/badge/Status-Unstable-red"></div>
+<div>
+	<img src="https://img.shields.io/badge/Git%20Version-0.0.1--alpha.3-green">
+	</img><img src="https://img.shields.io/badge/Status-Almost%20Done-yellow">
+</div>
+<div>
+	<a href="https://crates.io/crates/rrm">
+		<img src="https://img.shields.io/badge/crates.io-0.0.1--alpha.2-green"></img>
+	</a>
+	<img src="https://img.shields.io/badge/Status-Unstable-red">
+</div>
 
 <br/>
 
@@ -11,25 +19,30 @@ TODOs are available [here][1]. Discussions, PRs and Issues are open for anyone w
 
 Inspired by Spoons [rmm][2]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
 
-**Usage and help** is available in the [Wiki][4]
+## Usage
+All documentation, as well as usage examples and help is available in the [Wiki][3].
+Or you can ask via [Discussion][4]  
 
 <br/>
 
 ## Installation
-This program is installable with `cargo`. Install `rust` along with `cargo` [here][3]. It’s bundled with anything it needs to work. For security reasons, the minimum `rustc` version to compile the program is `1.58.1`.
+This program is installable with `cargo`. Install `rust` along with `cargo` [here][5]. It’s bundled with anything it needs to work. 
 
-You can update rustc with:
+For security reasons, the minimum `rustc` version for compiling the program is `1.58.1`. See more of [ CVE-2022-21658 ][6].
+
+You can update `rustc` with:
 
 	rustup update
 
-### Install (pre-release)
-To install run:
+### Install
+To install the `crates.io` pre-release version run:
 
 	cargo install rrm --version 0.0.1-alpha.2
-	
+
 Or install the GitHub version:
 
-	cargo install rrm --git https://github.com/AOx0/rrm
+	git clone https://github.com/AOx0/rrm --recursive
+	cargo install rrm --path rrm/
 
 ### Linux additional steps
 Additionally, if you are using **_linux_** on a 64 bit machine, you will need to add multiverse with:
@@ -72,7 +85,7 @@ You can bypass configured values with special flags.
 
 [1]:	https://github.com/AOx0/rrm/projects/1
 [2]:	https://github.com/Spoons/rmm "rmm"
-[3]:	https://www.rust-lang.org/tools/install
-[4]:	https://github.com/AOx0/rrm/wiki
-
-[image-1]:	./media/Demo1.svg
+[3]:	https://github.com/AOx0/rrm/wiki
+[4]:	https://github.com/AOx0/rrm/discussions
+[5]:	https://www.rust-lang.org/tools/install
+[6]:	https://www.cve.org/CVERecord?id=CVE-2022-21658
