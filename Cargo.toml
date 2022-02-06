@@ -19,6 +19,7 @@ execute = "0.2.9"
 clap = { version= "3.0.14", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
 tokio =  { version= "1.16.1", features=["full"] }
 symlink = "0.1.0"
+fs_extra = "1.2.0"
 
 rrm_locals = {path="rrm_locals", version="0.0.1-alpha.1"}
 rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.3"}

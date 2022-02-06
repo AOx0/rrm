@@ -1,7 +1,14 @@
+
 use rrm_scrap::ModSteamInfo;
 use crate::utils::*;
 use crate::args::Install;
-use symlink::symlink_dir;
+
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+    use symlink::symlink_dir;
+
+#[cfg(target_os = "windows")]
+    use fs_extra::dir;
+
 use crate::{printf};
 
 
@@ -98,15 +105,23 @@ pub async fn install(args: Install, i: Installer) {
         }
     }
 
+    #[cfg(any(target_os="macos", target_os="linux"))]
     for id in successful_ids {
         #[cfg(target_os="macos")]
             let source = format!("{}", i.config.parent().unwrap().join("Library/Application Support/Steam/steamapps/workshop/content/294100").join(&id).display());
 
-        #[cfg(target_os="windows")]
-            let source = format!("{}", i.config.parent().unwrap().join(r"steamcmd\steamapps\workshop\content\294100\").join(&id).display());
-
         symlink_dir(source, i.rim_install.as_ref().unwrap().path().join("Mods").join(&id)).unwrap();
     }
+
+    #[cfg(target_os="windows")]
+    for id in successful_ids {
+        let source = format!("{}", i.config.parent().unwrap().join(r"steamcmd\steamapps\workshop\content\294100\").join(&id).display());
+
+        let options = dir::CopyOptions::default();
+
+        dir::move_dir(source, i.rim_install.as_ref().unwrap().path().join("Mods").join(&id), &options ).unwrap();
+    }
+
 
     println!("Done! Installed...");
     to_install.iter().for_each(|e|
