@@ -10,6 +10,8 @@ TODOs are available [here][1]. Discussions, PRs and Issues are open for anyone w
 
 Inspired by Spoons [rmm][2]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
 
+**Usage and help** is available in the [Wiki][4]
+
 <br/>
 
 ## Installation
@@ -70,5 +72,6 @@ You can bypass configured values with special flags.
 [1]:	https://github.com/AOx0/rrm/projects/1
 [2]:	https://github.com/Spoons/rmm "rmm"
 [3]:	https://www.rust-lang.org/tools/install
+[4]:	https://github.com/AOx0/rrm/wiki
 
 [image-1]:	./media/Demo1.svg
