@@ -108,7 +108,7 @@ pub fn run_steam_command(c: &str, config_path: &Path, count: usize) -> String {
     let steam = config_path.join("steamcmd").join("steamcmd.exe");
 
     #[cfg(target_os = "windows")]
-    let try_execute_steam = std::process::Command::new(steam.as_path().to_str().unwrap())
+        let out = std::process::Command::new(steam.as_path().to_str().unwrap())
         .args("+login anonymous {} +quit".replace("{}", c).split(" "))
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::piped())
