@@ -78,3 +78,34 @@ pub fn try_get_path(game_path: Option<&Path>, will_set: bool) -> Installer {
         exit(1);
     }
 }
+
+#[macro_export]
+macro_rules! printf {
+    ( $($t:tt)* ) => {
+        {
+            use std::io::Write;
+            let mut h = std::io::stdout();
+            write!(h, $($t)* ).unwrap();
+            h.flush().unwrap();
+        }
+    }
+}
+
+#[macro_export]
+macro_rules! search_in_steam {
+    ($args: expr, $mods: expr) => {
+        {
+            if $args.filter.is_some() {
+                let value = if $args.filter.as_ref().unwrap().is_some() {
+                    $args.filter.as_ref().unwrap().clone().unwrap()
+                } else {
+                    $args.r#mod.clone()
+                };
+
+                $mods.filter_by($args.to_filter_obj(), &value)
+            } else {
+                $mods
+            }
+        }
+    };
+}

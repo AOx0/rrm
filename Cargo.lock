@@ -1132,19 +1132,20 @@ dependencies = [
 
 [[package]]
 name = "rrm"
-version = "0.0.1-alpha.2"
+version = "0.0.1-alpha.3"
 dependencies = [
  "clap",
  "execute",
  "rrm_installer",
  "rrm_locals",
  "rrm_scrap",
+ "symlink",
  "tokio",
 ]
 
 [[package]]
 name = "rrm_installer"
-version = "0.0.1-alpha.2"
+version = "0.0.1-alpha.3"
 dependencies = [
  "directories",
  "dotenv",
@@ -1167,7 +1168,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_scrap"
-version = "0.0.1-alpha.2"
+version = "0.0.1-alpha.3"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
@@ -1409,6 +1410,12 @@ name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
+
+[[package]]
+name = "symlink"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7973cce6668464ea31f176d85b13c7ab3bba2cb3b77a2ed26abd7801688010a"
 
 [[package]]
 name = "syn"

@@ -1,6 +1,8 @@
 use crate::args::{Local, Steam};
+use crate::search_in_steam;
 use crate::utils::*;
 
+#[macro_export]
 macro_rules! display_search {
     ($m: expr, $args: expr, $i: expr) => {
         if !$m.is_empty() {
@@ -33,17 +35,7 @@ pub async fn search_steam(i: Installer, args: Steam) {
         .await
         .with_display(rrm_locals::DisplayType::from(args.display.large));
 
-    let mods = if args.filter.is_some() {
-        let value = if args.filter.as_ref().unwrap().is_some() {
-            args.filter.as_ref().unwrap().clone().unwrap()
-        } else {
-            args.r#mod.clone()
-        };
-
-        mods.filter_by(args.to_filter_obj(), &value)
-    } else {
-        mods
-    };
+    let mods = search_in_steam!(args, mods);
 
     display_search!(mods, args, i);
 }

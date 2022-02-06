@@ -1,9 +1,12 @@
+extern crate core;
+
 use crate::args::Options;
 
 mod args;
 mod list;
 mod search;
 mod utils;
+mod install;
 
 #[tokio::main]
 async fn main() {
@@ -54,6 +57,8 @@ async fn main() {
             search::search_steam(installer, args).await;
         }
 
-        _ => {}
+        args::Commands::Install { args } => {
+            install::install(args, installer).await;
+        }
     };
 }
