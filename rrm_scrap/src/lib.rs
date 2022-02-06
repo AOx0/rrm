@@ -191,24 +191,41 @@ impl SteamMods {
         s
     }
 
+    pub fn with_raw_display(self, t: Option<DisplayType>) -> Self {
+        let mut s = self;
+        s.display_type = t;
+        s
+    }
+
     pub fn gen_display(&self) -> String{
         let mut result = "".to_string();
 
-        let d_type = self.display_type.as_ref().unwrap_or_else(|| {
-            eprintln!("Error, make sure to set display_type to a variant of DisplayType");
-            exit(1);
-        });
+        if let Some(typ) = self.display_type {
+            if let DisplayType::Short = typ {
+                result.push_str(&ModSteamInfo::gen_headers(self.biggest_name_size));
+                result.push_str("\n")
+            }
 
-        if let DisplayType::Short = d_type {
+            self.mods
+                .iter()
+                .for_each(|m| {
+                    result.push_str(&m.gen_display(&typ, self.biggest_name_size));
+                });
+        } else {
             result.push_str(&ModSteamInfo::gen_headers(self.biggest_name_size));
-            result.push_str("\n")
+            result = result.replace("       Steam ID", "             Steam ID");
+            result = result.replace("\n", "\n      ");
+            result.push_str("\n");
+
+            self.mods
+                .iter()
+                .enumerate()
+                .for_each(|(i, m)| {
+                    result.push_str(&format!(" {:<4} {}",i,  &m.gen_display(&DisplayType::Short, self.biggest_name_size)));
+                });
         }
 
-        self.mods
-            .iter()
-            .for_each(|m| {
-                result.push_str(&m.gen_display(d_type, self.biggest_name_size));
-            });
+
 
         result
     }
@@ -235,6 +252,10 @@ impl SteamMods {
     }
 
     pub fn display(&self) {
+        print!("{}",self.gen_display())
+    }
+
+    pub fn display_numbered(&self) {
         print!("{}",self.gen_display())
     }
 }
