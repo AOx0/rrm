@@ -16,7 +16,7 @@ pub async fn install(mut args: Install, i: Installer, d: usize, mut already_inst
         loop {
             let n: String = read()
                 .replace("\n", "")
-                .replace(" ", "");;
+                .replace(" ", "");
 
             if n != "END" {
                 args.r#mod.push(n);
@@ -122,7 +122,7 @@ pub async fn install(mut args: Install, i: Installer, d: usize, mut already_inst
 
     let ids : Vec<&str> = to_install.iter().map(|e| e.id.as_str()).collect();
 
-    if d == 0 {printf!("Installing mod{}...", if &args.r#mod.len() > &1 { "s" } else {""});};
+    if d == 0 {printf!("{:<30}", format!("Installing mod{} ...", if &args.r#mod.len() > &1 { "s" } else {""}))};
     let (_, result) = i.install(&ids);
 
     let mut successful_ids = HashSet::new();
@@ -191,7 +191,7 @@ pub async fn install(mut args: Install, i: Installer, d: usize, mut already_inst
     //dbg!(&dependencies_ids);
 
     if args.resolve && dependencies_ids.get_mut().len() != 0 {
-        if d == 0 { printf!("Installing dependencies recursively..."); };
+        if d == 0 { printf!("{:<30}","Installing dependencies ..."); };
         args.r#mod = Vec::from_iter(dependencies_ids.get_mut().clone());
         install(args.clone(), i.clone(), d + 1, already_installed).await;
         if d == 0 { printf!("Done!\n"); };
