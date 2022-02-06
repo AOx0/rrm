@@ -107,8 +107,13 @@ pub async fn install(mut args: Install, i: Installer, d: usize) {
     let mut dependencies_ids = RefCell::new(Vec::new());
 
     for id in successful_ids {
+
+
         #[cfg(target_os="windows")]
             let source = format!("{}", i.config.parent().unwrap().join(r"steamcmd\steamapps\workshop\content\294100\").join(&id).display());
+
+        #[cfg(target_os="linux")]
+            let source = format!("{}", i.config.parent().unwrap().join(r".steam/steamapps/workshop/content/294100/").join(&id).display());
 
         #[cfg(target_os="macos")]
             let source = format!("{}", i.config.parent().unwrap().join("Library/Application Support/Steam/steamapps/workshop/content/294100").join(&id).display());
