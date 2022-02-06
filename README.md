@@ -39,7 +39,7 @@ To install the `crates.io` pre-release version run:
 
 	cargo install rrm --version 0.0.1-alpha.3
 
-Or install the GitHub version:
+Or install the GitHub version. Although it's not recommended since it has a 'dev' flag which changes the installer:
 
 	git clone https://github.com/AOx0/rrm --recursive
 	cargo install rrm --path rrm/
