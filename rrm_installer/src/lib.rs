@@ -1,5 +1,6 @@
 extern crate core;
 
+use std::env::current_dir;
 use rrm_locals::GamePath;
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -96,7 +97,7 @@ fn create_config(at: &Path) {
     });
 }
 
-fn run_steam_command(c: &str, config_path: &Path) {
+pub fn run_steam_command(c: &str, config_path: &Path, count: usize) -> String {
     #[cfg(target_os = "macos")]
     let steam = config_path.join("steamcmd").join("steamcmd");
 
@@ -110,19 +111,16 @@ fn run_steam_command(c: &str, config_path: &Path) {
     let try_execute_steam = std::process::Command::new(steam.as_path().to_str().unwrap())
         .args("+login anonymous {} +quit".replace("{}", c).split(" "))
         .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::null())
-        .spawn()
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .output()
         .unwrap_or_else(|error| {
             eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
             exit(1);
-        })
-        .wait()
-        .unwrap()
-        .code()
-        .unwrap();
+        });
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    let _try_execute_steam = std::process::Command::new("env")
+    let out = std::process::Command::new("env")
         .args(
             r#"HOME=PATH [] +login anonymous {} +quit"#
                 .replace(
@@ -141,16 +139,24 @@ fn run_steam_command(c: &str, config_path: &Path) {
                 .split(" "),
         )
         .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::null())
-        .spawn()
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .output()
         .unwrap_or_else(|error| {
             eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
             exit(1);
-        })
-        .wait()
-        .unwrap()
-        .code()
-        .unwrap();
+        });
+
+        if c.contains("+workshop_download_item 294100") && String::from_utf8(out.clone().stdout).unwrap().contains("Connecting anonymously to Steam Public...OK\nWaiting for client config...OK\nWaiting for user info...OK") {
+            String::from_utf8(out.stdout).unwrap()
+        } else if c.contains("+workshop_download_item 294100")  {
+            run_steam_command(c, config_path, count + 1)
+        } else if count == 5 {
+            "Error: Failed to install".to_string()
+        } else {
+            run_steam_command(c, config_path, count + 1)
+        }
+
 }
 
 #[cfg(any(target_os = "macos", target_os = "linux"))]
@@ -187,9 +193,7 @@ impl Installer {
             fresh_new = true;
             create_config(&config_file);
             if config_exists(&home) {
-                let config_path = config_file.clone();
-                let config_path = config_path.as_path().parent().unwrap();
-                let steamcmd_path = config_path.join("steamcmd");
+                let steamcmd_path =  home.join(".rrm").join("steamcmd");
                 fs::create_dir(&steamcmd_path).unwrap_or_else(|err| {
                     if !steamcmd_path.is_dir() {
                         panic!("{}", err);
@@ -199,7 +203,7 @@ impl Installer {
                 PROJECT_DIR.extract(steamcmd_path.as_path()).unwrap();
 
                 #[cfg(any(target_os = "macos", target_os = "linux"))]
-                set_permissions_for_steamcmd(steamcmd_path.as_path());
+                    set_permissions_for_steamcmd(steamcmd_path.as_path());
 
                 config_file
             } else {
@@ -209,12 +213,15 @@ impl Installer {
 
         let path = path.map(|path| GamePath::from(&path));
 
-        std::env::set_current_dir(home.join(".rrm").as_path()).unwrap();
-
         if fresh_new {
-            run_steam_command("", config.parent().unwrap().to_str().unwrap().as_ref());
-        }
+            println!("Installing steamcmd...");
+            run_steam_command("", &current_dir().unwrap().as_path().join(".rrm"), 1);
+            println!("Done!");
 
+            std::env::set_current_dir(home.as_path()).unwrap();
+        } else {
+            std::env::set_current_dir(home.join(".rrm").as_path()).unwrap();
+        }
 
         Installer {
             with_paging: DEFAULT_PAGING_SOFTWARE.to_string(),
@@ -341,5 +348,14 @@ impl Installer {
                         is correct or that it is available within the PATH."
             );
         }
+    }
+
+    pub fn install(&self, c: &[&str]) -> (bool, String) {
+        let to_install = " +workshop_download_item 294100 ".to_string()  + &c.join(" +workshop_download_item 294100 ");
+        //println!("{to_install}");
+        //exit(1);
+        let a: String = run_steam_command(&to_install, &current_dir().unwrap(), 1);
+        //println!("{}", a);
+        (a.contains("Success. Downloaded item"), a)
     }
 }
