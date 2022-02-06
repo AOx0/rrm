@@ -92,17 +92,18 @@ pub async fn install(args: Install, i: Installer) {
     for line in result.split("\n") {
         if line.contains("Success") {
             let line = line.replace("Success. Downloaded item ", "");
+            println!("{}", line);
             let words = line.split(" ").next().unwrap();
             successful_ids.push(words.to_string());
         }
     }
 
-    for id in successful_ids {
+    /*for id in successful_ids {
         #[cfg(target_os="macos")]
             let source = format!("{}", i.config.parent().unwrap().join("Library/Application Support/Steam/steamapps/workshop/content/294100").join(&id).display());
 
         symlink_dir(source, i.rim_install.as_ref().unwrap().path().join("Mods").join(&id)).unwrap();
-    }
+    }*/
 
     println!("Done! Installed...");
     to_install.iter().for_each(|e|
