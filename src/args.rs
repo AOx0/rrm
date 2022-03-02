@@ -1,5 +1,5 @@
 use crate::utils::*;
-use clap::{AppSettings, Args, Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -68,7 +68,7 @@ pub enum Commands {
 
     #[clap(
         visible_alias = "ss",
-        setting(AppSettings::Hidden),
+        hide = true,
         about = "Search for mods in Steam",
         override_usage = "rrm search steam <MOD>"
     )]
@@ -79,7 +79,8 @@ pub enum Commands {
 
     #[clap(
         visible_alias = "sl",
-        setting(AppSettings::Hidden | AppSettings::DisableVersionFlag),
+        hide = true,
+        disable_version_flag = true,
         about = "Search for mods locally, where RimWorld is installed [with no flags searches by name]",
         override_usage = "rrm search local [OPTIONS] <STRING>"
     )]
@@ -94,10 +95,7 @@ pub enum Commands {
         command: Options,
     },
 
-    #[clap(
-        visible_alias = "s",
-        about = "Search for mods by id or name locally or in Steam within your terminal"
-    )]
+    #[clap(visible_alias = "s", about = "Search for mods locally or in Steam")]
     Search {
         #[clap(subcommand)]
         command: Search,
@@ -141,7 +139,7 @@ pub enum Search {
 
     #[clap(
         visible_aliases = &["l", "sl (global)"],
-        setting(AppSettings::DisableVersionFlag),
+        disable_version_flag = true,
         about = "Search for mods locally, where RimWorld is installed [with no flags searches by name]",
     )]
     Local {
@@ -151,7 +149,7 @@ pub enum Search {
 }
 
 #[derive(Args, Debug)]
-#[clap(setting(AppSettings::ArgRequiredElseHelp))]
+#[clap(arg_required_else_help = true)]
 pub struct Steam {
     #[clap(flatten)]
     pub display: DisplayOptions,
@@ -186,7 +184,7 @@ pub struct Steam {
 }
 
 #[derive(Args, Debug)]
-#[clap(setting(AppSettings::ArgRequiredElseHelp))]
+#[clap(arg_required_else_help = true)]
 pub struct Local {
     #[clap(flatten)]
     pub display: DisplayOptions,
@@ -217,7 +215,7 @@ pub struct Local {
 }
 
 #[derive(Args, Debug, Clone)]
-#[clap(setting(AppSettings::ArgRequiredElseHelp))]
+#[clap(arg_required_else_help = true)]
 pub struct Install {
     /// The name of the RimWorld mod(s)
     #[clap(required = true, default_value = "None")]

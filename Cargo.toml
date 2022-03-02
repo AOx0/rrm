@@ -1,6 +1,6 @@
 [package]
 name = "rrm"
-version = "0.0.1-alpha.4"
+version = "0.0.1-alpha.5"
 edition = "2021"
 authors = ["AOx0 <aoxo.contact@gmail.com>"]
 rust-version = "1.58.1"
@@ -17,9 +17,8 @@ license = "MIT"
 [dependencies]
 execute = "0.2.9"
 async-recursion = "1.0.0"
-clap = { version= "3.0.14", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
-tokio =  { version= "1.16.1", features=["full"] }
-symlink = "0.1.0"
+clap = { version= "3.1.3", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
+tokio =  { version= "1.17.0", default-features = false }
 fs_extra = "1.2.0"
 regex = "1.5.4"
 
