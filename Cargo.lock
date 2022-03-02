@@ -1155,6 +1155,7 @@ dependencies = [
  "clap",
  "execute",
  "fs_extra",
+ "regex",
  "rrm_installer",
  "rrm_locals",
  "rrm_scrap",

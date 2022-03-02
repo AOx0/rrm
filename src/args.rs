@@ -165,19 +165,19 @@ pub struct Steam {
     pub(crate) filter: Option<Option<String>>,
 
     /// Search by author(s) name(s)
-    #[clap(short, long, requires="filter")]
+    #[clap(short, long, requires = "filter")]
     pub(crate) author: bool,
 
     /// Search by version
-    #[clap(short, long, requires="filter")]
+    #[clap(short, long, requires = "filter")]
     pub(crate) version: bool,
 
     /// Search by Steam ID
-    #[clap(short, long, requires="filter")]
+    #[clap(short, long, requires = "filter")]
     pub(crate) steam_id: bool,
 
     /// Search by mod name
-    #[clap(short, long, requires="filter")]
+    #[clap(short, long, requires = "filter")]
     pub(crate) name: bool,
 
     /// Search by all fields
@@ -228,19 +228,19 @@ pub struct Install {
     pub(crate) filter: Option<Option<String>>,
 
     /// Search by author(s) name(s)
-    #[clap(short, long, requires="filter")]
+    #[clap(short, long, requires = "filter")]
     pub(crate) author: bool,
 
     /// Search by version
-    #[clap(short, long, requires="filter")]
+    #[clap(short, long, requires = "filter")]
     pub(crate) version: bool,
 
     /// Search by Steam ID
-    #[clap(short, long, requires="filter")]
+    #[clap(short, long, requires = "filter")]
     pub(crate) steam_id: bool,
 
     /// Search by mod name
-    #[clap(short, long, requires="filter")]
+    #[clap(short, long, requires = "filter")]
     pub(crate) name: bool,
 
     /// Search by all fields
@@ -278,7 +278,8 @@ macro_rules! b_if {
 
 impl Local {
     pub fn to_filter_obj(&self) -> rrm_locals::FlagSet<rrm_locals::FilterBy> {
-        let mut result: rrm_locals::FlagSet<rrm_locals::FilterBy> = rrm_locals::FlagSet::from(rrm_locals::FilterBy::None);
+        let mut result: rrm_locals::FlagSet<rrm_locals::FilterBy> =
+            rrm_locals::FlagSet::from(rrm_locals::FilterBy::None);
 
         if self.all {
             return rrm_locals::FlagSet::from(rrm_locals::FilterBy::All);
@@ -300,28 +301,27 @@ impl Local {
 }
 
 macro_rules! filter {
-    ($s: expr) => {
-        {
-            let mut result: rrm_scrap::FlagSet<rrm_scrap::FilterBy> =  rrm_scrap::FlagSet::from(rrm_scrap::FilterBy::None);
+    ($s: expr) => {{
+        let mut result: rrm_scrap::FlagSet<rrm_scrap::FilterBy> =
+            rrm_scrap::FlagSet::from(rrm_scrap::FilterBy::None);
 
-            if $s.all {
-                return rrm_scrap::FlagSet::from(rrm_scrap::FilterBy::All);
-            }
-
-            result |= b_if!($s.name, rrm_scrap::FilterBy::Title);
-            result |= b_if!($s.author, rrm_scrap::FilterBy::Author);
-            result |= b_if!($s.version, rrm_scrap::FilterBy::Description);
-            result |= b_if!($s.steam_id, rrm_scrap::FilterBy::SteamID);
-
-            result -= rrm_scrap::FilterBy::None;
-
-            if result.is_empty() {
-                result |= rrm_scrap::FilterBy::Title;
-            }
-
-            result
+        if $s.all {
+            return rrm_scrap::FlagSet::from(rrm_scrap::FilterBy::All);
         }
-    };
+
+        result |= b_if!($s.name, rrm_scrap::FilterBy::Title);
+        result |= b_if!($s.author, rrm_scrap::FilterBy::Author);
+        result |= b_if!($s.version, rrm_scrap::FilterBy::Description);
+        result |= b_if!($s.steam_id, rrm_scrap::FilterBy::SteamID);
+
+        result -= rrm_scrap::FilterBy::None;
+
+        if result.is_empty() {
+            result |= rrm_scrap::FilterBy::Title;
+        }
+
+        result
+    }};
 }
 
 impl Steam {

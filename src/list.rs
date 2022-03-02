@@ -15,5 +15,4 @@ pub fn list(i: Installer, d: DisplayOptions) {
     } else {
         println!("No results found")
     }
-
 }

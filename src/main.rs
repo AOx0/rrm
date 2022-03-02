@@ -1,18 +1,17 @@
 extern crate core;
 
-use std::collections::HashSet;
 use crate::args::Options;
+use std::collections::HashSet;
 
 mod args;
+mod install;
 mod list;
 mod search;
 mod utils;
-mod install;
 
 #[tokio::main]
 async fn main() {
     let args: args::App = args::App::load();
-
 
     let mut installer = utils::try_get_path(
         None,
