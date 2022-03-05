@@ -47,23 +47,23 @@ impl XMLFile for File {
                 Ok(XmlEvent::StartElement { name, .. }) => {
                     depth += 1;
                     record.name = name.to_string();
-                    if record.name.as_str() == "modDependencies" { dep = true };
+                    if record.name.as_str() == "modDependencies" {
+                        dep = true
+                    };
                 }
                 Ok(XmlEvent::Characters(value)) => {
                     if keys.contains(&&*record.name) && ([0, 1, 2].contains(&depth)) {
                         record.value = value;
                         r.push(record.clone());
                     } else if dep && record.name == "steamWorkshopUrl" {
-                        let value = value
-                            .to_string();
+                        let value = value.to_string();
 
                         let value: Vec<&str> = value
                             .split("")
                             .into_iter()
-                            .filter(
-                                |c| ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
-                                    .contains(c)
-                            )
+                            .filter(|c| {
+                                ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].contains(c)
+                            })
                             .collect();
 
                         record.value = value.join("");
@@ -71,7 +71,9 @@ impl XMLFile for File {
                     }
                 }
                 Ok(XmlEvent::EndElement { .. }) => {
-                    if record.name.as_str() == "modDependencies" { dep = false };
+                    if record.name.as_str() == "modDependencies" {
+                        dep = false
+                    };
                     depth -= 1;
                 }
                 Err(e) => {
