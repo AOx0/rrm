@@ -1323,7 +1323,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_installer"
-version = "0.0.1-alpha.3"
+version = "0.0.1-alpha.4"
 dependencies = [
  "directories",
  "dotenv",
@@ -1335,7 +1335,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_locals"
-version = "0.0.1-alpha.2"
+version = "0.0.1-alpha.3"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
@@ -1346,7 +1346,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_scrap"
-version = "0.0.1-alpha.3"
+version = "0.0.1-alpha.4"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
@@ -1360,7 +1360,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_xml"
-version = "0.0.1-alpha.0"
+version = "0.0.1-alpha.1"
 dependencies = [
  "xml-rs",
 ]

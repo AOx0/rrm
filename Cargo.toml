@@ -24,6 +24,6 @@ futures-lite = "1.12.0"
 fs_extra = "1.2.0"
 regex = "1.5.4"
 
-rrm_locals = {path="rrm_locals", version="0.0.1-alpha.2"}
-rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.3"}
-rrm_installer = { path="rrm_installer", version="0.0.1-alpha.3" , features=["dev"] }
+rrm_locals = {path="rrm_locals", version="0.0.1-alpha.3"}
+rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.4"}
+rrm_installer = { path="rrm_installer", version="0.0.1-alpha.4" , features=["dev"] }
