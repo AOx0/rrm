@@ -1,8 +1,8 @@
 extern crate core;
 
-use std::env::current_dir;
 use rrm_locals::GamePath;
 use serde::{Deserialize, Serialize};
+use std::env::current_dir;
 use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, Read, Write};
@@ -18,19 +18,19 @@ use std::os::unix::fs::PermissionsExt;
 static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
 
 #[cfg(all(target_os = "macos", feature = "dev"))]
-    static PROJECT_DIR: Dir = include_dir!("rrm_installer/src/steamcmd/macos");
-#[cfg(all(target_os = "macos", not( feature = "dev")))]
-    static PROJECT_DIR: Dir = include_dir!("src/steamcmd/macos");
+static PROJECT_DIR: Dir = include_dir!("rrm_installer/src/steamcmd/macos");
+#[cfg(all(target_os = "macos", not(feature = "dev")))]
+static PROJECT_DIR: Dir = include_dir!("src/steamcmd/macos");
 
 #[cfg(all(target_os = "windows", feature = "dev"))]
-    static PROJECT_DIR: Dir = include_dir!("rrm_installer/src/steamcmd/windows");
-#[cfg(all(target_os = "windows", not( feature = "dev")))]
-    static PROJECT_DIR: Dir = include_dir!("src/steamcmd/windows");
+static PROJECT_DIR: Dir = include_dir!("rrm_installer/src/steamcmd/windows");
+#[cfg(all(target_os = "windows", not(feature = "dev")))]
+static PROJECT_DIR: Dir = include_dir!("src/steamcmd/windows");
 
 #[cfg(all(target_os = "linux", feature = "dev"))]
-    static PROJECT_DIR: Dir = include_dir!("rrm_installer/src/steamcmd/linux");
-#[cfg(all(target_os = "linux", not( feature = "dev")))]
-    static PROJECT_DIR: Dir = include_dir!("src/steamcmd/linux");
+static PROJECT_DIR: Dir = include_dir!("rrm_installer/src/steamcmd/linux");
+#[cfg(all(target_os = "linux", not(feature = "dev")))]
+static PROJECT_DIR: Dir = include_dir!("src/steamcmd/linux");
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 static DEFAULT_PAGING_SOFTWARE: &str = r"more";
@@ -98,70 +98,67 @@ fn create_config(at: &Path) {
 }
 
 pub fn run_steam_command(c: &str, config_path: &Path, count: usize) -> String {
-    #[cfg(target_os = "macos")]
-        let steam = config_path.join("steamcmd").join("steamcmd");
-
-    #[cfg(target_os = "linux")]
-        let steam = config_path.join("steamcmd").join("steamcmd.sh");
+    let steam = get_steamcmd_path(config_path);
 
     #[cfg(target_os = "windows")]
-        let steam = config_path.join("steamcmd").join("steamcmd.exe");
-
-    #[cfg(target_os = "windows")]
-        let out = std::process::Command::new(steam.as_path().to_str().unwrap())
-            .args("+login anonymous {} +quit".replace("{}", c).split(" "))
-            .stdin(std::process::Stdio::null())
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::null())
-            .output()
-            .unwrap_or_else(|error| {
-                eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
-                exit(1);
-            });
+    let out = std::process::Command::new(steam.as_path().to_str().unwrap())
+        .args("+login anonymous {} +quit".replace("{}", c).split(" "))
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .output()
+        .unwrap_or_else(|error| {
+            eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
+            exit(1);
+        });
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-        let out = std::process::Command::new("env")
-            .args(
-                r#"HOME=PATH [] +login anonymous {} +quit"#
-                    .replace(
-                        "PATH",
-                        steam
-                            .as_path()
-                            .parent()
-                            .unwrap()
-                            .parent()
-                            .unwrap()
-                            .to_str()
-                            .unwrap(),
-                    )
-                    .replace("[]", steam.as_path().to_str().unwrap())
-                    .replace("{}", c)
-                    .split(" "),
-            )
-            .stdin(std::process::Stdio::null())
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::null())
-            .output()
-            .unwrap_or_else(|error| {
-                eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
-                exit(1);
-            });
+    let out = std::process::Command::new("env")
+        .args(
+            r#"HOME=PATH [] +login anonymous {} +quit"#
+                .replace(
+                    "PATH",
+                    config_path.as_os_str().to_str().unwrap(),
+                )
+                .replace("[]", steam.as_path().to_str().unwrap())
+                .replace("{}", c)
+                .split(" "),
+        )
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .output()
+        .unwrap_or_else(|error| {
+            eprintln!("Could not execute steamcmd successfully.\nError: {}", error);
+            exit(1);
+        });
 
     let out = String::from_utf8(out.clone().stdout).unwrap();
 
-    if
-    c.contains("+workshop_download_item 294100") &&
-        out.contains("Connecting anonymously to Steam Public...OK") &&
-        out.contains("Waiting for client config...OK") &&
-        out.contains("Waiting for user info...OK") {
-            out
-    } else if c.contains("+workshop_download_item 294100")  {
+    if c.contains("+workshop_download_item 294100")
+        && out.contains("Connecting anonymously to Steam Public...OK")
+        && out.contains("Waiting for client config...OK")
+        && out.contains("Waiting for user info...OK")
+    {
+        out
+    } else if c.contains("+workshop_download_item 294100") {
         run_steam_command(c, config_path, count + 1)
     } else if count == 5 {
         "Error: Failed to install".to_string()
     } else {
         run_steam_command(c, config_path, count + 1)
     }
+}
+
+pub fn get_steamcmd_path(config_path: &Path) -> PathBuf {
+    #[cfg(target_os = "macos")]
+    return config_path.join("steamcmd").join("steamcmd");
+
+    #[cfg(target_os = "linux")]
+    return config_path.join("steamcmd").join("steamcmd.sh");
+
+    #[cfg(target_os = "windows")]
+    return config_path.join("steamcmd").join("steamcmd.exe");
 }
 
 #[cfg(any(target_os = "macos", target_os = "linux"))]
@@ -198,7 +195,7 @@ impl Installer {
             fresh_new = true;
             create_config(&config_file);
             if config_exists(&home) {
-                let steamcmd_path =  home.join(".rrm").join("steamcmd");
+                let steamcmd_path = home.join(".rrm").join("steamcmd");
                 fs::create_dir(&steamcmd_path).unwrap_or_else(|err| {
                     if !steamcmd_path.is_dir() {
                         panic!("{}", err);
@@ -208,7 +205,7 @@ impl Installer {
                 PROJECT_DIR.extract(steamcmd_path.as_path()).unwrap();
 
                 #[cfg(any(target_os = "macos", target_os = "linux"))]
-                    set_permissions_for_steamcmd(steamcmd_path.as_path());
+                set_permissions_for_steamcmd(steamcmd_path.as_path());
 
                 config_file
             } else {
@@ -355,12 +352,23 @@ impl Installer {
         }
     }
 
-    pub fn install(&self, c: &[&str]) -> (bool, String) {
-        let to_install = " +workshop_download_item 294100 ".to_string()  + &c.join(" +workshop_download_item 294100 ");
-        //println!("{to_install}");
-        //exit(1);
+    pub fn install_sync(&self, c: &[&str]) -> (bool, String) {
+        let to_install = Self::gen_install_string(&c);
         let a: String = run_steam_command(&to_install, &current_dir().unwrap(), 1);
-        //println!("{}", a);
         (a.contains("Success. Downloaded item"), a)
+    }
+
+    pub fn gen_install_string(c: &&[&str]) -> String {
+        let to_install = " +workshop_download_item 294100 ".to_string()
+            + &c.join(" +workshop_download_item 294100 ");
+        to_install
+    }
+
+    pub fn get_steamcmd_path(&self) -> PathBuf {
+        get_steamcmd_path(&self.config.parent().unwrap())
+    }
+
+    pub fn run_steam_command(&self, c: &str, count: usize) -> String {
+        run_steam_command(c, &self.config, count)
     }
 }
