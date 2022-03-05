@@ -1,6 +1,6 @@
 [package]
 name = "rrm_scrap"
-version = "0.0.1-alpha.3"
+version = "0.0.1-alpha.4"
 edition = "2021"
 authors = ["AOx0 <aoxo.contact@gmail.com>"]
 rust-version = "1.58.1"
@@ -20,4 +20,4 @@ lazy-regex = "2.2.2"
 fuzzy-matcher = "0.3.7"
 html-escape = "0.2.9"
 flagset = "0.4.2"
-rrm_locals = {path="../rrm_locals", version="0.0.1-alpha.1"}
+rrm_locals = {path="../rrm_locals", version="0.0.1-alpha.2"}

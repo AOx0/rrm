@@ -1,12 +1,12 @@
+pub use flagset::*;
+use fuzzy_matcher::FuzzyMatcher;
 use lazy_regex::*;
 use reqwest::Response;
 use rrm_locals::{DisplayType, InfoString};
 use std::io::Stdout;
 use std::io::Write;
 use std::ops::Deref;
-pub use flagset::*;
 use std::process::{exit, Stdio};
-use fuzzy_matcher::FuzzyMatcher;
 
 fn capitalize(s: &str) -> String {
     let mut c = s.chars();
@@ -146,7 +146,6 @@ impl ModSteamInfo {
     }
 
     pub fn gen_display(&self, form: &DisplayType, biggest_name: usize) -> String {
-
         let mut result = String::new();
 
         if let DisplayType::Long = form {
@@ -197,7 +196,7 @@ impl SteamMods {
         s
     }
 
-    pub fn gen_display(&self) -> String{
+    pub fn gen_display(&self) -> String {
         let mut result = "".to_string();
 
         if let Some(typ) = self.display_type {
@@ -206,26 +205,23 @@ impl SteamMods {
                 result.push_str("\n")
             }
 
-            self.mods
-                .iter()
-                .for_each(|m| {
-                    result.push_str(&m.gen_display(&typ, self.biggest_name_size));
-                });
+            self.mods.iter().for_each(|m| {
+                result.push_str(&m.gen_display(&typ, self.biggest_name_size));
+            });
         } else {
             result.push_str(&ModSteamInfo::gen_headers(self.biggest_name_size));
             result = result.replace("       Steam ID", "             Steam ID");
             result = result.replace("\n", "\n      ");
             result.push_str("\n");
 
-            self.mods
-                .iter()
-                .enumerate()
-                .for_each(|(i, m)| {
-                    result.push_str(&format!(" {:<4} {}",i,  &m.gen_display(&DisplayType::Short, self.biggest_name_size)));
-                });
+            self.mods.iter().enumerate().for_each(|(i, m)| {
+                result.push_str(&format!(
+                    " {:<4} {}",
+                    i,
+                    &m.gen_display(&DisplayType::Short, self.biggest_name_size)
+                ));
+            });
         }
-
-
 
         result
     }
@@ -252,11 +248,11 @@ impl SteamMods {
     }
 
     pub fn display(&self) {
-        print!("{}",self.gen_display())
+        print!("{}", self.gen_display())
     }
 
     pub fn display_numbered(&self) {
-        print!("{}",self.gen_display())
+        print!("{}", self.gen_display())
     }
 }
 
@@ -267,7 +263,6 @@ impl Deref for SteamMods {
         &self.mods
     }
 }
-
 
 flags! {
     pub enum FilterBy: u8 {
