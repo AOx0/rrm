@@ -382,7 +382,7 @@ macro_rules! impl_io {
     ($s: ty) => {
         impl InstallingOptions for $s {
             fn is_verbose(&self) -> bool {
-                self.verbose
+                self.verbose || self.debug
             }
 
             fn is_debug(&self) -> bool {

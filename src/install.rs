@@ -1,4 +1,4 @@
-use crate::args::Install;
+use crate::args::{Install, InstallingOptions};
 use crate::printf;
 use crate::utils::*;
 use async_recursion::async_recursion;
@@ -223,15 +223,29 @@ pub async fn install(
             GameMods::from(rim_install.path().to_str().unwrap()).with_display(DisplayType::Short);
         let filtered = installed_mods.filter_by(FlagSet::from(FilterBy::SteamID), &id);
 
+        let mut ignored = false;
         for old_mod in filtered.mods {
             //dbg!(&old_mod.path);
-            dir::remove(old_mod.path).unwrap();
+            if old_mod.path.starts_with('_') {
+                if args.is_verbose() {
+                    printf!("Ignoring {}", old_mod.path);
+                }
+                ignored = true;
+                dir::remove(&source).unwrap();
+                break;
+            } else {
+                dir::remove(old_mod.path).unwrap();
+            }
+        }
+
+        if ignored {
+            continue;
         }
 
         if args.verbose {
             println!(
                 "Moving \"{}\" to \"{}\"",
-                source.as_str(),
+                &source,
                 destination.to_str().unwrap_or("error")
             );
         }

@@ -1,31 +1,45 @@
-use crate::args::{Install, Pull};
+use crate::args::{Install, InstallingOptions, Pull};
 use crate::install::install;
 use crate::utils::Path;
 use crate::utils::*;
-use std::borrow::Borrow;
 use std::collections::HashSet;
 
 pub async fn pull(args: Pull, i: Installer, ignored: bool) {
     let mods: GameMods =
         GameMods::from(i.rim_install.clone().unwrap()).with_display(DisplayType::Short);
 
+    if args.is_verbose() {
+        println!("Listing installed ids: ");
+    }
+
     let ids = mods
         .iter()
         .map(|mo| {
+            if args.is_debug() {
+                println!(
+                    "Turn of {}",
+                    Path::new(&mo.path).file_name().unwrap().to_str().unwrap()
+                );
+            }
+
             if Path::new(&mo.path)
-                .parent()
-                .unwrap()
                 .file_name()
                 .unwrap()
                 .to_str()
-                .unwrap()[0usize..1usize]
-                .borrow()
-                != "_"
+                .unwrap()
+                .to_string()
+                .starts_with('_')
                 && !ignored
             {
-                Some(mo.steam_id.clone())
-            } else {
+                if args.is_verbose() {
+                    println!("Ignoring {}", mo.steam_id);
+                }
                 None
+            } else {
+                if args.is_verbose() {
+                    println!("Adding {}", mo.steam_id);
+                }
+                Some(mo.steam_id.clone())
             }
         })
         .flatten();

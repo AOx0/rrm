@@ -60,13 +60,13 @@ pub async fn install<T: InstallingOptions>(args: T, mods: &[&str], installer: In
         }
 
         overall_result += &(line.clone() + "\n");
-        if line.contains("Success") && args.is_verbose() {
+        if args.is_debug() {
+            printf!("{}\n", &line);
+        } else if args.is_verbose() && line.contains("Success") {
             printf!(
                 "{})\n",
                 &line[0..line.find(") ").unwrap_or_else(|| line.len())]
             );
-        } else if args.is_debug() {
-            printf!("{}\n", &line);
         }
     }
 
