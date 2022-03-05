@@ -6,7 +6,6 @@ use path_absolutize::Absolutize;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use std::process::exit;
 
 #[derive(Debug)]
 pub struct ModPaths {
