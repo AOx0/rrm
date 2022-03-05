@@ -6,6 +6,7 @@ use path_absolutize::Absolutize;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
+use std::process::exit;
 
 #[derive(Debug)]
 pub struct ModPaths {
@@ -116,8 +117,17 @@ impl ModVec for Vec<Vec<ModPaths>> {
         let mut biggest_name_size: usize = 0;
         let mut mods = vec![];
         self.iter().for_each(|m| {
+            if m.is_empty() {
+                return;
+            }
+
             let values = EVector::build_from(m, &L_FIELDS);
-            let m = values.to_mod(m.get(0).unwrap());
+            let m = values.clone().to_mod(m.get(0).unwrap_or_else(|| {
+                println!("Error while getting index 0 of {:?}", m);
+                println!("E_vec: {:?}", values);
+                println!("Self: {:?}", self);
+                panic!();
+            }));
             let name_size = m.name.len();
             if name_size > biggest_name_size {
                 biggest_name_size = name_size;
@@ -136,7 +146,7 @@ impl ModVec for Vec<Vec<ModPaths>> {
 pub type EVector = Vec<Element>;
 
 pub trait ElementVector {
-    fn to_hash(self) ->  (HashMap<String, String>, Option<Vec<String>>) ;
+    fn to_hash(self) -> (HashMap<String, String>, Option<Vec<String>>);
     fn to_mod(self, m: &ModPaths) -> crate::mod_obj::Mod;
     fn build_from(m: &[ModPaths], with_fields: &[&str]) -> EVector;
 }
@@ -153,8 +163,11 @@ impl ElementVector for EVector {
             }
         });
 
-
-        let dependencies = if dependencies.is_empty() { None } else { Some(dependencies) };
+        let dependencies = if dependencies.is_empty() {
+            None
+        } else {
+            Some(dependencies)
+        };
         (basic_info, dependencies)
     }
 

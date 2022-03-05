@@ -1,6 +1,6 @@
 [package]
 name = "rrm_locals"
-version = "0.0.1-alpha.2"
+version = "0.0.1-alpha.3"
 edition = "2021"
 authors = ["AOx0 <aoxo.contact@gmail.com>"]
 rust-version = "1.58.1"
@@ -17,4 +17,4 @@ path-absolutize = "3.0.11"
 serde = {version="1.0.133", features=["derive"]}
 flagset = "0.4.2"
 fuzzy-matcher = "0.3.7"
-rrm_xml = {path="../rrm_xml", version="0.0.1-alpha.0"}
+rrm_xml = {path="../rrm_xml", version="0.0.1-alpha.1"}

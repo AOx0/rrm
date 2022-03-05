@@ -27,7 +27,7 @@ pub struct Mod {
     pub version: Option<String>,
     pub package_id: Option<String>,
     pub identifier: Option<String>,
-    pub dependencies: Option<Vec<String>>
+    pub dependencies: Option<Vec<String>>,
 }
 
 impl Mod {
