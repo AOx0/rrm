@@ -12,14 +12,15 @@ use std::collections::HashSet;
 use std::io;
 use std::io::prelude::*;
 
-#[async_recursion]
+#[async_recursion(?Send)]
 pub async fn install(
     mut args: Install,
     i: Installer,
     d: usize,
     mut already_installed: HashSet<String>,
 ) {
-    if args.r#mod.len() == 1 && args.r#mod.get(0).unwrap() == "None" {
+    let inline: bool = !(args.r#mod.len() == 1 && args.r#mod.get(0).unwrap() == "None");
+    if !inline {
         args.r#mod = Vec::new();
         let stdin = io::stdin();
         for line in stdin.lock().lines() {
@@ -47,6 +48,10 @@ pub async fn install(
 
     for m in &args.r#mod {
         if m.chars().all(char::is_numeric) {
+            if args.verbose {
+                println!("Adding {} to queue", m);
+            }
+
             to_install.push(ModSteamInfo {
                 id: m.clone(),
                 title: m.clone(),
@@ -60,7 +65,10 @@ pub async fn install(
             let m = m.replace("\n", "").replace(" ", "");
 
             if let Some(id) = extract_id(&m, &re) {
-                //println!("{}", id);
+                if args.verbose {
+                    println!("Adding {} to queue", id);
+                }
+
                 to_install.push(ModSteamInfo {
                     id: id.clone(),
                     title: id.clone(),
@@ -115,7 +123,7 @@ pub async fn install(
 
                 let mut already_large = false;
                 loop {
-                    printf!("Select which number to add to installation cart: ");
+                    printf!("Select the mod # to download: ");
                     let n: String = read();
                     if n == "m" {
                         mods.mods = more_mods.clone();
@@ -136,7 +144,10 @@ pub async fn install(
                 }
             }
         } else {
-            println!("No results found");
+            if !inline || args.verbose {
+                println!("No results found for {}", m);
+            }
+
             continue;
         }
     }
@@ -145,21 +156,19 @@ pub async fn install(
 
     if d == 0 {
         printf!(
-            "{:<30}",
-            format!(
-                "Installing mod{} ...",
-                if args.r#mod.len() > 1 { "s" } else { "" }
-            )
+            "{}Installing mod{} ... {}",
+            if args.verbose { "\n" } else { "" },
+            if args.r#mod.len() > 1 { "s" } else { "" },
+            if args.verbose { "\n" } else { "" }
         )
     };
-    let (_, result) = i.install(&ids);
+    let result = crate::async_installer::install(args.clone(), &ids, i.clone()).await;
 
     let mut successful_ids = HashSet::new();
 
     for line in result.split('\n') {
         if line.contains("Success") {
             let line = line.replace("Success. Downloaded item ", "");
-            //println!("{}", line);
             let words = line.split(' ').next().unwrap();
             successful_ids.insert(words.to_string());
         }
@@ -219,6 +228,14 @@ pub async fn install(
             dir::remove(old_mod.path).unwrap();
         }
 
+        if args.verbose {
+            println!(
+                "Moving \"{}\" to \"{}\"",
+                source.as_str(),
+                destination.to_str().unwrap_or("error")
+            );
+        }
+
         dir::move_dir(&source, &destination, &options).unwrap();
 
         let installed_mods =
@@ -227,9 +244,14 @@ pub async fn install(
 
         already_installed.insert(id.clone());
 
-        if filtered.mods.len() == 1 && !filtered.mods.is_empty() {
-            let m = filtered.mods[0].clone();
+        let is_installed = filtered.mods.len() == 1 && !filtered.mods.is_empty();
+
+        if is_installed {
+            let m: Mod = filtered.mods[0].clone(); // Get the installed mod as Mod instance (read its dependencies)
+
+            // If it does have dependencies
             if let Some(dependencies) = m.dependencies {
+                // Then add the ids to the queue
                 for id in dependencies {
                     if !already_installed.contains(&id) {
                         dependencies_ids.get_mut().insert(id);
@@ -237,7 +259,10 @@ pub async fn install(
                 }
             }
         } else {
-            eprintln!("There's a duplicated mod. {}", filtered.mods[0].steam_id);
+            eprintln!(
+                "Something unexpected happened. Duplicated mod: {}",
+                filtered.mods[0].steam_id
+            );
         }
     }
 
@@ -249,7 +274,11 @@ pub async fn install(
 
     if args.resolve && !dependencies_ids.get_mut().is_empty() {
         if d == 0 {
-            printf!("{:<30}", "Installing dependencies ...");
+            printf!(
+                "{:<30}{}",
+                "Installing dependencies ... ",
+                if args.verbose { '\n' } else { ' ' }
+            );
         };
         args.r#mod = Vec::from_iter(dependencies_ids.get_mut().clone());
         install(args.clone(), i.clone(), d + 1, already_installed).await;

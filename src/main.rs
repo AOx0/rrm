@@ -4,8 +4,10 @@ use crate::args::Options;
 use std::collections::HashSet;
 
 mod args;
+mod async_installer;
 mod install;
 mod list;
+mod pull;
 mod search;
 mod utils;
 
@@ -37,6 +39,10 @@ async fn main() {
                 installer.set_paging_software(value.to_str().unwrap());
             }
         },
+
+        args::Commands::Pull { args, ignored } => {
+            pull::pull(args, installer, ignored).await;
+        }
 
         args::Commands::List { display } => list::list(installer, display),
 

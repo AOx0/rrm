@@ -66,6 +66,15 @@ pub enum Commands {
         args: Install,
     },
 
+    #[clap(about = "Install everything again (except ignored by default)")]
+    Pull {
+        #[clap(flatten)]
+        args: Pull,
+        ///
+        #[clap(short, long, visible_alias = "also-ignored")]
+        ignored: bool,
+    },
+
     #[clap(
         visible_alias = "ss",
         hide = true,
@@ -216,6 +225,22 @@ pub struct Local {
 
 #[derive(Args, Debug, Clone)]
 #[clap(arg_required_else_help = true)]
+pub struct Pull {
+    /// Automatic dependencies installation
+    #[clap(long, short)]
+    pub(crate) resolve: bool,
+
+    /// Show more information about the process [alias: vvv]
+    #[clap(long, visible_alias = "vvv")]
+    pub(crate) verbose: bool,
+
+    /// Show even more information. Expect a lot of output
+    #[clap(long)]
+    pub(crate) debug: bool,
+}
+
+#[derive(Args, Debug, Clone)]
+#[clap(arg_required_else_help = true)]
 pub struct Install {
     /// The name of the RimWorld mod(s)
     #[clap(required = true, default_value = "None")]
@@ -252,6 +277,14 @@ pub struct Install {
     /// Automatic dependencies installation
     #[clap(long, short)]
     pub(crate) resolve: bool,
+
+    /// Show more information about the process [alias: vvv]
+    #[clap(long, visible_alias = "vvv")]
+    pub(crate) verbose: bool,
+
+    /// Show even more information. Expect a lot of output
+    #[clap(long)]
+    pub(crate) debug: bool,
 }
 
 macro_rules! a_if {
@@ -339,3 +372,25 @@ impl App {
         App::parse()
     }
 }
+
+pub trait InstallingOptions {
+    fn is_verbose(&self) -> bool;
+    fn is_debug(&self) -> bool;
+}
+
+macro_rules! impl_io {
+    ($s: ty) => {
+        impl InstallingOptions for $s {
+            fn is_verbose(&self) -> bool {
+                self.verbose
+            }
+
+            fn is_debug(&self) -> bool {
+                self.debug
+            }
+        }
+    };
+}
+
+impl_io!(Pull);
+impl_io!(Install);
