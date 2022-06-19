@@ -23,15 +23,15 @@ license = "MIT"
 
 
 [dependencies]
-execute = "0.2.9"
+execute = "0.2.11"
 async-recursion = "1.0.0"
-clap = { version= "3.1.3", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
-tokio =  { version= "1.17.0", default-features = false }
-async-process = "1.3.0"
+clap = { version= "3.2.5", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
+tokio =  { version= "1.19.2", default-features = false }
+async-process = "1.4.0"
 futures-lite = "1.12.0"
 fs_extra = "1.2.0"
-regex = "1.5.4"
+regex = "1.5.6"
 
 rrm_locals = {path="rrm_locals", version="0.0.1-alpha.3"}
 rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.4"}
-rrm_installer = { path="rrm_installer", version="0.0.1-alpha.4" , features=["dev"] }
+rrm_installer = { path="rrm_installer", version="0.0.1-alpha.4"}
