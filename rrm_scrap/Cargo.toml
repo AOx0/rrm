@@ -1,13 +1,12 @@
 [package]
 name = "rrm_scrap"
-version = "0.0.1-alpha.6"
+version = "0.0.1-alpha.7"
 edition = "2021"
 authors = ["AOx0 <aoxo.contact@gmail.com>"]
-rust-version = "1.58.1"
 description = "Part of rrm"
-repository = "https://github.com/AOx0/rrm_scrap"
-homepage = "https://github.com/AOx0/rrm_scrap"
-categories = ["rrm"]
+repository = "https://github.com/AOx0/rrm"
+homepage = "https://github.com/AOx0/rrm"
+categories = []
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -20,4 +19,4 @@ lazy-regex = "2.3.0"
 fuzzy-matcher = "0.3.7"
 html-escape = "0.2.11"
 flagset = "0.4.3"
-rrm_locals = {path="../rrm_locals", version="0.0.1-alpha.2"}
+rrm_locals = {path="../rrm_locals", version="0.0.1-alpha.7"}

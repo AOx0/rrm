@@ -8,10 +8,9 @@ members = [
 
 [package]
 name = "rrm"
-version = "0.0.1-alpha.6"
+version = "0.0.1-alpha.7"
 edition = "2021"
 authors = ["AOx0 <aoxo.contact@gmail.com>"]
-rust-version = "1.58.1"
 description = "Rusty RimWorld (mod) Manager is a cross-platform CLI mod manager written in Rust"
 readme = "README.md"
 repository = "https://github.com/AOx0/rrm"
@@ -32,6 +31,6 @@ futures-lite = "1.12.0"
 fs_extra = "1.2.0"
 regex = "1.5.6"
 
-rrm_locals = {path="rrm_locals", version="0.0.1-alpha.3"}
-rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.4"}
-rrm_installer = { path="rrm_installer", version="0.0.1-alpha.4"}
+rrm_locals = {path="rrm_locals", version="0.0.1-alpha.7"}
+rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.7"}
+rrm_installer = { path="rrm_installer", version="0.0.1-alpha.7"}
