@@ -1,6 +1,14 @@
+[workspace]
+members = [
+    "rrm_installer",
+    "rrm_locals",
+    "rrm_scrap",
+    "rrm_xml"
+]
+
 [package]
 name = "rrm"
-version = "0.0.1-alpha.5"
+version = "0.0.1-alpha.6"
 edition = "2021"
 authors = ["AOx0 <aoxo.contact@gmail.com>"]
 rust-version = "1.58.1"

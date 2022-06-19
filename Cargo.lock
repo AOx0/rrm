@@ -1306,7 +1306,7 @@ dependencies = [
 
 [[package]]
 name = "rrm"
-version = "0.0.1-alpha.5"
+version = "0.0.1-alpha.6"
 dependencies = [
  "async-process",
  "async-recursion",
@@ -1323,7 +1323,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_installer"
-version = "0.0.1-alpha.4"
+version = "0.0.1-alpha.6"
 dependencies = [
  "directories",
  "dotenv",
@@ -1335,7 +1335,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_locals"
-version = "0.0.1-alpha.3"
+version = "0.0.1-alpha.6"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
@@ -1346,7 +1346,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_scrap"
-version = "0.0.1-alpha.4"
+version = "0.0.1-alpha.6"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
@@ -1360,7 +1360,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_xml"
-version = "0.0.1-alpha.1"
+version = "0.0.1-alpha.6"
 dependencies = [
  "xml-rs",
 ]
