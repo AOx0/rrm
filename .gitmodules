@@ -1,9 +1,6 @@
 [submodule "rrm_installer"]
 	path = rrm_installer
 	url = https://github.com/AOx0/rrm_installer
-[submodule "rrm_xml"]
-	path = rrm_xml
-	url = https://github.com/AOx0/rrm_xml
 [submodule "rrm_scrap"]
 	path = rrm_scrap
 	url = https://github.com/AOx0/rrm_scrap.git
