@@ -1,10 +1,10 @@
 <div>
-	<img src="https://img.shields.io/badge/GitHub   Version-0.0.1--alpha.4-green">
+	<img src="https://img.shields.io/badge/GitHub   Version-0.0.1--alpha.7-green">
 	</img><img src="https://img.shields.io/badge/Status-Almost Done-yellow">
 </div>
 <div>
 	<a href="https://crates.io/crates/rrm">
-		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.4-green"></img>
+		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.7-green"></img>
 	</a>
 	<img src="https://img.shields.io/badge/Status-Almost Done-yellow">
 </div>
@@ -28,16 +28,10 @@ Inspired by Spoons [rmm][2]. This is a cross-platform Mod Manager for RimWorld i
 ## Installation
 This program is installable with `cargo`. Install `rust` along with `cargo` [here][5]. It’s bundled with anything it needs to work. 
 
-For security reasons, the minimum `rustc` version for compiling the program is `1.58.1`. See more of [ CVE-2022-21658 ][6].
-
-You can update `rustc` with:
-
-	rustup update
-
 ### Install
 To install the `crates.io` pre-release version run:
 
-	cargo install rrm --version 0.0.1-alpha.4
+	cargo install rrm --version 0.0.1-alpha.7
 
 Or install the GitHub version. Although it's not recommended since it has a 'dev' flag which changes the installer behaviour:
 
