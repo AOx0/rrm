@@ -8,7 +8,7 @@ members = [
 
 [package]
 name = "rrm"
-version = "0.0.1-alpha.6"
+version = "0.0.1-alpha.7"
 edition = "2021"
 authors = ["AOx0 <aoxo.contact@gmail.com>"]
 rust-version = "1.58.1"
