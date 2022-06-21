@@ -1,10 +1,10 @@
 <div>
-	<img src="https://img.shields.io/badge/GitHub   Version-0.0.1--alpha.7-green">
+	<img src="https://img.shields.io/badge/GitHub   Version-0.0.1--alpha.8-green">
 	</img><img src="https://img.shields.io/badge/Status-Almost Done-yellow">
 </div>
 <div>
 	<a href="https://crates.io/crates/rrm">
-		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.7-green"></img>
+		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.8-green"></img>
 	</a>
 	<img src="https://img.shields.io/badge/Status-Almost Done-yellow">
 </div>
@@ -31,7 +31,7 @@ This program is installable with `cargo`. Install `rust` along with `cargo` [her
 ### Install
 To install the `crates.io` pre-release version run:
 
-	cargo install rrm --version 0.0.1-alpha.7
+	cargo install rrm --version 0.0.1-alpha.8
 
 Or install the GitHub version. Although it's not recommended since it has a 'dev' flag which changes the installer behaviour:
 

@@ -8,7 +8,7 @@ members = [
 
 [package]
 name = "rrm"
-version = "0.0.1-alpha.7"
+version = "0.0.1-alpha.8"
 edition = "2021"
 authors = ["AOx0 <aoxo.contact@gmail.com>"]
 description = "Rusty RimWorld (mod) Manager is a cross-platform CLI mod manager written in Rust"

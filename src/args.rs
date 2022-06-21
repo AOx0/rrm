@@ -243,7 +243,7 @@ pub struct Pull {
 #[clap(arg_required_else_help = true)]
 pub struct Install {
     /// The name of the RimWorld mod(s)
-    #[clap(required = true, default_value = "None")]
+    #[clap(required = false, default_value = "None")]
     pub(crate) r#mod: Vec<String>,
 
     /// The name of the RimWorld mod
