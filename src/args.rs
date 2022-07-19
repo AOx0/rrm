@@ -227,7 +227,7 @@ pub struct Local {
 #[clap(arg_required_else_help = true)]
 pub struct Pull {
     /// Automatic dependencies installation
-    #[clap(long, short)]
+    #[clap(long, short, visible_alias = "resolve-dependencies")]
     pub(crate) resolve: bool,
 
     /// Show more information about the process [alias: vvv]
@@ -275,7 +275,7 @@ pub struct Install {
     pub(crate) yes: bool,
 
     /// Automatic dependencies installation
-    #[clap(long, short)]
+    #[clap(long, short, visible_alias = "resolve-dependencies")]
     pub(crate) resolve: bool,
 
     /// Show more information about the process [alias: vvv]

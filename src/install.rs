@@ -171,7 +171,7 @@ pub async fn install(
                 let mut already_large = false;
                 loop {
                     let n: isize = loop {
-                        printf!("Select the mod # to download: ");
+                        printf!("Select the mod # to download or `-1` for more: ");
                         let num: Result<isize, _> = try_read!();
                         if let Ok(read) = num {
                             break read;
@@ -190,8 +190,9 @@ pub async fn install(
                         let n = n as usize;
                         if n < mods.len() {
                             to_install.push(mods[n].clone());
-                            log!(Status: "Added {} by {}...", &mods[n].title, &mods[n].author);
-                            log!(Status: "With ID: {}", &mods[n].id);
+                            if args.is_verbose() {
+                                log!(Status: "Added {} by {} (id: {})...", &mods[n].title, &mods[n].author, &mods[n].id);
+                            }
                             break;
                         } else {
                             log!(Error: "Enter a valid positive index or a negative value (like -1) to show more options")
