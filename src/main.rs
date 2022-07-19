@@ -3,6 +3,7 @@ extern crate core;
 use crate::args::Options;
 use std::collections::HashSet;
 
+mod logger;
 mod args;
 mod async_installer;
 mod install;

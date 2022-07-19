@@ -11,6 +11,36 @@ use std::cell::RefCell;
 use std::collections::HashSet;
 use std::io;
 use std::io::prelude::*;
+use text_io::try_read;
+use std::sync::{Arc, Mutex};
+
+#[cfg(target_os = "windows")]
+const PATH: &str = r"steamcmd\steamapps\workshop\content\294100\"; 
+
+#[cfg(target_os = "linux")]
+const PATH: &str = r".steam/steamapps/workshop/content/294100/";
+
+#[cfg(target_os = "macos")]
+const PATH: &str = r"Library/Application Support/Steam/steamapps/workshop/content/294100";
+
+fn clear_leftlovers(at: &Path, args: &Install) {
+    if at.is_dir() && at.exists() {
+        if args.is_verbose() {
+            log!(Warning: "Attempting to remove leftlovers at {}", at.display() );
+        }
+        for entry in at.read_dir().unwrap() {
+            let entry = entry.unwrap();
+            if args.is_debug() {
+                log!(Warning: "Removig leftlover {}", entry.path().display() );
+            }
+            if entry.path().is_dir() {
+                std::fs::remove_dir_all(entry.path()).unwrap();
+            } else {
+                std::fs::remove_file(entry.path()).unwrap();
+            }
+        }
+    }
+} 
 
 #[async_recursion(?Send)]
 pub async fn install(
@@ -28,10 +58,10 @@ pub async fn install(
                 if line == "END" {
                     break;
                 } else {
-                    args.r#mod.push(line)
+                    args.r#mod.push(line);
                 }
             } else {
-                println!("Error al leer: {:?}", line);
+                log!(Error: "Could not read line {:?}", line);
             }
         }
     }
@@ -48,8 +78,12 @@ pub async fn install(
 
     for m in &args.r#mod {
         if m.chars().all(char::is_numeric) {
+            if m.trim().is_empty() {
+                continue;
+            }
+
             if args.verbose {
-                println!("Adding {} to queue", m);
+                log!(Status: "Adding {} to queue", m);
             }
 
             to_install.push(ModSteamInfo {
@@ -62,11 +96,15 @@ pub async fn install(
         }
 
         if m.contains("steamcommunity.com") {
-            let m = m.replace("\n", "").replace(" ", "");
+            let m = m.replace('\n', "").replace(' ', "");
 
             if let Some(id) = extract_id(&m, &re) {
+                if id.trim().is_empty() {
+                    continue;
+                }
+
                 if args.verbose {
-                    println!("Adding {} to queue", id);
+                    log!(Status: "Adding {} to queue", id);
                 }
 
                 to_install.push(ModSteamInfo {
@@ -104,7 +142,14 @@ pub async fn install(
                 &mods[0].title,
                 &mods[0].author
             );
-            let n = read();
+            let n = loop {
+                let read: Result<String, _> = try_read!();
+                if let Ok(read) = read {
+                    break read;
+                } else {
+                    log!(Error: "Somehting wrong happened. Re-input your answer.");
+                };
+            };
 
             if n == "yes" || n == "y" {
                 to_install.push(mods[0].clone());
@@ -123,29 +168,38 @@ pub async fn install(
 
                 let mut already_large = false;
                 loop {
-                    printf!("Select the mod # to download: ");
-                    let n: String = read();
-                    if n == "m" {
+                    let n: isize = loop {
+                        printf!("Select the mod # to download: ");
+                        let num: Result<isize, _> = try_read!();
+                        if let Ok(read) = num {
+                            break read;
+                        } else {
+                            log!(Error: "Somehting wrong happened. Re-input your answer.");
+                        };
+                    };
+
+                    if n < 0 {
                         mods.mods = more_mods.clone();
                         if !already_large {
                             mods.display();
                         }
                         already_large = true;
                     } else {
-                        let n: usize = n.parse().unwrap();
+                        let n = n as usize;
                         if n < mods.len() {
-                            to_install.push(mods[0].clone());
-                            printf!("Added {} by {}...\n", &mods[n].title, &mods[n].author);
+                            to_install.push(mods[n].clone());
+                            log!(Status: "Added {} by {}...", &mods[n].title, &mods[n].author);
+                            log!(Status: "With ID: {}", &mods[n].id);
                             break;
                         } else {
-                            println!("Enter a valid number or 'm' to show more options")
+                            log!(Error: "Enter a valid positive index or a negative value (like -1) to show more options")
                         }
                     }
                 }
             }
         } else {
             if !inline || args.verbose {
-                println!("No results found for {}", m);
+                log!( Error: "No results found for {}", m);
             }
 
             continue;
@@ -155,14 +209,97 @@ pub async fn install(
     let ids: Vec<&str> = to_install.iter().map(|e| e.id.as_str()).collect();
 
     if d == 0 {
-        printf!(
-            "{}Installing mod{} ... {}",
-            if args.verbose { "\n" } else { "" },
+        log!( Status:
+            "Installing mod{}...",
             if args.r#mod.len() > 1 { "s" } else { "" },
-            if args.verbose { "\n" } else { "" }
         )
     };
-    let result = crate::async_installer::install(args.clone(), &ids, i.clone()).await;
+
+    let downloads_dir = PATH.replace("content","downloads");
+    let path_downloads = PathBuf::from(&downloads_dir);
+    // Remove any download leflovers
+    clear_leftlovers(&path_downloads, &args);
+    clear_leftlovers(&PathBuf::from(PATH), &args); 
+
+    let should_end = Arc::new(Mutex::new(false));
+    let should_start = Arc::new(Mutex::new(false));
+
+    let status_downloader = std::thread::spawn({
+        let path_downloads = path_downloads.to_owned();
+        let should_end = Arc::clone(&should_end);
+        let should_start = Arc::clone(&should_start);
+        let number_to_install = ids.len(); 
+        move || {
+            let mut start: bool;
+            start = *should_start.lock().unwrap();
+
+            while start != true {
+                start = *should_start.lock().unwrap();
+            }
+
+            let mut end: bool;
+            end = *should_end.lock().unwrap();
+
+            let mut last_printed = String::new();
+            let mut d = 0;
+
+            while end != true {
+                if path_downloads.exists() && path_downloads.is_dir() {
+                    let contents = path_downloads.read_dir().unwrap();
+                    
+                    for entry in contents {
+                        let entry = entry.unwrap();
+                        if entry.path().is_dir() {
+                            let name = entry.file_name().to_str().unwrap().to_owned();
+                            if last_printed != name {
+                                d += 1;
+                                last_printed = name;
+                                log!(Status: "[{1:0>3}/{2:0>3}] Dowloading {0}", last_printed, d, number_to_install);
+                            }
+                        }
+                    } 
+                }
+
+                
+                std::thread::sleep(std::time::Duration::from_secs_f32(0.15));
+                end = *should_end.lock().unwrap();
+            }
+        }
+    });
+
+    let result = {
+        let mut result = String::new();
+        let mut num = ids.len();
+        let mut n = 0;
+        let large_list = num > 200;
+
+        if large_list {
+            log!(Warning: "More than 200 mods. Splitting to chunks of 200 to avoid problems with SteamCMD");
+        }
+
+        while num >= 200 {
+            log!(Warning: "Spawning SteamCMD with mods {}..{}", n, n+200);
+            let r = crate::async_installer::install(args.clone(), &ids[n..n+200], i.clone(), Arc::clone(&should_start)).await;
+            result.push_str(&r);
+            num -= 200;
+            n += 200;
+        }
+
+        if large_list {
+            log!(Warning: "Spawning last SteamCMD with mods {}..{}", n, n+num); 
+        }
+        let r = crate::async_installer::install(args.clone(), &ids[n..n+num], i.clone(), Arc::clone(&should_start)).await;
+        result.push_str(&r);
+        result
+    };
+
+    log!(Status: "Installer finished");
+
+    {
+        let mut should_end = should_end.lock().unwrap();
+        *should_end = true;
+    }
+    status_downloader.join().unwrap();
 
     let mut successful_ids = HashSet::new();
 
@@ -178,42 +315,29 @@ pub async fn install(
 
     let mut dependencies_ids = RefCell::new(HashSet::new());
 
-    for id in successful_ids {
-        #[cfg(target_os = "windows")]
+    let destination = rim_install.path().join("Mods");
+
+    log!( Status:
+            "Handling & moving mods to \"{}\"",
+            destination.to_str().unwrap_or("error")
+    );
+
+    let mut ids: HashSet<String>  = ids.iter().map(|s| s.to_string()).collect();
+
+    for id in successful_ids.clone() {
+        ids.remove(&id);
+
         let source = format!(
             "{}",
             i.config
                 .parent()
                 .unwrap()
-                .join(r"steamcmd\steamapps\workshop\content\294100\")
+                .join(PATH)
                 .join(&id)
                 .display()
         );
 
-        #[cfg(target_os = "linux")]
-        let source = format!(
-            "{}",
-            i.config
-                .parent()
-                .unwrap()
-                .join(r".steam/steamapps/workshop/content/294100/")
-                .join(&id)
-                .display()
-        );
-
-        #[cfg(target_os = "macos")]
-        let source = format!(
-            "{}",
-            i.config
-                .parent()
-                .unwrap()
-                .join("Library/Application Support/Steam/steamapps/workshop/content/294100")
-                .join(&id)
-                .display()
-        );
-
-        let destination = rim_install.path().join("Mods");
-
+        
         let options = CopyOptions {
             overwrite: true,
             ..Default::default()
@@ -223,12 +347,13 @@ pub async fn install(
             GameMods::from(rim_install.path().to_str().unwrap()).with_display(DisplayType::Short);
         let filtered = installed_mods.filter_by(FlagSet::from(FilterBy::SteamID), &id);
 
-        let mut ignored = false;
+        let mut ignored = false; 
+
         for old_mod in filtered.mods {
             //dbg!(&old_mod.path);
             if old_mod.path.starts_with('_') {
                 if args.is_verbose() {
-                    printf!("Ignoring {}", old_mod.path);
+                    log!( Warning: "Ignoring {}", old_mod.path);
                 }
                 ignored = true;
                 dir::remove(&source).unwrap();
@@ -243,7 +368,7 @@ pub async fn install(
         }
 
         if args.verbose {
-            println!(
+            log!( Status:
                 "Moving \"{}\" to \"{}\"",
                 &source,
                 destination.to_str().unwrap_or("error")
@@ -258,52 +383,67 @@ pub async fn install(
 
         already_installed.insert(id.clone());
 
-        let is_installed = filtered.mods.len() == 1 && !filtered.mods.is_empty();
+        match filtered.mods.len() {
+            1 => {
+                let m: Mod = filtered.mods[0].clone(); // Get the installed mod as Mod instance (read its dependencies)
 
-        if is_installed {
-            let m: Mod = filtered.mods[0].clone(); // Get the installed mod as Mod instance (read its dependencies)
-
-            // If it does have dependencies
-            if let Some(dependencies) = m.dependencies {
-                // Then add the ids to the queue
-                for id in dependencies {
-                    if !already_installed.contains(&id) {
-                        dependencies_ids.get_mut().insert(id);
+                // If it does have dependencies
+                if let Some(dependencies) = m.dependencies {
+                    // Then add the ids to the queue
+                    for id in dependencies {
+                        if id == "294100" { continue; }
+                        if !already_installed.contains(&id) {
+                            dependencies_ids.get_mut().insert(id);
+                        }
                     }
                 }
             }
-        } else {
-            eprintln!(
-                "Something unexpected happened. Duplicated mod: {}",
-                filtered.mods[0].steam_id
-            );
+            x if x > 1 => {
+                log!(Error:
+                    "Something unexpected happened. Possible duplicated mod: {}",
+                    id
+                );
+                log!(Error: "Filter result: {:?}", filtered);
+            }
+            _ => {
+                log!(Error:
+                    "Something unexpected happened with mod {}.",
+                    id
+                );
+                log!(Error: "Probably information files have unexpected names like \"About/about.xml\" instead of \"About/About.xml\"")
+            }
         }
     }
 
+    if !ids.is_empty() {
+        log!(Warning: "Did not install {:?}", ids);
+    }
+    
     if d == 0 {
-        printf!("Done!\n");
+        log!(Status: "Done!");
     };
 
     //dbg!(&dependencies_ids);
 
     if args.resolve && !dependencies_ids.get_mut().is_empty() {
         if d == 0 {
-            printf!(
-                "{:<30}{}",
-                "Installing dependencies ... ",
-                if args.verbose { '\n' } else { ' ' }
+            log!( Status:
+                "Installing dependencies",
             );
         };
         args.r#mod = Vec::from_iter(dependencies_ids.get_mut().clone());
-        install(args.clone(), i.clone(), d + 1, already_installed).await;
+        install(args.clone(), i.clone(), d + 1, already_installed.clone()).await;
         if d == 0 {
-            printf!("Done!\n");
+            clear_leftlovers(&path_downloads, &args);
+            clear_leftlovers(&PathBuf::from(PATH), &args); 
+            log!(Status: "Done!");
+
+            if !ids.is_empty() {
+                log!(Warning: "Trying to install failed ids {:?}", ids);
+                args.r#mod = ids.iter().map(|s| s.to_string()).collect::<Vec<String>>();
+                install(args.clone(), i.clone(), d + 1, already_installed.clone()).await;
+            }
+
         };
     }
-}
-
-fn read() -> String {
-    let mut n = String::new();
-    std::io::stdin().read_line(&mut n).unwrap();
-    n.replace("\n", "").replace(" ", "")
 }

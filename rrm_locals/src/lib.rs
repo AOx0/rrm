@@ -14,7 +14,7 @@ use std::process::{exit, Stdio};
 
 pub type Mods = Vec<Mod>;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct GameMods {
     pub mods: Mods,
     pub biggest_name_size: usize,
@@ -140,21 +140,21 @@ impl Filtrable<FilterBy> for GameMods {
         mods.into_iter().for_each(|m| {
             let result = {
                 (if filter.contains(All) || filter.contains(Name) || filter.contains(Name) {
-                    matcher.fuzzy_match(&m.name, &value).is_some()
+                    matcher.fuzzy_match(&m.name, value).is_some()
                 } else {
                     false
                 }) || (if filter.contains(Author) || filter.contains(All) {
-                    matcher.fuzzy_match(&m.author, &value).is_some()
+                    matcher.fuzzy_match(&m.author, value).is_some()
                 } else {
                     false
                 }) || (if filter.contains(Version) || filter.contains(All) {
                     matcher
-                        .fuzzy_match(&m.version.clone().unwrap_or_else(|| "".to_string()), &value)
+                        .fuzzy_match(&m.version.clone().unwrap_or_else(|| "".to_string()), value)
                         .is_some()
                 } else {
                     false
                 }) || (if filter.contains(SteamID) || filter.contains(All) {
-                    matcher.fuzzy_match(&m.steam_id, &value).is_some()
+                    matcher.fuzzy_match(&m.steam_id, value).is_some()
                 } else {
                     false
                 })

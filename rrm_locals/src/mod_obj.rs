@@ -2,7 +2,7 @@ use crate::mod_paths::ModPaths;
 use crate::*;
 use std::io::{Stdout, Write};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum DisplayType {
     Short,
     Long,
@@ -18,7 +18,7 @@ impl From<bool> for DisplayType {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Mod {
     pub path: String,
     pub name: String,
@@ -37,8 +37,14 @@ impl Mod {
         Mod {
             dependencies,
             path: m.path.parent().unwrap().display().to_string(),
-            name: mods["name"].clone(),
-            author: mods["author"].clone(),
+            name: mods
+                .get("name")
+                .unwrap_or(&"NOT FOUND".to_string())
+                .to_string(),
+            author: mods
+                .get("author")
+                .unwrap_or(&"NOT FOUND".to_string())
+                .to_string(),
             steam_id: m.steam_id.clone(),
             version: mods.get("version").cloned(),
             package_id: mods.get("packageId").cloned(),

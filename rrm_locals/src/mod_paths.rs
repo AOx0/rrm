@@ -48,12 +48,12 @@ fn get_mods(about_dir: &Path) -> Vec<ModPaths> {
         }
 
         let m = ModPaths {
-            about: if path.file_name().unwrap() == "About.xml" {
+            about: if path.file_name().unwrap().to_str().unwrap().to_lowercase() == "about.xml" {
                 Some(PathBuf::from(path))
             } else {
                 None
             },
-            manifest: if path.file_name().unwrap() == "Manifest.xml" {
+            manifest: if path.file_name().unwrap().to_str().unwrap().to_lowercase() == "manifest.xml" {
                 Some(PathBuf::from(path))
             } else {
                 None
@@ -87,7 +87,7 @@ pub fn list_path_abouts(path: &Path) -> Vec<PathBuf> {
     for e in list_p(path) {
         if e.is_dir() {
             list_b(&e).iter().for_each(|e| {
-                if e.file_name().unwrap() == "About" {
+                if e.file_name().unwrap().to_str().unwrap().to_lowercase() == "about" {
                     result.push(PathBuf::from(e));
                 }
             });
