@@ -1,10 +1,10 @@
 <div>
-	<img src="https://img.shields.io/badge/GitHub   Version-0.0.1--alpha.8-green">
+	<img src="https://img.shields.io/badge/GitHub   Version-0.0.1--alpha.9-green">
 	</img><img src="https://img.shields.io/badge/Status-Almost Done-yellow">
 </div>
 <div>
 	<a href="https://crates.io/crates/rrm">
-		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.8-green"></img>
+		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.9-green"></img>
 	</a>
 	<img src="https://img.shields.io/badge/Status-Almost Done-yellow">
 </div>
