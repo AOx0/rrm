@@ -15,6 +15,8 @@ TODOs are available [here][1]. Discussions, PRs and Issues are open for anyone w
 
 <br/>
 
+<img width="1680" alt="Screen Shot 2022-07-19 at 4 44 18 a m" src="https://user-images.githubusercontent.com/50227494/179720712-69a4d2d1-4cb1-4c48-902e-32644759e8dd.png">
+
 # rrm
 
 Inspired by Spoons [rmm][2]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
@@ -31,12 +33,11 @@ This program is installable with `cargo`. Install `rust` along with `cargo` [her
 ### Install
 To install the `crates.io` pre-release version run:
 
-	cargo install rrm --version 0.0.1-alpha.8
+	cargo install rrm --version 0.0.1-alpha.9
 
 Or install the GitHub version. Although it's not recommended since it has a 'dev' flag which changes the installer behaviour:
 
-	git clone https://github.com/AOx0/rrm --recursive
-	cargo install rrm --path rrm/
+	cargo install --git https://github.com/AOx0/rrm
 
 ### Linux additional steps
 Additionally, if you are using **_linux_** on a 64 bit machine, you will need to add multiverse with:
