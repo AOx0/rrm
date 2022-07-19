@@ -51,6 +51,9 @@ pub async fn install(
     d: usize,
     mut already_installed: HashSet<String>,
 ) {
+    if args.is_debug() {
+        log!(Warning: "Already installed {:?}", already_installed);
+    }
     let inline: bool = !(args.r#mod.len() == 1 && args.r#mod.get(0).unwrap() == "None");
     if !inline {
         args.r#mod = Vec::new();
@@ -210,6 +213,7 @@ pub async fn install(
     }
 
     let ids: Vec<&str> = to_install.iter().map(|e| e.id.as_str()).collect();
+    let ids: Vec<_> = ids.into_iter().filter(|&id| !already_installed.contains(&id.to_owned()) ).collect();
 
     if d == 0 {
         log!( Status:
@@ -291,7 +295,7 @@ pub async fn install(
             }
         }
     });
-
+ 
     let result = {
         let mut result = String::new();
         let mut num = ids.len();

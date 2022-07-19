@@ -240,7 +240,7 @@ pub struct Pull {
 }
 
 #[derive(Args, Debug, Clone)]
-#[clap(arg_required_else_help = true)]
+#[clap(arg_required_else_help = false)]
 pub struct Install {
     /// The name of the RimWorld mod(s)
     #[clap(required = false, default_value = "None")]
