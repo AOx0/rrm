@@ -4,10 +4,10 @@ use std::process::Stdio;
 use rrm_installer::Installer;
 use crate::utils::*;
 use async_recursion::async_recursion;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 #[async_recursion(?Send)]
-pub async fn install<T: InstallingOptions>(args: T, mods: &[&str], installer: Installer, start_file_watcher: Arc<Mutex<bool>>) -> String {
+pub async fn install<T: InstallingOptions>(args: T, mods: &[&str], installer: Installer, start_file_watcher: Arc<std::sync::mpsc::Sender<bool>>) -> String {
     let install_message = Installer::gen_install_string(&mods);
     let steamcmd = installer.get_steamcmd_path();
 
@@ -74,12 +74,7 @@ pub async fn install<T: InstallingOptions>(args: T, mods: &[&str], installer: In
     let mut child = cmd.spawn().unwrap();
 
     if args.is_verbose() { log!( Status: "Done spawning"); }
-
-    {
-        let mut start = start_file_watcher.lock().unwrap();
-        *start = true;
-    }
-
+    
     let stdout = child.stdout.take().unwrap();
     let mut reader = BufReader::new(stdout).lines();
 
@@ -88,6 +83,9 @@ pub async fn install<T: InstallingOptions>(args: T, mods: &[&str], installer: In
     let mut did_update = false;
 
     while let Some(line) = reader.next_line().await.unwrap() {
+        if line.contains("Waiting for client config...OK") {
+            start_file_watcher.send(true).unwrap();
+        }
         if line.contains("Update complete") {
             log!(Warning: "SteamCMD updated");
             did_update = true;

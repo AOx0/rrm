@@ -13,6 +13,8 @@ use std::io;
 use std::io::prelude::*;
 use text_io::try_read;
 use std::sync::{Arc, Mutex};
+use std::sync::mpsc::channel;
+
 
 #[cfg(target_os = "windows")]
 const PATH: &str = r"steamcmd\steamapps\workshop\content\294100\"; 
@@ -74,7 +76,7 @@ pub async fn install(
 
     let mut to_install: Vec<ModSteamInfo> = Vec::new();
     let filter_obj = args.to_filter_obj();
-    let re = Regex::new(r"[a-zA-Z/:.]+\?id=(?P<id>\d+).*").unwrap();
+    let re = Regex::new(r"[a-zA-Z/:.]+[?0-9a-zA-Z0-9/=&]+[\?\&]{1}id=(?P<id>\d+).*").unwrap();
 
     for m in &args.r#mod {
         if m.chars().all(char::is_numeric) {
@@ -221,48 +223,70 @@ pub async fn install(
     clear_leftlovers(&path_downloads, &args);
     clear_leftlovers(&PathBuf::from(PATH), &args); 
 
+    let (ty, ry) = channel::<bool>();
+    let should_start = Arc::new(ty);
     let should_end = Arc::new(Mutex::new(false));
-    let should_start = Arc::new(Mutex::new(false));
 
+    
     let status_downloader = std::thread::spawn({
         let path_downloads = path_downloads.to_owned();
+        let number_to_install = ids.len();
         let should_end = Arc::clone(&should_end);
-        let should_start = Arc::clone(&should_start);
-        let number_to_install = ids.len(); 
+        let verbose = args.is_verbose();
         move || {
-            let mut start: bool;
-            start = *should_start.lock().unwrap();
+            extern crate notify;
 
-            while start != true {
-                start = *should_start.lock().unwrap();
+            use notify::{Watcher, watcher, DebouncedEvent};
+            use std::time::Duration;
+
+            // Wait for start signal
+            let _ = ry.recv().unwrap();
+            
+            if verbose {
+                log!(Warning: "Starting file watcher");
             }
-
-            let mut end: bool;
-            end = *should_end.lock().unwrap();
 
             let mut last_printed = String::new();
             let mut d = 0;
 
-            while end != true {
-                if path_downloads.exists() && path_downloads.is_dir() {
-                    let contents = path_downloads.read_dir().unwrap();
-                    
-                    for entry in contents {
-                        let entry = entry.unwrap();
-                        if entry.path().is_dir() {
-                            let name = entry.file_name().to_str().unwrap().to_owned();
-                            if last_printed != name {
-                                d += 1;
-                                last_printed = name;
-                                log!(Status: "[{1:0>3}/{2:0>3}] Dowloading {0}", last_printed, d, number_to_install);
-                            }
+            let (tx, rx) = channel();
+            let mut watcher = watcher(tx, Duration::from_secs(0)).unwrap();
+            watcher.watch(path_downloads.parent().unwrap().to_str().unwrap(), notify::RecursiveMode::Recursive).unwrap();
+
+            let timeout = Duration::from_secs_f32(1.0);
+
+            loop {
+                match rx.recv_timeout(timeout) {
+                    Ok(event) => {
+                        match event {
+                            DebouncedEvent::Create(path) => {
+                                let current = path.file_name().unwrap().to_str().unwrap();  
+                                if let Some(n) = path.parent() {
+                                    if let Some(name) = n.file_name() {
+                                        let name = name.to_str().unwrap();
+                                        if name == "294100" {
+                                            if current != last_printed {
+                                                d += 1;
+                                                log!(Status: "[{1:0>3}/{2:0>3}] Dowloading {0}", current, d, number_to_install);
+                                                last_printed = current.to_owned();
+                                            }
+                                        }
+                                    } 
+                                }
+                            },
+                            _ => {}
                         }
+                    }
+                    Err(_) => {
+                        let end = *should_end.lock().unwrap();
+                        if end == true {
+                            if verbose {
+                                log!(Warning: "Ending file watcher.");
+                            }
+                            break; 
+                        }           
                     } 
                 }
-
-                
-                std::thread::sleep(std::time::Duration::from_secs_f32(0.15));
-                end = *should_end.lock().unwrap();
             }
         }
     });
@@ -299,6 +323,7 @@ pub async fn install(
         let mut should_end = should_end.lock().unwrap();
         *should_end = true;
     }
+
     status_downloader.join().unwrap();
 
     let mut successful_ids = HashSet::new();
