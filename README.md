@@ -15,6 +15,8 @@ TODOs are available [here][1]. Discussions, PRs and Issues are open for anyone w
 
 <br/>
 
+[![asciicast](https://asciinema.org/a/509512.svg)](https://asciinema.org/a/509512)
+
 # rrm
 
 Inspired by Spoons [rmm][2]. This is a cross-platform Mod Manager for RimWorld intended to work with macOS, linux and Windows
