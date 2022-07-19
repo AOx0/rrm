@@ -11,7 +11,9 @@ pub async fn install<T: InstallingOptions>(args: T, mods: &[&str], installer: In
     let install_message = Installer::gen_install_string(&mods);
     let steamcmd = installer.get_steamcmd_path();
 
-    log!( Status: "Spawning SteamCMD");
+    if args.is_verbose(){
+        log!( Status: "Spawning SteamCMD");
+    }
    
 
     #[cfg(target_os = "windows")]

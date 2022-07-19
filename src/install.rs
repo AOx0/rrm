@@ -87,7 +87,7 @@ pub async fn install(
                 continue;
             }
 
-            if args.verbose {
+            if args.is_verbose() {
                 log!(Status: "Adding {} to queue", m);
             }
 
@@ -108,7 +108,7 @@ pub async fn install(
                     continue;
                 }
 
-                if args.verbose {
+                if args.is_verbose() {
                     log!(Status: "Adding {} to queue", id);
                 }
 
@@ -204,7 +204,7 @@ pub async fn install(
                 }
             }
         } else {
-            if !inline || args.verbose {
+            if !inline || args.is_verbose() {
                 log!( Error: "No results found for {}", m);
             }
 
@@ -217,7 +217,7 @@ pub async fn install(
 
     if d == 0 {
         log!( Status:
-            "Installing mod{}...",
+            "Installing mod{}",
             if args.r#mod.len() > 1 { "s" } else { "" },
         )
     };
@@ -322,7 +322,9 @@ pub async fn install(
         result
     };
 
-    log!(Status: "Installer finished");
+    if args.is_verbose() {
+        log!(Status: "Installer finished");
+    }
 
     {
         let mut should_end = should_end.lock().unwrap();
@@ -347,10 +349,12 @@ pub async fn install(
 
     let destination = rim_install.path().join("Mods");
 
-    log!( Status:
-            "Handling & moving mods to \"{}\"",
-            destination.to_str().unwrap_or("error")
-    );
+    if args.is_verbose() {
+        log!( Status:
+                "Handling & moving mods to \"{}\"",
+                destination.to_str().unwrap_or("error")
+        );
+    }
 
     let mut ids: HashSet<String>  = ids.iter().map(|s| s.to_string()).collect();
 
@@ -449,7 +453,7 @@ pub async fn install(
         log!(Warning: "Did not install {:?}", ids);
     }
     
-    if d == 0 {
+    if d == 0 && args.is_verbose() {
         log!(Status: "Done!");
     };
 
@@ -466,14 +470,7 @@ pub async fn install(
         if d == 0 {
             clear_leftlovers(&path_downloads, &args);
             clear_leftlovers(&PathBuf::from(PATH), &args); 
-            log!(Status: "Done!");
-
-            if !ids.is_empty() {
-                log!(Warning: "Trying to install failed ids {:?}", ids);
-                args.r#mod = ids.iter().map(|s| s.to_string()).collect::<Vec<String>>();
-                install(args.clone(), i.clone(), d + 1, already_installed.clone()).await;
-            }
-
+            log!(Status: "Done!"); 
         };
     }
 }
