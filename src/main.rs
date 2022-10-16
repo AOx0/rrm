@@ -2,12 +2,13 @@ extern crate core;
 
 use crate::args::Options;
 use std::collections::HashSet;
+use rrm_installer::get_or_create_config_dir;
 
-mod logger;
 mod args;
 mod async_installer;
 mod install;
 mod list;
+mod logger;
 mod pull;
 mod search;
 mod utils;

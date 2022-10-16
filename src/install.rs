@@ -11,8 +11,13 @@ use std::cell::RefCell;
 use std::collections::HashSet;
 use std::io;
 use std::io::prelude::*;
+use std::slice::SliceIndex;
 use std::sync::mpsc::channel;
 use std::sync::{Arc, Mutex};
+use std::sync::atomic::AtomicUsize;
+use std::thread::sleep;
+use notify::Event;
+use notify::event::CreateKind;
 use text_io::try_read;
 
 #[cfg(target_os = "windows")]
@@ -230,76 +235,40 @@ pub async fn install(
     clear_leftlovers(&path_downloads, &args);
     clear_leftlovers(&PathBuf::from(PATH), &args);
 
-    let (ty, ry) = channel::<bool>();
-    let should_start = Arc::new(ty);
-    let should_end = Arc::new(Mutex::new(false));
+    extern crate notify;
 
-    let status_downloader = std::thread::spawn({
-        let path_downloads = path_downloads.to_owned();
-        let number_to_install = ids.len();
-        let should_end = Arc::clone(&should_end);
-        let verbose = args.is_verbose();
-        move || {
-            extern crate notify;
+    use notify::{Watcher};
+    use std::time::Duration;
 
-            use notify::{watcher, DebouncedEvent, Watcher};
-            use std::time::Duration;
+    if args.is_verbose() {
+        log!(Warning: "Starting file watcher");
+    }
 
-            // Wait for start signal
-            let _ = ry.recv().unwrap();
-
-            if verbose {
-                log!(Warning: "Starting file watcher");
-            }
-
-            let mut last_printed = String::new();
-            let mut d = 0;
-
-            let (tx, rx) = channel();
-            let mut watcher = watcher(tx, Duration::from_secs(0)).unwrap();
-            log!(Status: "Path: {}", path_downloads.display());
-            watcher
-                .watch(
-                    path_downloads.parent().unwrap().to_str().unwrap(),
-                    notify::RecursiveMode::Recursive,
-                )
-                .unwrap();
-
-            let timeout = Duration::from_secs_f32(1.0);
-
-            loop {
-                match rx.recv_timeout(timeout) {
-                    Ok(event) => match event {
-                        DebouncedEvent::Create(path) => {
-                            let current = path.file_name().unwrap().to_str().unwrap();
-                            if let Some(n) = path.parent() {
-                                if let Some(name) = n.file_name() {
-                                    let name = name.to_str().unwrap();
-                                    if name == "294100" {
-                                        if current != last_printed {
-                                            d += 1;
-                                            log!(Status: "[{1:0>3}/{2:0>3}] Dowloading {0}", current, d, number_to_install);
-                                            last_printed = current.to_owned();
-                                        }
-                                    }
-                                }
+    let mut cur: AtomicUsize = AtomicUsize::new(0);
+    let number_to_install = ids.len();
+    let verbose = args.is_verbose();
+    let mut last_printed = String::new();
+    let mut watcher = notify::recommended_watcher(move |res: notify::Result<Event>| {
+        if let Ok(event) = res {
+            if let notify::EventKind::Create(CreateKind::Folder) = event.kind {
+                let path = event.paths[0].to_owned();
+                let current = path.file_name().unwrap().to_str().unwrap().to_owned();
+                if let Some(n) = path.parent() {
+                    if let Some(name) = n.file_name() {
+                        let name = name.to_str().unwrap();
+                        if name == "294100" {
+                            if current != last_printed {
+                                *cur.get_mut() += 1;
+                                log!(Status: "[{1:0>3}/{2:0>3}] Downloading {0}", current, cur.get_mut(), number_to_install);
+                                last_printed = current;
                             }
-                        }
-                        _ => {}
-                    },
-                    Err(_) => {
-                        let end = *should_end.lock().unwrap();
-                        if end == true {
-                            if verbose {
-                                log!(Warning: "Ending file watcher.");
-                            }
-                            break;
                         }
                     }
                 }
             }
         }
-    });
+    }).unwrap();
+
 
     let result = {
         let mut result = String::new();
@@ -317,7 +286,8 @@ pub async fn install(
                 args.clone(),
                 &ids[n..n + 200],
                 i.clone(),
-                Arc::clone(&should_start),
+                &mut watcher,
+                &path_downloads
             )
             .await;
             result.push_str(&r);
@@ -332,7 +302,8 @@ pub async fn install(
             args.clone(),
             &ids[n..n + num],
             i.clone(),
-            Arc::clone(&should_start),
+            &mut watcher,
+            &path_downloads
         )
         .await;
         result.push_str(&r);
@@ -343,12 +314,9 @@ pub async fn install(
         log!(Status: "Installer finished");
     }
 
-    {
-        let mut should_end = should_end.lock().unwrap();
-        *should_end = true;
-    }
-
-    status_downloader.join().unwrap();
+    watcher.unwatch(
+        &rrm_installer::get_or_create_config_dir().join(path_downloads.parent().unwrap()),
+    ).unwrap();
 
     let mut successful_ids = HashSet::new();
 
@@ -380,7 +348,8 @@ pub async fn install(
 
         let source = format!(
             "{}",
-            i.config.parent().unwrap().join(PATH).join(&id).display()
+            rrm_installer::get_or_create_config_dir()
+              .join(PATH).join(&id).display()
         );
 
         let options = CopyOptions {

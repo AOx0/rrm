@@ -24,7 +24,7 @@ license = "MIT"
 [dependencies]
 execute = "0.2.11"
 async-recursion = "1.0.0"
-clap = { version= "3.2.5", default-features = false, features=["env", "derive", "unicode", "suggestions", "std"] }
+clap = { version= "4.0.10", features=["env", "derive", "unicode", "suggestions", "std"] }
 tokio =  { version = "1.19.2", default-features = false, features = ["full"] }
 fs_extra = "1.2.0"
 regex = "1.5.6"
@@ -34,4 +34,4 @@ rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.7"}
 rrm_installer = { path="rrm_installer", version="0.0.1-alpha.7"}
 colored = "2.0.0"
 text_io = "0.1.10"
-notify = "4.0.17"
+notify = "5.0.0"

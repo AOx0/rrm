@@ -1,4 +1,3 @@
-
 #[macro_export]
 macro_rules! log {
     ( $na:tt : $($t:tt)* ) => {

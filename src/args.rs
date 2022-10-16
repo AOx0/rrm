@@ -27,7 +27,7 @@ pub enum Options {
         visible_alias = "use-paging"
     )]
     UsePager {
-        #[clap(required = true, possible_values= &["true", "false", "0", "1"])]
+        #[clap(required = true, value_parser(["true", "false", "0", "1"]))]
         value: String,
     },
 
