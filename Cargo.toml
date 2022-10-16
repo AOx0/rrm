@@ -30,7 +30,7 @@ fs_extra = "1.2.0"
 regex = "1.5.6"
 
 rrm_locals = {path="rrm_locals", version="0.0.1-alpha.9"}
-rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.7"}
+rrm_scrap = {path="rrm_scrap", version="0.0.1-alpha.8"}
 rrm_installer = { path="rrm_installer", version="0.0.1-alpha.8"}
 colored = "2.0.0"
 text_io = "0.1.10"

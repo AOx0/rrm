@@ -90,6 +90,11 @@ pub async fn install<T: InstallingOptions>(
 
     while let Some(line) = reader.next_line().await.unwrap() {
         if line.contains("Waiting for client config...OK") {
+
+            if !&get_or_create_config_dir().join(path_downloads.parent().unwrap()).exists() {
+                std::fs::create_dir_all(&get_or_create_config_dir().join(path_downloads.parent().unwrap())).unwrap();
+            }
+
             start_file_watcher
                 .watch(
                     &get_or_create_config_dir().join(path_downloads.parent().unwrap()),

@@ -44,11 +44,7 @@ pub fn get_or_create_config_dir() -> PathBuf {
         return path;
     }
 
-    if let Some(path) = env_var_config("RRM_CONFIG_DIR") {
-        return path;
-    }
-
-    if let Some(path) = env_var_config("CONFIG_DIR") {
+     if let Some(path) = env_var_config("RRM_CONFIG_HOME") {
         return path;
     }
 
@@ -68,13 +64,6 @@ pub fn get_or_create_config_dir() -> PathBuf {
     let config_dir = UserDirs::new().unwrap().home_dir().join(".rrm");
     if !config_dir.exists() {
         fs::create_dir_all(&config_dir).unwrap();
-        return config_dir.to_path_buf();
-    }
-
-    let binding = ProjectDirs::from("com", "AOx0", "rrm").unwrap();
-    let config_dir = binding.preference_dir();
-    if !config_dir.exists() {
-        fs::create_dir_all(&config_dir).unwrap();
     }
 
     return config_dir.to_path_buf();
@@ -83,6 +72,7 @@ pub fn get_or_create_config_dir() -> PathBuf {
 fn env_var_config(var: &'static str) -> Option<PathBuf> {
     let env_config_dir = std::env::var(var);
     if let Ok(env_config_dir) = env_config_dir {
+        let env_config_dir = PathBuf::from(env_config_dir).join("rrm");
         if !Path::new(&env_config_dir).exists() {
             fs::create_dir_all(&env_config_dir).unwrap();
         }
