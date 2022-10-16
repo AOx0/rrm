@@ -53,7 +53,9 @@ fn get_mods(about_dir: &Path) -> Vec<ModPaths> {
             } else {
                 None
             },
-            manifest: if path.file_name().unwrap().to_str().unwrap().to_lowercase() == "manifest.xml" {
+            manifest: if path.file_name().unwrap().to_str().unwrap().to_lowercase()
+                == "manifest.xml"
+            {
                 Some(PathBuf::from(path))
             } else {
                 None
