@@ -1,10 +1,9 @@
 use crate::args::InstallingOptions;
 use crate::utils::*;
 use async_recursion::async_recursion;
+use notify::{RecommendedWatcher, Watcher};
 use rrm_installer::{get_or_create_config_dir, Installer};
 use std::process::Stdio;
-use std::sync::Arc;
-use notify::{RecommendedWatcher, Watcher};
 use tokio::{
     io::{AsyncBufReadExt, BufReader},
     process::Command,
@@ -15,7 +14,7 @@ pub async fn install<T: InstallingOptions>(
     args: T,
     mods: &[&str],
     installer: Installer,
-    mut start_file_watcher: &mut RecommendedWatcher,
+    start_file_watcher: &mut RecommendedWatcher,
     path_downloads: &Path,
 ) -> String {
     let install_message = Installer::gen_install_string(&mods);
@@ -92,11 +91,11 @@ pub async fn install<T: InstallingOptions>(
     while let Some(line) = reader.next_line().await.unwrap() {
         if line.contains("Waiting for client config...OK") {
             start_file_watcher
-              .watch(
-                  &get_or_create_config_dir().join(path_downloads.parent().unwrap()),
-                  notify::RecursiveMode::Recursive,
-              )
-              .unwrap();
+                .watch(
+                    &get_or_create_config_dir().join(path_downloads.parent().unwrap()),
+                    notify::RecursiveMode::Recursive,
+                )
+                .unwrap();
         }
         if line.contains("Update complete") {
             log!(Warning: "SteamCMD updated");

@@ -4,6 +4,9 @@ use crate::utils::*;
 use async_recursion::async_recursion;
 use fs_extra::dir;
 use fs_extra::dir::CopyOptions;
+use notify::event::CreateKind;
+use notify::Event;
+use notify::Watcher;
 use regex::Regex;
 use rrm_locals::{FilterBy, Filtrable};
 use rrm_scrap::{FlagSet, ModSteamInfo};
@@ -11,13 +14,6 @@ use std::cell::RefCell;
 use std::collections::HashSet;
 use std::io;
 use std::io::prelude::*;
-use std::slice::SliceIndex;
-use std::sync::mpsc::channel;
-use std::sync::{Arc, Mutex};
-use std::sync::atomic::AtomicUsize;
-use std::thread::sleep;
-use notify::Event;
-use notify::event::CreateKind;
 use text_io::try_read;
 
 #[cfg(target_os = "windows")]
@@ -235,18 +231,12 @@ pub async fn install(
     clear_leftlovers(&path_downloads, &args);
     clear_leftlovers(&PathBuf::from(PATH), &args);
 
-    extern crate notify;
-
-    use notify::{Watcher};
-    use std::time::Duration;
-
     if args.is_verbose() {
         log!(Warning: "Starting file watcher");
     }
 
-    let mut cur: AtomicUsize = AtomicUsize::new(0);
+    let mut cur = 0;
     let number_to_install = ids.len();
-    let verbose = args.is_verbose();
     let mut last_printed = String::new();
     let mut watcher = notify::recommended_watcher(move |res: notify::Result<Event>| {
         if let Ok(event) = res {
@@ -258,8 +248,8 @@ pub async fn install(
                         let name = name.to_str().unwrap();
                         if name == "294100" {
                             if current != last_printed {
-                                *cur.get_mut() += 1;
-                                log!(Status: "[{1:0>3}/{2:0>3}] Downloading {0}", current, cur.get_mut(), number_to_install);
+                                cur += 1;
+                                log!(Status: "[{1:0>3}/{2:0>3}] Downloading {0}", current, cur, number_to_install);
                                 last_printed = current;
                             }
                         }
@@ -268,7 +258,6 @@ pub async fn install(
             }
         }
     }).unwrap();
-
 
     let result = {
         let mut result = String::new();
@@ -287,7 +276,7 @@ pub async fn install(
                 &ids[n..n + 200],
                 i.clone(),
                 &mut watcher,
-                &path_downloads
+                &path_downloads,
             )
             .await;
             result.push_str(&r);
@@ -303,7 +292,7 @@ pub async fn install(
             &ids[n..n + num],
             i.clone(),
             &mut watcher,
-            &path_downloads
+            &path_downloads,
         )
         .await;
         result.push_str(&r);
@@ -314,9 +303,9 @@ pub async fn install(
         log!(Status: "Installer finished");
     }
 
-    watcher.unwatch(
-        &rrm_installer::get_or_create_config_dir().join(path_downloads.parent().unwrap()),
-    ).unwrap();
+    watcher
+        .unwatch(&rrm_installer::get_or_create_config_dir().join(path_downloads.parent().unwrap()))
+        .unwrap();
 
     let mut successful_ids = HashSet::new();
 
@@ -349,7 +338,9 @@ pub async fn install(
         let source = format!(
             "{}",
             rrm_installer::get_or_create_config_dir()
-              .join(PATH).join(&id).display()
+                .join(PATH)
+                .join(&id)
+                .display()
         );
 
         let options = CopyOptions {

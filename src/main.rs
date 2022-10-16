@@ -2,7 +2,6 @@ extern crate core;
 
 use crate::args::Options;
 use std::collections::HashSet;
-use rrm_installer::get_or_create_config_dir;
 
 mod args;
 mod async_installer;
