@@ -1338,7 +1338,7 @@ dependencies = [
 
 [[package]]
 name = "rrm"
-version = "0.0.1-alpha.9"
+version = "0.0.1-alpha.10"
 dependencies = [
  "async-recursion",
  "clap",
@@ -1356,7 +1356,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_installer"
-version = "0.0.1-alpha.7"
+version = "0.0.1-alpha.8"
 dependencies = [
  "directories",
  "dotenv",
@@ -1368,7 +1368,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_locals"
-version = "0.0.1-alpha.8"
+version = "0.0.1-alpha.9"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
