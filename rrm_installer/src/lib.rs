@@ -2,20 +2,18 @@ extern crate core;
 
 use rrm_locals::GamePath;
 use serde::{Deserialize, Serialize};
-use std::env::current_dir;
 use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, Read, Write};
 
+use directories;
 use include_dir::{include_dir, Dir};
 use std::path::{Path, PathBuf};
 use std::process::exit;
-use directories;
-use fs_extra;
 
+use directories::{ProjectDirs, UserDirs};
 #[cfg(any(target_os = "macos", target_os = "linux"))]
 use std::os::unix::fs::PermissionsExt;
-use directories::{ProjectDirs, UserDirs};
 
 #[cfg(target_os = "windows")]
 static DEFAULT_PAGING_SOFTWARE: &str = r"C:\Windows\System32\more.com";
@@ -42,7 +40,7 @@ mod tests {
 }
 
 pub fn get_or_create_config_dir() -> PathBuf {
-    if let Some(path) =  env_var_config("XDG_CONFIG_HOME") {
+    if let Some(path) = env_var_config("XDG_CONFIG_HOME") {
         return path;
     }
 
@@ -233,7 +231,10 @@ impl Installer {
             .read(false)
             .open(&get_or_create_config_dir().join("config"))
             .unwrap_or_else(|err| {
-                eprintln!("Failed to open config file at {}", &get_or_create_config_dir().join("config").display());
+                eprintln!(
+                    "Failed to open config file at {}",
+                    &get_or_create_config_dir().join("config").display()
+                );
                 eprintln!("Error: {}", err);
                 exit(1);
             });

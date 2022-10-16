@@ -1360,7 +1360,6 @@ version = "0.0.1-alpha.7"
 dependencies = [
  "directories",
  "dotenv",
- "fs_extra",
  "include_dir",
  "rrm_locals",
  "serde",
