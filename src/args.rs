@@ -118,6 +118,10 @@ pub enum Commands {
         #[clap(flatten)]
         display: DisplayOptions,
     },
+    GenerateCompletion {
+        #[clap(value_parser(["bash", "fish", "zsh", "powershell", "elvish"]))]
+        shell: String,
+    },
 }
 
 #[derive(Args, Debug)]

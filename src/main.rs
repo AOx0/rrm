@@ -1,6 +1,7 @@
 extern crate core;
 
-use crate::args::Options;
+use clap::CommandFactory;
+use crate::args::{Commands, Options};
 use std::collections::HashSet;
 
 mod args;
@@ -11,6 +12,7 @@ mod logger;
 mod pull;
 mod search;
 mod utils;
+use clap_complete::{generate, Shell};
 
 #[tokio::main]
 async fn main() {
@@ -27,6 +29,21 @@ async fn main() {
     );
 
     match args.command {
+        args::Commands::GenerateCompletion { shell } => {
+            let mut matches = args::App::command();
+            match shell.as_str() {
+                "bash" => { generate(Shell::Bash, &mut matches, "rrm", &mut std::io::stdout()); }
+                "fish" => { generate(Shell::Fish, &mut matches, "rrm", &mut std::io::stdout()); }
+                "zsh" => { generate(Shell::Zsh, &mut matches, "rrm", &mut std::io::stdout()); }
+                "powershell" => { generate(Shell::PowerShell, &mut matches, "rrm", &mut std::io::stdout()); }
+                "elvish" => { generate(Shell::Elvish, &mut matches, "rrm", &mut std::io::stdout()); }
+                _ => {
+                    eprintln!("Invalid shell");
+                    std::process::exit(1);
+                }
+            }
+        },
+
         args::Commands::Set { command } => match command {
             Options::UsePager { value } => {
                 installer.set_more_value(value == "true" || value == "1")
