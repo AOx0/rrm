@@ -25,6 +25,8 @@ license = "MIT"
 execute = "0.2.11"
 async-recursion = "1.0.0"
 clap = { version= "4.0.10", features=["env", "derive", "unicode", "suggestions", "std"] }
+clap_complete = "4.0.2"
+clap_complete_command = "0.4.0"
 tokio =  { version = "1.19.2", default-features = false, features = ["full"] }
 fs_extra = "1.2.0"
 regex = "1.5.6"
