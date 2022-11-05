@@ -44,16 +44,6 @@ fn clear_leftlovers(at: &Path, args: &Install) {
     }
 }
 
-use rustyline::validate::MatchingBracketValidator;
-use rustyline::{Cmd, Editor, EventHandler, KeyCode, KeyEvent, Modifiers};
-use rustyline_derive::{Completer, Helper, Highlighter, Hinter, Validator};
-
-#[derive(Completer, Helper, Highlighter, Hinter, Validator)]
-struct InputValidator {
-    #[rustyline(Validator)]
-    brackets: MatchingBracketValidator,
-}
-
 #[async_recursion(?Send)]
 pub async fn install(
     mut args: Install,
@@ -67,21 +57,18 @@ pub async fn install(
     let inline: bool = !(args.r#mod.len() == 1 && args.r#mod.get(0).unwrap() == "None");
     if !inline {
         args.r#mod = Vec::new();
-        let h = InputValidator {
-            brackets: MatchingBracketValidator::new(),
-        };
-
-        let Ok(mut rl) = Editor::new() else {
-            return;
-        };
-        rl.set_helper(Some(h));
-        rl.bind_sequence(
-            KeyEvent(KeyCode::Char('s'), Modifiers::CTRL),
-            EventHandler::Simple(Cmd::Newline),
-        );
-
-        let Ok(input) = rl.readline("Start typing mod names, urls or ids:\n") else { return; };
-        args.r#mod = input.lines().map(|s| s.to_owned()).collect();
+        let stdin = io::stdin();
+        for line in stdin.lock().lines() {
+            if let Ok(line) = line {
+                if line == "END" {
+                    break;
+                } else {
+                    args.r#mod.push(line);
+                }
+            } else {
+                log!(Error: "Could not read line {:?}", line);
+            }
+        }
     }
 
     if args.r#mod.is_empty() {
