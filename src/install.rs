@@ -101,7 +101,7 @@ pub async fn install(
         }
 
         if m.contains("steamcommunity.com") {
-            let m = m.replace('\n', "").replace(' ', "");
+            let m = m.replace(['\n', ' '], "");
 
             if let Some(id) = extract_id(&m, &re) {
                 if id.trim().is_empty() {
@@ -246,12 +246,10 @@ pub async fn install(
                 if let Some(n) = path.parent() {
                     if let Some(name) = n.file_name() {
                         let name = name.to_str().unwrap();
-                        if name == "294100" {
-                            if current != last_printed {
-                                cur += 1;
-                                log!(Status: "[{1:0>3}/{2:0>3}] Downloading {0}", current, cur, number_to_install);
-                                last_printed = current;
-                            }
+                        if name == "294100" && current != last_printed {
+                            cur += 1;
+                            log!(Status: "[{1:0>3}/{2:0>3}] Downloading {0}", current, cur, number_to_install);
+                            last_printed = current;
                         }
                     }
                 }

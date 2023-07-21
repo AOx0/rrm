@@ -20,17 +20,18 @@ pub async fn install<T: InstallingOptions>(
     let install_message = Installer::gen_install_string(&mods);
     let steamcmd = installer.get_steamcmd_path();
 
-    if args.is_verbose() {
-        log!( Status: "Spawning SteamCMD");
-    }
+    args.is_verbose()
+        .then(|| log!( Status: "Spawning SteamCMD"));
 
     #[cfg(target_os = "windows")]
     let mut cmd = {
-        if args.is_debug() {
-            log!(Status: "Spawning with command \"{} {}\"", steamcmd.as_path().to_str().unwrap(), "+login anonymous {} +quit"
-                    .replace("{}", &install_message)
-            );
-        }
+        args.is_debug().then(|| {
+            log!(Status: "Spawning with command \"{} {}\"",
+                steamcmd.as_path().to_str().unwrap(),
+                "+login anonymous {} +quit".replace("{}", &install_message)
+            )
+        });
+
         let mut cmd = Command::new(steamcmd.as_path().to_str().unwrap());
         cmd.args(
             "+login anonymous {} +quit"
@@ -90,9 +91,14 @@ pub async fn install<T: InstallingOptions>(
 
     while let Some(line) = reader.next_line().await.unwrap() {
         if line.contains("Waiting for client config...OK") {
-
-            if !&get_or_create_config_dir().join(path_downloads.parent().unwrap()).exists() {
-                std::fs::create_dir_all(&get_or_create_config_dir().join(path_downloads.parent().unwrap())).unwrap();
+            if !&get_or_create_config_dir()
+                .join(path_downloads.parent().unwrap())
+                .exists()
+            {
+                std::fs::create_dir_all(
+                    &get_or_create_config_dir().join(path_downloads.parent().unwrap()),
+                )
+                .unwrap();
             }
 
             start_file_watcher
@@ -113,7 +119,7 @@ pub async fn install<T: InstallingOptions>(
         } else if args.is_debug() && line.contains("Success") {
             log!(Warning:
                 "{})",
-                &line[0..line.find(") ").unwrap_or_else(|| line.len())]
+                &line[0..line.find(") ").unwrap_or(line.len())]
             );
         }
     }

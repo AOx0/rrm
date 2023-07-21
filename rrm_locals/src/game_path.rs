@@ -48,8 +48,8 @@ impl From<&Path> for GamePath {
 }
 
 impl GamePath {
-    pub fn path(&self) -> Box<Path> {
-        self.0.clone()
+    pub fn path(&self) -> &Path {
+        &self.0
     }
 }
 
