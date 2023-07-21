@@ -14,7 +14,7 @@ pub async fn pull(args: Pull, i: Installer, ignored: bool) {
 
     let ids = mods
         .iter()
-        .map(|mo| {
+        .filter_map(|mo| {
             if args.is_debug() {
                 println!(
                     "Turn of {}",
@@ -41,8 +41,7 @@ pub async fn pull(args: Pull, i: Installer, ignored: bool) {
                 }
                 Some(mo.steam_id.clone())
             }
-        })
-        .flatten();
+        });
 
     let to_install: HashSet<String> = HashSet::from_iter(ids);
     let ids: Vec<String> = to_install.iter().cloned().collect();

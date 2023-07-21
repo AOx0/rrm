@@ -2,15 +2,16 @@ extern crate core;
 
 use rrm_locals::GamePath;
 use serde::{Deserialize, Serialize};
-use std::env::current_dir;
 use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, Read, Write};
+
 
 use include_dir::{include_dir, Dir};
 use std::path::{Path, PathBuf};
 use std::process::exit;
 
+use directories::UserDirs;
 #[cfg(any(target_os = "macos", target_os = "linux"))]
 use std::os::unix::fs::PermissionsExt;
 
@@ -29,66 +30,46 @@ static PROJECT_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/src/steamcmd/linux")
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 static DEFAULT_PAGING_SOFTWARE: &str = r"more";
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+pub fn get_or_create_config_dir() -> PathBuf {
+    if let Some(path) = env_var_config("XDG_CONFIG_HOME")
+        .or_else(|| env_var_config("RRM_CONFIG_HOME"))
+        .or_else(|| env_var_config("CONFIG_HOME"))
+    {
+        return path;
     }
-}
 
-pub fn config_does_exists() -> bool {
-    let home = if let Some(home) = get_home() {
-        home
-    } else {
-        eprintln!("Something failed while getting the user's home dir");
-        exit(1);
-    };
-
-    let config = home.join(".rrm").join("config");
-    config.exists() && config.is_file()
-}
-
-fn config_exists(home: &Path) -> bool {
-    let config = home.join(".rrm").join("config");
-    config.exists() && config.is_file()
-}
-
-fn get_home() -> Option<PathBuf> {
-    #[cfg(feature = "dev")]
-    return Some(std::env::current_dir().unwrap());
-
-    #[cfg(not(feature = "dev"))]
-    if let Some(user_dirs) = directories::UserDirs::new() {
-        let home: &Path = user_dirs.home_dir();
-        Some(home.to_path_buf())
-    } else {
-        None
+    let config_dir = UserDirs::new().unwrap().home_dir().join(".config");
+    if config_dir.exists() {
+        let config_dir = config_dir.join("rrm");
+        if !config_dir.exists() {
+            fs::create_dir_all(&config_dir).unwrap();
+        }
+        return config_dir.to_path_buf();
     }
+
+    let config_dir = UserDirs::new().unwrap().home_dir().join(".rrm");
+    if !config_dir.exists() {
+        fs::create_dir_all(&config_dir).unwrap();
+    }
+
+    config_dir.to_path_buf()
+}
+
+fn env_var_config(var: &'static str) -> Option<PathBuf> {
+    std::env::var(var).ok().map(|env_config_dir| {
+        let env_config_dir = PathBuf::from(env_config_dir).join("rrm");
+        if !env_config_dir.exists() {
+            fs::create_dir_all(&env_config_dir).unwrap();
+        }
+        env_config_dir
+    })
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Installer {
-    pub config: PathBuf,
-    pub home: PathBuf,
     pub rim_install: Option<GamePath>,
     pub use_more: bool,
     pub with_paging: String,
-}
-
-fn create_config(at: &Path) {
-    fs::create_dir(at.parent().unwrap()).unwrap_or_else(|err| {
-        if !at.parent().unwrap().is_dir() {
-            panic!("{}", err);
-        }
-    });
-
-    File::create(at).unwrap_or_else(|err| {
-        eprintln!("Something happened while trying to create {}", at.display());
-        eprintln!("Error: {}", err);
-        exit(1);
-    });
 }
 
 pub fn run_steam_command(c: &str, config_path: &Path, count: usize) -> String {
@@ -116,7 +97,7 @@ pub fn run_steam_command(c: &str, config_path: &Path, count: usize) -> String {
                 )
                 .replace("[]", steam.as_path().to_str().unwrap())
                 .replace("{}", c)
-                .split(" "),
+                .split(' '),
         )
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::piped())
@@ -174,56 +155,36 @@ fn set_permissions_for_steamcmd(path: &Path) {
 
 impl Installer {
     fn init(path: Option<PathBuf>) -> Self {
-        let mut fresh_new = false;
-        let home = if let Some(home) = get_home() {
-            home
-        } else {
-            eprintln!("Something failed while getting the user's home dir");
-            exit(1);
-        };
+        let config_dir = get_or_create_config_dir();
+        let config_file = config_dir.join("config");
+        if !config_file.exists() {
+            File::create(&config_file).unwrap();
 
-        let config_file = home.join(".rrm").join("config");
-        let config = if config_exists(&home) {
-            config_file
-        } else {
-            fresh_new = true;
-            create_config(&config_file);
-            if config_exists(&home) {
-                let steamcmd_path = home.join(".rrm").join("steamcmd");
-                fs::create_dir(&steamcmd_path).unwrap_or_else(|err| {
-                    if !steamcmd_path.is_dir() {
-                        panic!("{}", err);
-                    }
-                });
+            let steamcmd_path = config_dir.join("steamcmd");
+            fs::create_dir(&steamcmd_path).unwrap_or_else(|err| {
+                if !steamcmd_path.is_dir() {
+                    panic!("{}", err);
+                }
+            });
 
-                PROJECT_DIR.extract(steamcmd_path.as_path()).unwrap();
+            // TODO: Install from https://steamcdn-a.akamaihd.net/client/installer/steamcmd
+            PROJECT_DIR.extract(steamcmd_path.as_path()).unwrap();
 
-                #[cfg(any(target_os = "macos", target_os = "linux"))]
-                set_permissions_for_steamcmd(steamcmd_path.as_path());
+            #[cfg(any(target_os = "macos", target_os = "linux"))]
+            set_permissions_for_steamcmd(steamcmd_path.as_path());
 
-                config_file
-            } else {
-                exit(1);
-            }
-        };
+            println!("Installing steamcmd...");
+            run_steam_command("", &config_dir, 1);
+            println!("Done!");
+        }
 
         let path = path.map(|path| GamePath::from(&path));
 
-        if fresh_new {
-            println!("Installing steamcmd...");
-            run_steam_command("", &current_dir().unwrap().as_path().join(".rrm"), 1);
-            println!("Done!");
-
-            std::env::set_current_dir(home.as_path()).unwrap();
-        } else {
-            std::env::set_current_dir(home.join(".rrm").as_path()).unwrap();
-        }
+        std::env::set_current_dir(&config_dir).unwrap();
 
         Installer {
             with_paging: DEFAULT_PAGING_SOFTWARE.to_string(),
-            home,
             rim_install: path,
-            config,
             use_more: true,
         }
     }
@@ -242,9 +203,12 @@ impl Installer {
             .write(true)
             .truncate(true)
             .read(false)
-            .open(&self.config)
+            .open(get_or_create_config_dir().join("config"))
             .unwrap_or_else(|err| {
-                eprintln!("Failed to open config file at {}", &self.config.display());
+                eprintln!(
+                    "Failed to open config file at {}",
+                    &get_or_create_config_dir().join("config").display()
+                );
                 eprintln!("Error: {}", err);
                 exit(1);
             });
@@ -270,27 +234,19 @@ impl Installer {
             Installer::init_with_path(path)
         } else {
             let installer = Installer::init(None);
-            let old_config = Installer::load_config(&installer.config);
+            let mut installer = Installer::load_config(&get_or_create_config_dir().join("config"))
+                .unwrap_or(installer);
 
-            if let Ok(mut i) = old_config {
-                if i.rim_install.as_ref().is_some() {
-                    let rim = i.rim_install.as_ref().unwrap().path();
-                    if rim.exists() {
-                        i
-                    } else {
-                        eprintln!(
-                            "Warning: Previous saved game location \"{}\" no longer exists.",
-                            rim.display()
-                        );
-                        i.rim_install = None;
-                        i
-                    }
-                } else {
-                    i
+            if let Some(ref rim_path) = installer.rim_install {
+                if !rim_path.path().exists() {
+                    eprintln!(
+                        "Warning: Previous saved game location \"{}\" no longer exists.",
+                        rim_path.path().display()
+                    );
+                    installer.rim_install = None;
                 }
-            } else {
-                installer
             }
+            installer
         };
 
         installer.write_config();
@@ -348,21 +304,21 @@ impl Installer {
 
     pub fn install_sync(&self, c: &[&str]) -> (bool, String) {
         let to_install = Self::gen_install_string(&c);
-        let a: String = run_steam_command(&to_install, &current_dir().unwrap(), 1);
+        let a: String = run_steam_command(&to_install, &get_or_create_config_dir(), 1);
         (a.contains("Success. Downloaded item"), a)
     }
 
     pub fn gen_install_string(c: &&[&str]) -> String {
-        let to_install = " +workshop_download_item 294100 ".to_string()
-            + &c.join(" +workshop_download_item 294100 ");
-        to_install
+        
+        " +workshop_download_item 294100 ".to_string()
+            + &c.join(" +workshop_download_item 294100 ")
     }
 
     pub fn get_steamcmd_path(&self) -> PathBuf {
-        get_steamcmd_path(&self.config.parent().unwrap())
+        get_steamcmd_path(&get_or_create_config_dir())
     }
 
     pub fn run_steam_command(&self, c: &str, count: usize) -> String {
-        run_steam_command(c, &self.config, count)
+        run_steam_command(c, &get_or_create_config_dir(), count)
     }
 }

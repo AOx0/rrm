@@ -1,10 +1,10 @@
+pub use crate::log;
 use regex::Regex;
 pub use rrm_installer::Installer;
 pub use rrm_locals::{DisplayType, GameMods, GamePath, Mod, Mods};
 pub use rrm_scrap::SteamMods;
 pub use std::path::{Path, PathBuf};
 use std::process::exit;
-pub use crate::log;
 
 #[cfg(target_os = "macos")]
 pub const RW_DEFAULT_PATH: [&str; 2] = [
