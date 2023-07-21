@@ -149,7 +149,7 @@ impl Filtrable<FilterBy> for GameMods {
                     false
                 }) || (if filter.contains(Version) || filter.contains(All) {
                     matcher
-                        .fuzzy_match(&m.version.clone().unwrap_or_else(|| "".to_string()), value)
+                        .fuzzy_match(&m.version.clone().unwrap_or_default(), value)
                         .is_some()
                 } else {
                     false

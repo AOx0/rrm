@@ -1,7 +1,7 @@
 extern crate core;
 
+use crate::args::Options;
 use clap::CommandFactory;
-use crate::args::{Commands, Options};
 use std::collections::HashSet;
 
 mod args;
@@ -14,8 +14,19 @@ mod search;
 mod utils;
 use clap_complete::{generate, Shell};
 
+#[cfg(feature = "dhat")]
+#[global_allocator]
+static ALLOC: dhat::Alloc = dhat::Alloc;
+
+fn main() {
+    #[cfg(feature = "dhat")]
+    let _profiler = dhat::Profiler::new_heap();
+
+    app();
+}
+
 #[tokio::main]
-async fn main() {
+async fn app() {
     let args: args::App = args::App::load();
 
     let mut installer = utils::try_get_path(
@@ -32,17 +43,32 @@ async fn main() {
         args::Commands::GenerateCompletion { shell } => {
             let mut matches = args::App::command();
             match shell.as_str() {
-                "bash" => { generate(Shell::Bash, &mut matches, "rrm", &mut std::io::stdout()); }
-                "fish" => { generate(Shell::Fish, &mut matches, "rrm", &mut std::io::stdout()); }
-                "zsh" => { generate(Shell::Zsh, &mut matches, "rrm", &mut std::io::stdout()); }
-                "powershell" => { generate(Shell::PowerShell, &mut matches, "rrm", &mut std::io::stdout()); }
-                "elvish" => { generate(Shell::Elvish, &mut matches, "rrm", &mut std::io::stdout()); }
+                "bash" => {
+                    generate(Shell::Bash, &mut matches, "rrm", &mut std::io::stdout());
+                }
+                "fish" => {
+                    generate(Shell::Fish, &mut matches, "rrm", &mut std::io::stdout());
+                }
+                "zsh" => {
+                    generate(Shell::Zsh, &mut matches, "rrm", &mut std::io::stdout());
+                }
+                "powershell" => {
+                    generate(
+                        Shell::PowerShell,
+                        &mut matches,
+                        "rrm",
+                        &mut std::io::stdout(),
+                    );
+                }
+                "elvish" => {
+                    generate(Shell::Elvish, &mut matches, "rrm", &mut std::io::stdout());
+                }
                 _ => {
                     eprintln!("Invalid shell");
                     std::process::exit(1);
                 }
             }
-        },
+        }
 
         args::Commands::Set { command } => match command {
             Options::UsePager { value } => {

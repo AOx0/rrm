@@ -63,8 +63,7 @@ fn get_mods(about_dir: &Path) -> Vec<ModPaths> {
             path: PathBuf::from(parent),
             steam_id: String::from_utf8(steam_id)
                 .unwrap()
-                .replace("\n", "")
-                .replace(" ", ""),
+                .replace(['\n', ' '], ""),
         };
 
         if m.about.is_some() || m.manifest.is_some() {

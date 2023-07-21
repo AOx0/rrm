@@ -37,3 +37,11 @@ rrm_installer = { path="rrm_installer", version="0.0.1-alpha.8"}
 colored = "2.0.0"
 text_io = "0.1.10"
 notify = "5.0.0"
+dhat = { version = "0.3.2", optional = true }
+
+[profile.pf]
+inherits = "release"
+debug = 1
+
+[features]
+dhat = ["dep:dhat"]
