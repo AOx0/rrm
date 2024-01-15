@@ -11,16 +11,15 @@ use std::cell::RefCell;
 use std::collections::HashSet;
 use std::io;
 use std::io::prelude::*;
-use text_io::try_read;
-use std::sync::{Arc, Mutex};
 use std::sync::mpsc::channel;
-
+use std::sync::{Arc, Mutex};
+use text_io::try_read;
 
 #[cfg(target_os = "windows")]
-const PATH: &str = r"steamcmd\steamapps\workshop\content\294100\"; 
+const PATH: &str = r"steamcmd\steamapps\workshop\content\294100\";
 
 #[cfg(target_os = "linux")]
-const PATH: &str = r".steam/steamapps/workshop/content/294100/";
+const PATH: &str = r"Steam/steamapps/workshop/content/294100/";
 
 #[cfg(target_os = "macos")]
 const PATH: &str = r"Library/Application Support/Steam/steamapps/workshop/content/294100";
@@ -42,7 +41,7 @@ fn clear_leftlovers(at: &Path, args: &Install) {
             }
         }
     }
-} 
+}
 
 #[async_recursion(?Send)]
 pub async fn install(
@@ -213,7 +212,10 @@ pub async fn install(
     }
 
     let ids: Vec<&str> = to_install.iter().map(|e| e.id.as_str()).collect();
-    let ids: Vec<_> = ids.into_iter().filter(|&id| !already_installed.contains(&id.to_owned()) ).collect();
+    let ids: Vec<_> = ids
+        .into_iter()
+        .filter(|&id| !already_installed.contains(&id.to_owned()))
+        .collect();
 
     if d == 0 {
         log!( Status:
@@ -222,17 +224,16 @@ pub async fn install(
         )
     };
 
-    let downloads_dir = PATH.replace("content","downloads");
+    let downloads_dir = PATH.replace("content", "downloads");
     let path_downloads = PathBuf::from(&downloads_dir);
     // Remove any download leflovers
     clear_leftlovers(&path_downloads, &args);
-    clear_leftlovers(&PathBuf::from(PATH), &args); 
+    clear_leftlovers(&PathBuf::from(PATH), &args);
 
     let (ty, ry) = channel::<bool>();
     let should_start = Arc::new(ty);
     let should_end = Arc::new(Mutex::new(false));
 
-    
     let status_downloader = std::thread::spawn({
         let path_downloads = path_downloads.to_owned();
         let number_to_install = ids.len();
@@ -241,12 +242,12 @@ pub async fn install(
         move || {
             extern crate notify;
 
-            use notify::{Watcher, watcher, DebouncedEvent};
+            use notify::{watcher, DebouncedEvent, Watcher};
             use std::time::Duration;
 
             // Wait for start signal
             let _ = ry.recv().unwrap();
-            
+
             if verbose {
                 log!(Warning: "Starting file watcher");
             }
@@ -256,46 +257,50 @@ pub async fn install(
 
             let (tx, rx) = channel();
             let mut watcher = watcher(tx, Duration::from_secs(0)).unwrap();
-            watcher.watch(path_downloads.parent().unwrap().to_str().unwrap(), notify::RecursiveMode::Recursive).unwrap();
+            log!(Status: "Path: {}", path_downloads.display());
+            watcher
+                .watch(
+                    path_downloads.parent().unwrap().to_str().unwrap(),
+                    notify::RecursiveMode::Recursive,
+                )
+                .unwrap();
 
             let timeout = Duration::from_secs_f32(1.0);
 
             loop {
                 match rx.recv_timeout(timeout) {
-                    Ok(event) => {
-                        match event {
-                            DebouncedEvent::Create(path) => {
-                                let current = path.file_name().unwrap().to_str().unwrap();  
-                                if let Some(n) = path.parent() {
-                                    if let Some(name) = n.file_name() {
-                                        let name = name.to_str().unwrap();
-                                        if name == "294100" {
-                                            if current != last_printed {
-                                                d += 1;
-                                                log!(Status: "[{1:0>3}/{2:0>3}] Dowloading {0}", current, d, number_to_install);
-                                                last_printed = current.to_owned();
-                                            }
+                    Ok(event) => match event {
+                        DebouncedEvent::Create(path) => {
+                            let current = path.file_name().unwrap().to_str().unwrap();
+                            if let Some(n) = path.parent() {
+                                if let Some(name) = n.file_name() {
+                                    let name = name.to_str().unwrap();
+                                    if name == "294100" {
+                                        if current != last_printed {
+                                            d += 1;
+                                            log!(Status: "[{1:0>3}/{2:0>3}] Dowloading {0}", current, d, number_to_install);
+                                            last_printed = current.to_owned();
                                         }
-                                    } 
+                                    }
                                 }
-                            },
-                            _ => {}
+                            }
                         }
-                    }
+                        _ => {}
+                    },
                     Err(_) => {
                         let end = *should_end.lock().unwrap();
                         if end == true {
                             if verbose {
                                 log!(Warning: "Ending file watcher.");
                             }
-                            break; 
-                        }           
-                    } 
+                            break;
+                        }
+                    }
                 }
             }
         }
     });
- 
+
     let result = {
         let mut result = String::new();
         let mut num = ids.len();
@@ -308,16 +313,28 @@ pub async fn install(
 
         while num >= 200 {
             log!(Warning: "Spawning SteamCMD with mods {}..{}", n, n+200);
-            let r = crate::async_installer::install(args.clone(), &ids[n..n+200], i.clone(), Arc::clone(&should_start)).await;
+            let r = crate::async_installer::install(
+                args.clone(),
+                &ids[n..n + 200],
+                i.clone(),
+                Arc::clone(&should_start),
+            )
+            .await;
             result.push_str(&r);
             num -= 200;
             n += 200;
         }
 
         if large_list {
-            log!(Warning: "Spawning last SteamCMD with mods {}..{}", n, n+num); 
+            log!(Warning: "Spawning last SteamCMD with mods {}..{}", n, n+num);
         }
-        let r = crate::async_installer::install(args.clone(), &ids[n..n+num], i.clone(), Arc::clone(&should_start)).await;
+        let r = crate::async_installer::install(
+            args.clone(),
+            &ids[n..n + num],
+            i.clone(),
+            Arc::clone(&should_start),
+        )
+        .await;
         result.push_str(&r);
         result
     };
@@ -356,22 +373,16 @@ pub async fn install(
         );
     }
 
-    let mut ids: HashSet<String>  = ids.iter().map(|s| s.to_string()).collect();
+    let mut ids: HashSet<String> = ids.iter().map(|s| s.to_string()).collect();
 
     for id in successful_ids.clone() {
         ids.remove(&id);
 
         let source = format!(
             "{}",
-            i.config
-                .parent()
-                .unwrap()
-                .join(PATH)
-                .join(&id)
-                .display()
+            i.config.parent().unwrap().join(PATH).join(&id).display()
         );
 
-        
         let options = CopyOptions {
             overwrite: true,
             ..Default::default()
@@ -381,7 +392,7 @@ pub async fn install(
             GameMods::from(rim_install.path().to_str().unwrap()).with_display(DisplayType::Short);
         let filtered = installed_mods.filter_by(FlagSet::from(FilterBy::SteamID), &id);
 
-        let mut ignored = false; 
+        let mut ignored = false;
 
         for old_mod in filtered.mods {
             //dbg!(&old_mod.path);
@@ -425,7 +436,9 @@ pub async fn install(
                 if let Some(dependencies) = m.dependencies {
                     // Then add the ids to the queue
                     for id in dependencies {
-                        if id == "294100" { continue; }
+                        if id == "294100" {
+                            continue;
+                        }
                         if !already_installed.contains(&id) {
                             dependencies_ids.get_mut().insert(id);
                         }
@@ -452,7 +465,7 @@ pub async fn install(
     if !ids.is_empty() {
         log!(Warning: "Did not install {:?}", ids);
     }
-    
+
     if d == 0 && args.is_verbose() {
         log!(Status: "Done!");
     };
@@ -469,8 +482,8 @@ pub async fn install(
         install(args.clone(), i.clone(), d + 1, already_installed.clone()).await;
         if d == 0 {
             clear_leftlovers(&path_downloads, &args);
-            clear_leftlovers(&PathBuf::from(PATH), &args); 
-            log!(Status: "Done!"); 
+            clear_leftlovers(&PathBuf::from(PATH), &args);
+            log!(Status: "Done!");
         };
     }
 }

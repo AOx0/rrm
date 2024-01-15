@@ -1409,7 +1409,7 @@ dependencies = [
 
 [[package]]
 name = "rrm"
-version = "0.0.1-alpha.8"
+version = "0.0.1-alpha.9"
 dependencies = [
  "async-recursion",
  "clap",
@@ -1439,7 +1439,7 @@ dependencies = [
 
 [[package]]
 name = "rrm_locals"
-version = "0.0.1-alpha.7"
+version = "0.0.1-alpha.8"
 dependencies = [
  "flagset",
  "fuzzy-matcher",
