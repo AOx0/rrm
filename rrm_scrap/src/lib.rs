@@ -74,9 +74,9 @@ pub async fn look_for_mod(mod_name: &str) -> (Vec<ModSteamInfo>, usize) {
 
         let mut msf = vec![];
 
-        m.split(',').into_iter().for_each(|m| {
+        m.split(',').for_each(|m| {
             if m.contains("\"id") || m.contains("\"title") || m.contains("\"description") {
-                msf.push(m.trim().replace("\"", ""));
+                msf.push(m.trim().replace('\"', ""));
             }
         });
 
@@ -154,7 +154,7 @@ impl ModSteamInfo {
             result.push_str(&self.gen_short(biggest_name));
         }
 
-        result.push_str("\n");
+        result.push('\n');
 
         result
     }
@@ -202,7 +202,7 @@ impl SteamMods {
         if let Some(typ) = self.display_type {
             if let DisplayType::Short = typ {
                 result.push_str(&ModSteamInfo::gen_headers(self.biggest_name_size));
-                result.push_str("\n")
+                result.push('\n')
             }
 
             self.mods.iter().for_each(|m| {
@@ -211,8 +211,8 @@ impl SteamMods {
         } else {
             result.push_str(&ModSteamInfo::gen_headers(self.biggest_name_size));
             result = result.replace("       Steam ID", "             Steam ID");
-            result = result.replace("\n", "\n      ");
-            result.push_str("\n");
+            result = result.replace('\n', "\n      ");
+            result.push('\n');
 
             self.mods.iter().enumerate().for_each(|(i, m)| {
                 result.push_str(&format!(
@@ -293,19 +293,19 @@ impl Filtrable<FilterBy> for SteamMods {
         mods.into_iter().for_each(|m| {
             let result = {
                 (if filter.contains(All) || filter.contains(Title) {
-                    matcher.fuzzy_match(&m.title, &value).is_some()
+                    matcher.fuzzy_match(&m.title, value).is_some()
                 } else {
                     false
                 }) || (if filter.contains(Author) || filter.contains(All) {
-                    matcher.fuzzy_match(&m.author, &value).is_some()
+                    matcher.fuzzy_match(&m.author, value).is_some()
                 } else {
                     false
                 }) || (if filter.contains(Description) || filter.contains(All) {
-                    matcher.fuzzy_match(&m.author, &value).is_some()
+                    matcher.fuzzy_match(&m.author, value).is_some()
                 } else {
                     false
                 }) || (if filter.contains(SteamID) || filter.contains(All) {
-                    matcher.fuzzy_match(&m.id, &value).is_some()
+                    matcher.fuzzy_match(&m.id, value).is_some()
                 } else {
                     false
                 })

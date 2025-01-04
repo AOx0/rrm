@@ -1,6 +1,6 @@
 [package]
 name = "rrm_installer"
-version = "0.0.1-alpha.7"
+version = "0.0.1-alpha.8"
 edition = "2021"
 authors = ["AOx0 <aoxo.contact@gmail.com>"]
 description = "Part of rrm."
@@ -11,14 +11,10 @@ license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[features]
-dev = []
-
-
 [dependencies]
-serde = {version = "1.0.137", features = ["derive"]}
-serde_json = "1.0.81"
-include_dir = "0.7.2"
-directories = "4.0.1"
+serde = {version = "1.0.217", features = ["derive"]}
+serde_json = "1.0.134"
+include_dir = "0.7.4"
+directories = "5.0.1"
 dotenv = "0.15.0"
-rrm_locals = {path="../rrm_locals", version="0.0.1-alpha.7"}
+rrm_locals = {path="../rrm_locals", version="0.0.1-alpha.9"}

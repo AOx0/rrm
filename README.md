@@ -1,10 +1,6 @@
 <div>
-	<img src="https://img.shields.io/badge/GitHub   Version-0.0.1--alpha.9-green">
-	</img><img src="https://img.shields.io/badge/Status-Almost Done-yellow">
-</div>
-<div>
 	<a href="https://crates.io/crates/rrm">
-		<img src="https://img.shields.io/badge/crates.io%20Version-0.0.1--alpha.9-green"></img>
+		<img src="https://img.shields.io/badge/Version-0.0.1--alpha.10-green"></img>
 	</a>
 	<img src="https://img.shields.io/badge/Status-Almost Done-yellow">
 </div>
@@ -33,11 +29,7 @@ This program is installable with `cargo`. Install `rust` along with `cargo` [her
 ### Install
 To install the `crates.io` pre-release version run:
 
-	cargo install rrm --version 0.0.1-alpha.9
-
-Or install the GitHub version. Although it's not recommended since it has a 'dev' flag which changes the installer behaviour:
-
-	cargo install --git https://github.com/AOx0/rrm
+	cargo install rrm --version 0.0.1-alpha.10
 
 ### Linux additional steps
 Additionally, if you are using **_linux_** on a 64 bit machine, you will need to add multiverse with:
@@ -51,7 +43,15 @@ Additionally, if you are using **_linux_** on a 64 bit machine, you will need to
 
 <br/> <br/>
 ## Configuration
-To set configuration values like game installation path and whether `rrm` should use `more` to display its output or not, you can use the `set` subcommand. The configuration file is available in `$USER_HOME/.rrm/config` on macOS, Linux, and Windows with a JSON format. 
+To set configuration values like game installation path and whether `rrm` should use `more` to display its output or not, you can use the `set` subcommand. 
+
+The configuration file is available in, by order:
+
+1. `$XDG_CONFIG_HOME/rrm/config`
+2. `$RRM_CONFIG_HOME/rrm/config`
+3. `$CONFIG_HOME/rrm/config`
+4. `$USER_HOME/.config/rrm/config`
+5. `$USER_HOME/.rrm/config`
 
 For example, to set the path were RimWorld is installed, you can use:
 
