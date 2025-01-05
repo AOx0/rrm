@@ -10,13 +10,16 @@ use tokio::{
 };
 
 #[async_recursion(?Send)]
-pub async fn install<T: InstallingOptions>(
+pub async fn install<T>(
     args: T,
     mods: &[&str],
     installer: Installer,
     start_file_watcher: &mut RecommendedWatcher,
     path_downloads: &Path,
-) -> String {
+) -> String
+where
+    T: InstallingOptions,
+{
     let install_message = Installer::gen_install_string(&mods);
     let steamcmd = installer.get_steamcmd_path();
 
@@ -96,7 +99,7 @@ pub async fn install<T: InstallingOptions>(
                 .exists()
             {
                 std::fs::create_dir_all(
-                    &get_or_create_config_dir().join(path_downloads.parent().unwrap()),
+                    get_or_create_config_dir().join(path_downloads.parent().unwrap()),
                 )
                 .unwrap();
             }

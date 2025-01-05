@@ -14,7 +14,7 @@ use std::process::{exit, Stdio};
 
 pub type Mods = Vec<Mod>;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct GameMods {
     pub mods: Mods,
     pub biggest_name_size: usize,
@@ -23,11 +23,7 @@ pub struct GameMods {
 
 impl GameMods {
     pub fn new() -> Self {
-        GameMods {
-            mods: Vec::new(),
-            biggest_name_size: 0,
-            display_type: None,
-        }
+        GameMods::default()
     }
 
     pub fn with_display(self, t: DisplayType) -> Self {

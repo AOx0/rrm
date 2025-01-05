@@ -70,7 +70,6 @@ pub enum Commands {
     Pull {
         #[clap(flatten)]
         args: Pull,
-        ///
         #[clap(short, long, visible_alias = "also-ignored")]
         ignored: bool,
     },

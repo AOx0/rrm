@@ -160,6 +160,7 @@ impl ModSteamInfo {
     }
 }
 
+#[derive(Default)]
 pub struct SteamMods {
     pub mods: Vec<ModSteamInfo>,
     pub biggest_name_size: usize,
@@ -168,12 +169,9 @@ pub struct SteamMods {
 
 impl SteamMods {
     pub fn new() -> Self {
-        SteamMods {
-            mods: Vec::new(),
-            biggest_name_size: 0,
-            display_type: None,
-        }
+        SteamMods::default()
     }
+
     pub async fn search(m: &str) -> Self {
         let (mods, biggest_name_size) = look_for_mod(m).await;
 

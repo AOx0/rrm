@@ -37,14 +37,14 @@ fn get_mods(about_dir: &Path) -> Vec<ModPaths> {
         let file: std::io::Result<File> = File::open(steam_id);
         let mut steam_id: Vec<u8> = Vec::new();
 
-        if file.is_err() {
+        if let Ok(mut file) = file {
+            file.read_to_end(&mut steam_id).unwrap();
+        } else {
             steam_id = Vec::from("NOT FOUND".as_bytes());
             eprintln!(
                 "Warning: Could not find PublishedFileId.txt in path {}",
                 parent.display()
             );
-        } else {
-            file.unwrap().read_to_end(&mut steam_id).unwrap();
         }
 
         let m = ModPaths {
@@ -122,7 +122,7 @@ impl ModVec for Vec<Vec<ModPaths>> {
             }
 
             let values = EVector::build_from(m, &L_FIELDS);
-            let m = values.clone().to_mod(m.get(0).unwrap_or_else(|| {
+            let m = values.clone().to_mod(m.first().unwrap_or_else(|| {
                 println!("Error while getting index 0 of {:?}", m);
                 println!("E_vec: {:?}", values);
                 println!("Self: {:?}", self);

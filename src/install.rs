@@ -54,7 +54,7 @@ pub async fn install(
     if args.is_debug() {
         log!(Warning: "Already installed {:?}", already_installed);
     }
-    let inline: bool = !(args.r#mod.len() == 1 && args.r#mod.get(0).unwrap() == "None");
+    let inline: bool = !(args.r#mod.len() == 1 && args.r#mod.first().unwrap() == "None");
     if !inline {
         args.r#mod = Vec::new();
         let stdin = io::stdin();
@@ -215,7 +215,7 @@ pub async fn install(
     let ids: Vec<&str> = to_install.iter().map(|e| e.id.as_str()).collect();
     let ids: Vec<_> = ids
         .into_iter()
-        .filter(|&id| !already_installed.contains(&id.to_owned()))
+        .filter(|&id| !already_installed.contains(id))
         .collect();
 
     if d == 0 {
