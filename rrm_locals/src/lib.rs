@@ -119,12 +119,13 @@ flags! {
 }
 
 pub trait Filtrable<T: flagset::Flags>: Sized {
-    fn filter_by(&self, filter: FlagSet<T>, value: &str) -> Self;
+    fn filter_by<B: ToString>(&self, filter: FlagSet<T>, value: B) -> Self;
 }
 
 impl Filtrable<FilterBy> for GameMods {
-    fn filter_by(&self, filter: FlagSet<FilterBy>, value: &str) -> Self {
+    fn filter_by<B: ToString>(&self, filter: FlagSet<FilterBy>, value: B) -> Self {
         use FilterBy::*;
+        let value = &value.to_string();
 
         let mut filtered = GameMods::new();
         let mods: Vec<Mod> = self.mods.clone();

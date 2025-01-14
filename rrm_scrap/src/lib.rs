@@ -69,11 +69,20 @@ fn single_decode_element(element_contents: String) -> ModSteamInfo {
     let re = regex::Regex::new(r"\{.{1,}\}").unwrap();
     let mm = re.find(element_contents.trim()).unwrap().as_str();
 
-    serde_json::from_str::<ModSteamInfo>(mm).unwrap()
+    serde_json::from_str::<ModSteamInfoRaw>(mm).unwrap().into()
 }
 
-#[derive(Default, Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Clone, Debug, PartialEq)]
 pub struct ModSteamInfo {
+    pub id: usize,
+    pub title: String,
+    pub description: String,
+    pub author: String,
+}
+
+/// Raw struct from the script string
+#[derive(serde::Serialize, serde::Deserialize)]
+struct ModSteamInfoRaw {
     pub id: String,
     pub title: String,
     pub description: String,
@@ -83,6 +92,17 @@ pub struct ModSteamInfo {
 
 fn default_author() -> String {
     "".to_string()
+}
+
+impl From<ModSteamInfoRaw> for ModSteamInfo {
+    fn from(value: ModSteamInfoRaw) -> Self {
+        ModSteamInfo {
+            id: value.id.parse().unwrap(),
+            title: value.title,
+            description: value.description,
+            author: value.author,
+        }
+    }
 }
 
 impl ModSteamInfo {
@@ -280,7 +300,7 @@ impl Filtrable<FilterBy> for SteamMods {
                 } else {
                     false
                 }) || (if filter.contains(SteamID) || filter.contains(All) {
-                    matcher.fuzzy_match(&m.id, value).is_some()
+                    matcher.fuzzy_match(&m.id.to_string(), value).is_some()
                 } else {
                     false
                 })
