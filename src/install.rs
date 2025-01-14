@@ -45,7 +45,7 @@ pub async fn install(
         log!(Warning: "Already installed {:?}", already_installed);
     }
 
-    if args.r#mod.is_empty() {
+    if args.rimmod.is_empty() {
         std::process::exit(0);
     }
 
@@ -55,7 +55,7 @@ pub async fn install(
     let filter_obj = args.to_filter_obj();
     let re = Regex::new(r"[a-zA-Z/:.]+[?0-9a-zA-Z0-9/=&]+[\?\&]{1}id=(?P<id>\d+).*").unwrap();
 
-    for mod_identifier in &args.r#mod {
+    for mod_identifier in &args.rimmod {
         if mod_identifier.chars().all(char::is_numeric) {
             if mod_identifier.trim().is_empty() {
                 continue;
@@ -183,7 +183,7 @@ pub async fn install(
     if d == 0 {
         log!( Status:
             "Installing mod{}",
-            if args.r#mod.len() > 1 { "s" } else { "" },
+            if args.rimmod.len() > 1 { "s" } else { "" },
         )
     };
 
@@ -391,7 +391,7 @@ pub async fn install(
                 "Installing dependencies",
             );
         };
-        args.r#mod = Vec::from_iter(
+        args.rimmod = Vec::from_iter(
             dependencies_ids
                 .get_mut()
                 .iter()

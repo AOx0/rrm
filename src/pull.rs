@@ -45,7 +45,7 @@ pub async fn pull(args: Pull, i: Installer, ignored: bool) {
     let ids: Vec<String> = to_install.iter().cloned().collect();
 
     let to_install = InstallCommandGroup {
-        r#mod: ids,
+        rimmod: ids,
         filter: None,
         author: false,
         version: false,

@@ -246,8 +246,8 @@ pub struct Pull {
 #[clap(arg_required_else_help = false)]
 pub struct InstallCommandGroup {
     /// The name of the RimWorld mod(s)
-    #[clap(required = false, default_value = "None")]
-    pub(crate) r#mod: Vec<String>,
+    #[clap(required = true)]
+    pub(crate) rimmod: Vec<String>,
 
     /// The name of the RimWorld mod
     #[clap(short, long, required = false)]
