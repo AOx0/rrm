@@ -12,8 +12,6 @@ use rrm_locals::{FilterBy, Filtrable};
 use rrm_scrap::{FlagSet, ModSteamInfo};
 use std::cell::RefCell;
 use std::collections::HashSet;
-use std::io;
-use std::io::prelude::*;
 use text_io::try_read;
 
 #[cfg(target_os = "windows")]
@@ -45,22 +43,6 @@ pub async fn install(
 ) {
     if args.is_debug() {
         log!(Warning: "Already installed {:?}", already_installed);
-    }
-    let inline: bool = !(args.r#mod.len() == 1 && args.r#mod.first().unwrap() == "None");
-    if !inline {
-        args.r#mod = Vec::new();
-        let stdin = io::stdin();
-        for line in stdin.lock().lines() {
-            if let Ok(line) = line {
-                if line == "END" {
-                    break;
-                } else {
-                    args.r#mod.push(line);
-                }
-            } else {
-                log!(Error: "Could not read line {:?}", line);
-            }
-        }
     }
 
     if args.r#mod.is_empty() {
@@ -129,13 +111,6 @@ pub async fn install(
         } else {
             mods
         };
-
-        if mods.is_empty() {
-            if !inline || args.is_verbose() {
-                log!( Error: "No results found for {}", mod_identifier);
-            }
-            continue;
-        }
 
         if args.yes {
             to_install.push(mods[0].clone());
