@@ -63,7 +63,7 @@ pub enum Commands {
     #[clap(visible_alias = "i", about = "Install a RimWorld Mod by name or ID")]
     Install {
         #[clap(flatten)]
-        args: Install,
+        args: InstallCommandGroup,
     },
 
     #[clap(about = "Install everything again (except ignored by default)")]
@@ -244,10 +244,10 @@ pub struct Pull {
 
 #[derive(Args, Debug, Clone)]
 #[clap(arg_required_else_help = false)]
-pub struct Install {
+pub struct InstallCommandGroup {
     /// The name of the RimWorld mod(s)
-    #[clap(required = false, default_value = "None")]
-    pub(crate) r#mod: Vec<String>,
+    #[clap(required = true)]
+    pub(crate) rimmod: Vec<String>,
 
     /// The name of the RimWorld mod
     #[clap(short, long, required = false)]
@@ -270,7 +270,7 @@ pub struct Install {
     pub(crate) name: bool,
 
     /// Search by all fields
-    #[clap(long, conflicts_with_all = &["authors", "version", "steam-id", "name"], requires="filter")]
+    #[clap(long, conflicts_with_all = &["author", "version", "steam_id", "name"], requires="filter")]
     pub(crate) all: bool,
 
     /// Yes to all questions
@@ -364,7 +364,7 @@ impl Steam {
     }
 }
 
-impl Install {
+impl InstallCommandGroup {
     pub fn to_filter_obj(&self) -> rrm_scrap::FlagSet<rrm_scrap::FilterBy> {
         filter!(self)
     }
@@ -396,4 +396,4 @@ macro_rules! impl_io {
 }
 
 impl_io!(Pull);
-impl_io!(Install);
+impl_io!(InstallCommandGroup);

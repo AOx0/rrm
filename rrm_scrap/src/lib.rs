@@ -8,15 +8,16 @@ use std::io::Write;
 use std::ops::Deref;
 use std::process::{exit, Stdio};
 
+#[cfg(test)]
+mod test;
+
+/// Capitalizes the first character of a string
 fn capitalize(s: &str) -> String {
-    let mut c = s.chars();
-    match c.next() {
-        None => String::new(),
-        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
-    }
+    let (ccc, bbb) = s.split_at(1);
+    ccc.to_uppercase() + bbb
 }
 
-async fn get_contents(url: &str) -> String {
+async fn get_contents(url: String) -> String {
     let resp: Response = reqwest::get(url).await.unwrap_or_else(|err| {
         eprintln!("{}", capitalize(&err.to_string()));
         exit(1);
@@ -34,65 +35,27 @@ pub async fn look_for_mod(mod_name: &str) -> (Vec<ModSteamInfo>, usize) {
     use scraper::{Html, Selector};
 
     let contents: String = get_contents(
-        &r#"https://steamcommunity.com/workshop/browse/?appid=294100&searchtext="URL""#
+        r#"https://steamcommunity.com/workshop/browse/?appid=294100&searchtext="URL""#
             .replace("URL", mod_name),
     )
     .await;
-
-    let mut mods_steam_info: Vec<ModSteamInfo> = vec![];
 
     let contents: Html = Html::parse_document(&contents);
     let script: Selector =
         Selector::parse("#profileBlock > div > div.workshopBrowseItems > script").unwrap();
 
-    for element in contents.select(&script) {
-        let m = html_escape::decode_html_entities(element.inner_html().as_str()).to_string();
-
-        //Get rid of unused characters in description.
-        let m: String = m
-            .replace("\\/", "/")
-            .replace(r"<br />", " ")
-            .replace("SharedFileBindMouseHover( ", "");
-
-        //Replace \uXXXX to its actual character
-        let s = regex_replace_all!(r#"\\u(.{4})"#, &m, |_, num: &str| {
-            let num: u32 = u32::from_str_radix(num, 16).unwrap();
-            let c: char = std::char::from_u32(num).unwrap();
-            c.to_string()
-        })
-        .to_string();
-
-        //Get rid of \\n \\t \\r, etc.
-        let s = regex_replace_all!(r#"(\\.)"#, &s, |_, _| { "".to_string() });
-
-        //Get rid of multiple contiguous spaces
-        let mut m = regex_replace_all!(r#"( +)"#, &s, |_, _| { " ".to_string() }).to_string();
-
-        //Remove ); from the end
-        m.remove(m.len() - 1);
-        m.remove(m.len() - 1);
-
-        let mut msf = vec![];
-
-        m.split(',').for_each(|m| {
-            if m.contains("\"id") || m.contains("\"title") || m.contains("\"description") {
-                msf.push(m.trim().replace('\"', ""));
-            }
-        });
-
-        mods_steam_info.push(ModSteamInfo {
-            id: msf[0].replace("{id:", ""),
-            title: msf[1].replace("title:", ""),
-            description: msf[2].replace("description:", ""),
-            author: "".to_string(),
-        });
-    }
+    let mut mods_steam_info: Vec<ModSteamInfo> = contents
+        .select(&script)
+        .map(|elem| single_decode_element(elem.inner_html()))
+        .collect();
 
     let author: Selector = Selector::parse("#profileBlock > div > div.workshopBrowseItems > div > div.workshopItemAuthorName.ellipsis > a").unwrap();
+
+    // What this size for?
     let mut size: usize = 0;
 
     for (i, element) in contents.select(&author).enumerate() {
-        mods_steam_info[i].author = element.inner_html().to_string();
+        mods_steam_info[i].author = element.inner_html();
         if mods_steam_info[i].title.len() > size {
             size = mods_steam_info[i].title.len();
         }
@@ -101,15 +64,49 @@ pub async fn look_for_mod(mod_name: &str) -> (Vec<ModSteamInfo>, usize) {
     (mods_steam_info, size)
 }
 
-#[derive(Default, Clone)]
+/// From a <script> tag from steam's workshop page, gets the relevant info about said mod
+fn single_decode_element(element_contents: String) -> ModSteamInfo {
+    let re = regex::Regex::new(r"\{.{1,}\}").unwrap();
+    let mm = re.find(element_contents.trim()).unwrap().as_str();
+
+    serde_json::from_str::<ModSteamInfoRaw>(mm).unwrap().into()
+}
+
+#[derive(Default, Clone, Debug, PartialEq)]
 pub struct ModSteamInfo {
-    pub id: String,
+    pub id: usize,
     pub title: String,
     pub description: String,
     pub author: String,
 }
 
+/// Raw struct from the script string
+#[derive(serde::Serialize, serde::Deserialize)]
+struct ModSteamInfoRaw {
+    pub id: String,
+    pub title: String,
+    pub description: String,
+    #[serde(default = "default_author")]
+    pub author: String,
+}
+
+fn default_author() -> String {
+    "".to_string()
+}
+
+impl From<ModSteamInfoRaw> for ModSteamInfo {
+    fn from(value: ModSteamInfoRaw) -> Self {
+        ModSteamInfo {
+            id: value.id.parse().unwrap(),
+            title: value.title,
+            description: value.description,
+            author: value.author,
+        }
+    }
+}
+
 impl ModSteamInfo {
+    /// Generates the headers of the table with the {size} spacing
     fn gen_headers(size: usize) -> String {
         "".to_string()
             .add_s(format!("{:>15}", "Steam ID"))
@@ -303,7 +300,7 @@ impl Filtrable<FilterBy> for SteamMods {
                 } else {
                     false
                 }) || (if filter.contains(SteamID) || filter.contains(All) {
-                    matcher.fuzzy_match(&m.id, value).is_some()
+                    matcher.fuzzy_match(&m.id.to_string(), value).is_some()
                 } else {
                     false
                 })

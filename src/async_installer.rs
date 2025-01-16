@@ -2,7 +2,7 @@ use crate::args::InstallingOptions;
 use crate::utils::*;
 use async_recursion::async_recursion;
 use notify::{RecommendedWatcher, Watcher};
-use rrm_installer::{get_or_create_config_dir, Installer};
+use rrm_installer::{Installer, get_or_create_config_dir};
 use std::process::Stdio;
 use tokio::{
     io::{AsyncBufReadExt, BufReader},
@@ -12,10 +12,10 @@ use tokio::{
 #[async_recursion(?Send)]
 pub async fn install<T>(
     args: T,
-    mods: &[&str],
+    mods: Vec<rrm_scrap::ModSteamInfo>,
     installer: Installer,
     start_file_watcher: &mut RecommendedWatcher,
-    path_downloads: &Path,
+    path_downloads: &PathBuf,
 ) -> String
 where
     T: InstallingOptions,
@@ -47,34 +47,13 @@ where
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     let mut cmd = {
+        let dwl_path = PathBuf::from(crate::install::TMP_PATH);
+        let mut cmd = Command::new(steamcmd.display().to_string());
+        cmd.args(["+login anonymous", &install_message, "+quit"]);
+        cmd.env("HOME", dwl_path.display().to_string());
         if args.is_debug() {
-            log!(Status: "Spawning with command \"{} {}\"", "env",
-                    r#"HOME=PATH [] +login anonymous {} +quit"#
-                    .replace(
-                        "PATH",
-                        rrm_installer::get_or_create_config_dir()
-                            .as_os_str()
-                            .to_str()
-                            .unwrap(),
-                    )
-                    .replace("[]", steamcmd.as_path().to_str().unwrap())
-                    .replace("{}", &install_message)
-            );
+            log!(Status: "Spawning with command \"{:?}\"", cmd);
         }
-        let mut cmd = Command::new("env");
-        cmd.args(
-            r#"HOME=PATH [] +login anonymous {} +quit"#
-                .replace(
-                    "PATH",
-                    rrm_installer::get_or_create_config_dir()
-                        .as_os_str()
-                        .to_str()
-                        .unwrap(),
-                )
-                .replace("[]", steamcmd.as_path().to_str().unwrap())
-                .replace("{}", &install_message)
-                .split(' '),
-        );
         cmd.stdout(Stdio::piped());
         cmd
     };

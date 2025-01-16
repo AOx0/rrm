@@ -6,7 +6,6 @@ use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, Read, Write};
 
-
 use include_dir::{include_dir, Dir};
 use std::path::{Path, PathBuf};
 use std::process::exit;
@@ -52,6 +51,7 @@ pub fn get_or_create_config_dir() -> PathBuf {
         fs::create_dir_all(&config_dir).unwrap();
     }
 
+    println!("{:?}", &config_dir);
     config_dir.to_path_buf()
 }
 
@@ -302,16 +302,18 @@ impl Installer {
         }
     }
 
-    pub fn install_sync(&self, c: &[&str]) -> (bool, String) {
+    pub fn install_sync(&self, c: Vec<rrm_scrap::ModSteamInfo>) -> (bool, String) {
         let to_install = Self::gen_install_string(&c);
         let a: String = run_steam_command(&to_install, &get_or_create_config_dir(), 1);
         (a.contains("Success. Downloaded item"), a)
     }
 
-    pub fn gen_install_string(c: &&[&str]) -> String {
-        
-        " +workshop_download_item 294100 ".to_string()
-            + &c.join(" +workshop_download_item 294100 ")
+    pub fn gen_install_string(c: &[rrm_scrap::ModSteamInfo]) -> String {
+        "+workshop_download_item 294100 ".to_string()
+            + &c.iter()
+                .map(|rimmod| rimmod.id.to_string())
+                .collect::<Vec<String>>()
+                .join(" +workshop_download_item 294100 ")
     }
 
     pub fn get_steamcmd_path(&self) -> PathBuf {

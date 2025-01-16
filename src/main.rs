@@ -12,7 +12,7 @@ mod logger;
 mod pull;
 mod search;
 mod utils;
-use clap_complete::{generate, Shell};
+use clap_complete::{Shell, generate};
 
 #[cfg(feature = "dhat")]
 #[global_allocator]
@@ -35,12 +35,9 @@ async fn app() -> Result<(), ExitCode> {
 
     let mut installer = utils::try_get_path(
         None,
-        matches!(
-            &args.command,
-            args::Commands::Set {
-                command: Options::GamePath { .. }
-            }
-        ),
+        matches!(&args.command, args::Commands::Set {
+            command: Options::GamePath { .. }
+        }),
     );
 
     match args.command {
